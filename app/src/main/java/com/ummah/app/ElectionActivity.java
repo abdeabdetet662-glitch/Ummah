@@ -83,6 +83,18 @@ public class ElectionActivity extends Activity {
         candBtn.setOnClickListener(v -> showCandidateDialog());
         root.addView(candBtn);
 
+        Button celebrateBtn = new Button(this);
+        celebrateBtn.setText("🎉  احتفال تنصيب الرئيس");
+        celebrateBtn.setTextSize(15);
+        celebrateBtn.setTextColor(Color.WHITE);
+        celebrateBtn.setBackgroundColor(Color.parseColor("#B8860B"));
+        LinearLayout.LayoutParams clp = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        clp.setMargins(0, 10, 0, 0);
+        celebrateBtn.setLayoutParams(clp);
+        celebrateBtn.setOnClickListener(v -> celebrateWinner());
+        root.addView(celebrateBtn);
+
         listContainer = new LinearLayout(this);
         listContainer.setOrientation(LinearLayout.VERTICAL);
         listContainer.setPadding(0, 24, 0, 0);
@@ -254,6 +266,36 @@ public class ElectionActivity extends Activity {
                             });
                     });
             });
+    }
+
+    private void celebrateWinner() {
+        db.collection("candidates")
+            .orderBy("votes", com.google.firebase.firestore.Query.Direction.DESCENDING)
+            .limit(1)
+            .get()
+            .addOnSuccessListener(q -> {
+                if (q.isEmpty()) {
+                    Toast.makeText(this, "لا يوجد مرشحون", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                com.google.firebase.firestore.QueryDocumentSnapshot d = q.getDocuments().get(0);
+                String name = d.getString("name");
+                String slogan = d.getString("slogan");
+                Long v = d.getLong("votes");
+                int votes = v != null ? v.intValue() : 0;
+                if (votes == 0) {
+                    Toast.makeText(this, "لا توجد أصوات بعد", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                android.content.Intent i = new android.content.Intent(
+                    ElectionActivity.this, ElectionCelebrationActivity.class);
+                i.putExtra("president_name", name);
+                i.putExtra("president_slogan", slogan);
+                i.putExtra("votes", votes);
+                startActivity(i);
+            })
+            .addOnFailureListener(e ->
+                Toast.makeText(this, "خطأ: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
     private void showCandidateDialog() {

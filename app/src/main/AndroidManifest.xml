@@ -21,6 +21,7 @@
         <activity android:name=".ParliamentActivity" android:exported="false" />
         <activity android:name=".TransferActivity" android:exported="false" />
         <activity android:name=".ElectionActivity" android:exported="false" />
+        <activity android:name=".ElectionCelebrationActivity" android:exported="false" />
         <activity android:name=".NewsActivity" android:exported="false" />
         <activity android:name=".CitizensActivity" android:exported="false" />
         <activity android:name=".TreasuryActivity" android:exported="false" />
