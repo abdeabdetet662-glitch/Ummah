@@ -14,3 +14,4 @@ local.properties
 *.log
 ummah-release.keystore
 keystore-base64.txt
+app-release.apk
