@@ -103,21 +103,6 @@ public class WalletActivity extends Activity {
         });
         root.addView(myIdBtn);
 
-        // زر شحن تجريبي
-        Button topupBtn = new Button(this);
-        topupBtn.setText("🧪  شحن تجريبي (+100 Đ)");
-        topupBtn.setTextSize(14);
-        topupBtn.setOnClickListener(v -> {
-            fm.addBalance(c.nationalId, 100, new FirebaseManager.OnDone() {
-                @Override public void onSuccess() {
-                    Toast.makeText(WalletActivity.this, "+100 Đ", Toast.LENGTH_SHORT).show();
-                }
-                @Override public void onError(String msg) {
-                    Toast.makeText(WalletActivity.this, "خطأ: " + msg, Toast.LENGTH_SHORT).show();
-                }
-            });
-        });
-        root.addView(topupBtn);
 
         // زر تحديث يدوي
         Button refreshBtn = new Button(this);
