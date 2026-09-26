@@ -29,6 +29,7 @@ public class MainActivity extends Activity {
     private TextView countView;
     private TextView balanceView;
     private Citizen currentCitizen;
+    private android.os.Handler heartbeatHandler;
 
     @Override
     protected void onCreate(Bundle b) {
@@ -416,7 +417,7 @@ public class MainActivity extends Activity {
         final Runnable task = new Runnable() {
             @Override public void run() {
                 fm.updateLastSeen(c.nationalId);
-                heartbeatHandler.postDelayed(this, 30000); // كل 30 ثانية
+                if (heartbeatHandler != null) heartbeatHandler.postDelayed(this, 30000);
             }
         };
         heartbeatHandler.post(task);
