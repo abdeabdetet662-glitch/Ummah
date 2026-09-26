@@ -104,13 +104,36 @@ public class CitizensActivity extends Activity {
 
     private LinearLayout buildCard(final FirebaseManager.CitizenItem c, int rank, boolean isMe) {
         LinearLayout card = new LinearLayout(this);
-        card.setOrientation(LinearLayout.VERTICAL);
+        card.setOrientation(LinearLayout.HORIZONTAL);
         card.setBackgroundColor(isMe ? Color.parseColor("#0B4F2C") : Color.parseColor("#141414"));
-        card.setPadding(30, 22, 30, 22);
+        card.setPadding(20, 18, 20, 18);
+        card.setGravity(Gravity.CENTER_VERTICAL);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         lp.setMargins(0, 0, 0, 12);
         card.setLayoutParams(lp);
+
+        // الصورة
+        android.widget.ImageView avatar = new android.widget.ImageView(this);
+        LinearLayout.LayoutParams alp = new LinearLayout.LayoutParams(120, 120);
+        alp.setMargins(0, 0, 20, 0);
+        avatar.setLayoutParams(alp);
+        avatar.setBackgroundColor(Color.parseColor("#1E1E1E"));
+        avatar.setScaleType(android.widget.ImageView.ScaleType.CENTER_CROP);
+
+        if (c.photoUrl != null && !c.photoUrl.isEmpty()) {
+            com.bumptech.glide.Glide.with(this).load(c.photoUrl)
+                .placeholder(android.R.drawable.ic_menu_myplaces)
+                .circleCrop().into(avatar);
+        } else {
+            avatar.setImageResource(android.R.drawable.ic_menu_myplaces);
+        }
+        card.addView(avatar);
+
+        // المعلومات
+        LinearLayout info = new LinearLayout(this);
+        info.setOrientation(LinearLayout.VERTICAL);
+        info.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
 
         TextView rankView = new TextView(this);
         String rankText;
@@ -120,54 +143,25 @@ public class CitizensActivity extends Activity {
         else rankText = "#" + rank;
         rankView.setText(rankText + (isMe ? "  (أنت)" : ""));
         rankView.setTextColor(Color.parseColor("#D4AF37"));
-        rankView.setTextSize(12);
+        rankView.setTextSize(11);
         rankView.setTypeface(null, Typeface.BOLD);
-        card.addView(rankView);
+        info.addView(rankView);
 
         TextView name = new TextView(this);
-        name.setText("👤 " + (c.name != null ? c.name : "مجهول"));
+        name.setText(c.name != null ? c.name : "مجهول");
         name.setTextColor(Color.WHITE);
-        name.setTextSize(18);
+        name.setTextSize(16);
         name.setTypeface(null, Typeface.BOLD);
-        name.setPadding(0, 6, 0, 4);
-        card.addView(name);
+        name.setPadding(0, 4, 0, 4);
+        info.addView(name);
 
         TextView balance = new TextView(this);
         balance.setText("💰 " + c.balance + " Đ");
         balance.setTextColor(Color.parseColor("#D4AF37"));
-        balance.setTextSize(16);
-        balance.setPadding(0, 4, 0, 8);
-        card.addView(balance);
+        balance.setTextSize(14);
+        info.addView(balance);
 
-        TextView idView = new TextView(this);
-        idView.setText(c.nationalId);
-        idView.setTextColor(Color.parseColor("#616161"));
-        idView.setTextSize(10);
-        idView.setTypeface(Typeface.MONOSPACE);
-        card.addView(idView);
-
-        if (!isMe) {
-            Button chatBtn = new Button(this);
-            chatBtn.setText("💬  دردشة خاصة");
-            chatBtn.setTextSize(13);
-            chatBtn.setOnClickListener(v -> {
-                Intent i = new Intent(CitizensActivity.this, PrivateChatActivity.class);
-                i.putExtra("other_id", c.nationalId);
-                i.putExtra("other_name", c.name);
-                startActivity(i);
-            });
-            card.addView(chatBtn);
-
-            Button sendBtn = new Button(this);
-            sendBtn.setText("💸  إرسال دينار له");
-            sendBtn.setTextSize(13);
-            sendBtn.setOnClickListener(v -> {
-                Intent i = new Intent(CitizensActivity.this, TransferActivity.class);
-                i.putExtra("prefill_id", c.nationalId);
-                startActivity(i);
-            });
-            card.addView(sendBtn);
-        }
+        card.addView(info);
 
         return card;
     }

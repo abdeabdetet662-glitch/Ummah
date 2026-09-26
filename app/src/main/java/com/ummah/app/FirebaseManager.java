@@ -336,6 +336,7 @@ public class FirebaseManager {
         public String name;
         public String joinDate;
         public String country;
+        public String photoUrl;
         public int balance;
     }
 
@@ -352,6 +353,7 @@ public class FirebaseManager {
                     c.name = d.getString("name");
                     c.joinDate = d.getString("joinDate");
                     c.country = d.getString("country");
+                    c.photoUrl = d.getString("photoUrl");
                     Long b = d.getLong("balance");
                     c.balance = b != null ? b.intValue() : 0;
                     list.add(c);
@@ -422,6 +424,7 @@ public class FirebaseManager {
         public String id;
         public String author;
         public String nationalId;
+        public String photoUrl;
         public String text;
         public long timestamp;
     }
@@ -433,6 +436,7 @@ public class FirebaseManager {
         m.put("author", author);
         m.put("nationalId", nationalId);
         m.put("text", text);
+        m.put("photoUrl", getMyPhotoUrl());
         m.put("timestamp", System.currentTimeMillis());
         db.collection("global_chat").add(m)
             .addOnSuccessListener(d -> cb.onSuccess())
@@ -451,6 +455,7 @@ public class FirebaseManager {
                     m.id = d.getId();
                     m.author = d.getString("author");
                     m.nationalId = d.getString("nationalId");
+                    m.photoUrl = d.getString("photoUrl");
                     m.text = d.getString("text");
                     Long t = d.getLong("timestamp");
                     m.timestamp = t != null ? t : 0;
@@ -854,4 +859,10 @@ public class FirebaseManager {
                 l.onPhoto(url);
             });
     }
+
+    // ==================== كاش صورة المستخدم الحالي ====================
+    private String myPhotoUrl = null;
+
+    public void setMyPhotoUrl(String url) { this.myPhotoUrl = url; }
+    public String getMyPhotoUrl() { return myPhotoUrl != null ? myPhotoUrl : ""; }
 }

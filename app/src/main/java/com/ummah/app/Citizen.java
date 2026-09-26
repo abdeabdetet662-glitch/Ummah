@@ -6,6 +6,7 @@ public class Citizen {
     public String joinDate;
     public String seedPhrase;
     public String country;
+    public String photoUrl;
     public int balance;
     public long lastSeen;
     public boolean online;

@@ -175,16 +175,38 @@ public class ChatActivity extends Activity {
         scroll.post(() -> scroll.fullScroll(View.FOCUS_DOWN));
     }
 
-    private View buildBubble(FirebaseManager.ChatMessage m) {
+    private View buildBubble(final FirebaseManager.ChatMessage m) {
         boolean mine = me.nationalId.equals(m.nationalId);
 
         LinearLayout wrapper = new LinearLayout(this);
-        wrapper.setOrientation(LinearLayout.VERTICAL);
+        wrapper.setOrientation(LinearLayout.HORIZONTAL);
         wrapper.setGravity(mine ? Gravity.END : Gravity.START);
         LinearLayout.LayoutParams wlp = new LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         wlp.setMargins(0, 6, 0, 6);
         wrapper.setLayoutParams(wlp);
+
+        // الصورة (لرسائل الآخرين)
+        android.widget.ImageView avatar = null;
+        if (!mine) {
+            avatar = new android.widget.ImageView(this);
+            LinearLayout.LayoutParams alp = new LinearLayout.LayoutParams(80, 80);
+            alp.setMargins(0, 0, 12, 0);
+            avatar.setLayoutParams(alp);
+            avatar.setBackgroundColor(Color.parseColor("#1E1E1E"));
+            avatar.setScaleType(android.widget.ImageView.ScaleType.CENTER_CROP);
+
+            if (m.photoUrl != null && !m.photoUrl.isEmpty()) {
+                com.bumptech.glide.Glide.with(this)
+                    .load(m.photoUrl)
+                    .placeholder(android.R.drawable.ic_menu_myplaces)
+                    .circleCrop()
+                    .into(avatar);
+            } else {
+                avatar.setImageResource(android.R.drawable.ic_menu_myplaces);
+            }
+            wrapper.addView(avatar);
+        }
 
         LinearLayout bubble = new LinearLayout(this);
         bubble.setOrientation(LinearLayout.VERTICAL);
@@ -215,7 +237,6 @@ public class ChatActivity extends Activity {
         date.setTextSize(9);
         bottomRow.addView(date);
 
-        // زر الإبلاغ (فقط لرسائل الآخرين)
         if (!mine && m.nationalId != null) {
             TextView reportBtn = new TextView(this);
             reportBtn.setText("  🚩");

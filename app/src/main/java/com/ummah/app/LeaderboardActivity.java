@@ -78,13 +78,14 @@ public class LeaderboardActivity extends Activity {
             LinearLayout row = new LinearLayout(this);
             row.setOrientation(LinearLayout.HORIZONTAL);
             row.setBackgroundColor(isMe ? Color.parseColor("#0B4F2C") : Color.parseColor("#141414"));
-            row.setPadding(28, 22, 28, 22);
+            row.setPadding(20, 16, 20, 16);
+            row.setGravity(Gravity.CENTER_VERTICAL);
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             lp.setMargins(0, 0, 0, 10);
             row.setLayoutParams(lp);
-            row.setGravity(Gravity.CENTER_VERTICAL);
 
+            // الترتيب
             TextView rank = new TextView(this);
             String r;
             if (i == 0) r = "🥇";
@@ -98,30 +99,36 @@ public class LeaderboardActivity extends Activity {
             rank.setMinWidth(80);
             row.addView(rank);
 
-            LinearLayout info = new LinearLayout(this);
-            info.setOrientation(LinearLayout.VERTICAL);
-            info.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+            // الصورة
+            android.widget.ImageView avatar = new android.widget.ImageView(this);
+            LinearLayout.LayoutParams alp = new LinearLayout.LayoutParams(100, 100);
+            alp.setMargins(10, 0, 20, 0);
+            avatar.setLayoutParams(alp);
+            avatar.setBackgroundColor(Color.parseColor("#1E1E1E"));
+            avatar.setScaleType(android.widget.ImageView.ScaleType.CENTER_CROP);
+            if (c.photoUrl != null && !c.photoUrl.isEmpty()) {
+                com.bumptech.glide.Glide.with(this).load(c.photoUrl)
+                    .placeholder(android.R.drawable.ic_menu_myplaces)
+                    .circleCrop().into(avatar);
+            } else {
+                avatar.setImageResource(android.R.drawable.ic_menu_myplaces);
+            }
+            row.addView(avatar);
 
+            // الاسم
             TextView name = new TextView(this);
             name.setText((c.name != null ? c.name : "مجهول") + (isMe ? "  (أنت)" : ""));
             name.setTextColor(Color.WHITE);
-            name.setTextSize(16);
+            name.setTextSize(15);
             name.setTypeface(null, Typeface.BOLD);
-            info.addView(name);
+            name.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+            row.addView(name);
 
-            TextView idView = new TextView(this);
-            idView.setText(c.nationalId);
-            idView.setTextColor(Color.parseColor("#616161"));
-            idView.setTextSize(9);
-            idView.setTypeface(Typeface.MONOSPACE);
-            info.addView(idView);
-
-            row.addView(info);
-
+            // الرصيد
             TextView bal = new TextView(this);
             bal.setText(c.balance + " Đ");
             bal.setTextColor(Color.parseColor("#D4AF37"));
-            bal.setTextSize(16);
+            bal.setTextSize(15);
             bal.setTypeface(null, Typeface.BOLD);
             row.addView(bal);
 
