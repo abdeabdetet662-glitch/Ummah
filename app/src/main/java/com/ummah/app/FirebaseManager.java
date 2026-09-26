@@ -662,28 +662,19 @@ public class FirebaseManager {
 
     public interface GiftEntriesListener { void onGifts(java.util.List<GiftEntry> list); }
 
+
+
     public ListenerRegistration listenReceivedGifts(String nationalId, GiftEntriesListener l) {
         return db.collection("gifts")
             .whereEqualTo("toId", nationalId)
-            .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
             .limit(100)
             .addSnapshotListener((snap, e) -> {
                 if (snap == null) return;
                 java.util.List<GiftEntry> list = new java.util.ArrayList<>();
                 for (com.google.firebase.firestore.QueryDocumentSnapshot d : snap) {
-                    GiftEntry g = new GiftEntry();
-                    g.fromId = d.getString("fromId");
-                    g.fromName = d.getString("fromName");
-                    g.toId = d.getString("toId");
-                    g.emoji = d.getString("emoji");
-                    g.giftName = d.getString("giftName");
-                    g.meaning = d.getString("meaning");
-                    Long p = d.getLong("price");
-                    g.price = p != null ? p.intValue() : 0;
-                    Long t = d.getLong("timestamp");
-                    g.timestamp = t != null ? t : 0;
-                    list.add(g);
+                    list.add(toGiftEntry(d));
                 }
+                java.util.Collections.sort(list, (a, b) -> Long.compare(b.timestamp, a.timestamp));
                 l.onGifts(list);
             });
     }
@@ -691,26 +682,30 @@ public class FirebaseManager {
     public ListenerRegistration listenSentGifts(String nationalId, GiftEntriesListener l) {
         return db.collection("gifts")
             .whereEqualTo("fromId", nationalId)
-            .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
             .limit(100)
             .addSnapshotListener((snap, e) -> {
                 if (snap == null) return;
                 java.util.List<GiftEntry> list = new java.util.ArrayList<>();
                 for (com.google.firebase.firestore.QueryDocumentSnapshot d : snap) {
-                    GiftEntry g = new GiftEntry();
-                    g.fromId = d.getString("fromId");
-                    g.fromName = d.getString("fromName");
-                    g.toId = d.getString("toId");
-                    g.emoji = d.getString("emoji");
-                    g.giftName = d.getString("giftName");
-                    g.meaning = d.getString("meaning");
-                    Long p = d.getLong("price");
-                    g.price = p != null ? p.intValue() : 0;
-                    Long t = d.getLong("timestamp");
-                    g.timestamp = t != null ? t : 0;
-                    list.add(g);
+                    list.add(toGiftEntry(d));
                 }
+                java.util.Collections.sort(list, (a, b) -> Long.compare(b.timestamp, a.timestamp));
                 l.onGifts(list);
             });
+    }
+
+    private GiftEntry toGiftEntry(com.google.firebase.firestore.QueryDocumentSnapshot d) {
+        GiftEntry g = new GiftEntry();
+        g.fromId = d.getString("fromId");
+        g.fromName = d.getString("fromName");
+        g.toId = d.getString("toId");
+        g.emoji = d.getString("emoji");
+        g.giftName = d.getString("giftName");
+        g.meaning = d.getString("meaning");
+        Long p = d.getLong("price");
+        g.price = p != null ? p.intValue() : 0;
+        Long t = d.getLong("timestamp");
+        g.timestamp = t != null ? t : 0;
+        return g;
     }
 }
