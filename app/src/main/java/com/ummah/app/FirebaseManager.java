@@ -759,4 +759,99 @@ public class FirebaseManager {
             })
             .addOnFailureListener(e -> l.onStatus(false, false, 0));
     }
+
+    // ==================== رفع الصور عبر ImgBB ====================
+    public static final String IMGBB_API_KEY = "321c3f7d35b65a723ab9269df5bbba77";
+
+    public interface PhotoUploadListener {
+        void onSuccess(String url);
+        void onError(String msg);
+    }
+
+    public void uploadToImgBB(String nationalId, final android.net.Uri imageUri, final PhotoUploadListener l) {
+        new Thread(() -> {
+            try {
+                // 1. اقرأ الصورة وحوّلها إلى Base64
+                java.io.InputStream is = getContentResolverSafe(imageUri);
+                if (is == null) { postError(l, "لا يمكن قراءة الصورة"); return; }
+
+                java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+                byte[] buffer = new byte[8192];
+                int len;
+                while ((len = is.read(buffer)) != -1) baos.write(buffer, 0, len);
+                is.close();
+
+                byte[] imageBytes = baos.toByteArray();
+                String base64 = android.util.Base64.encodeToString(imageBytes, android.util.Base64.DEFAULT);
+
+                // 2. جهّز الطلب
+                java.net.URL url = new java.net.URL("https://api.imgbb.com/1/upload");
+                java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setDoOutput(true);
+                conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                conn.setConnectTimeout(30000);
+                conn.setReadTimeout(30000);
+
+                String postData = "key=" + IMGBB_API_KEY + "&image=" + java.net.URLEncoder.encode(base64, "UTF-8");
+                java.io.OutputStream os = conn.getOutputStream();
+                os.write(postData.getBytes("UTF-8"));
+                os.close();
+
+                // 3. اقرأ الرد
+                int code = conn.getResponseCode();
+                java.io.BufferedReader br = new java.io.BufferedReader(new java.io.InputStreamReader(
+                    code == 200 ? conn.getInputStream() : conn.getErrorStream()));
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while ((line = br.readLine()) != null) sb.append(line);
+                br.close();
+
+                if (code != 200) { postError(l, "ImgBB: HTTP " + code); return; }
+
+                // 4. استخرج الرابط
+                org.json.JSONObject response = new org.json.JSONObject(sb.toString());
+                if (!response.optBoolean("success", false)) {
+                    postError(l, "ImgBB: فشل الرفع");
+                    return;
+                }
+                String imageUrl = response.getJSONObject("data").getString("url");
+
+                // 5. احفظ الرابط في Firestore
+                db.collection("citizens").document(nationalId)
+                    .update("photoUrl", imageUrl)
+                    .addOnSuccessListener(a -> postSuccess(l, imageUrl))
+                    .addOnFailureListener(e -> postError(l, e.getMessage()));
+
+            } catch (Exception e) {
+                postError(l, e.getMessage() != null ? e.getMessage() : "خطأ");
+            }
+        }).start();
+    }
+
+    private java.io.InputStream getContentResolverSafe(android.net.Uri uri) {
+        try {
+            return com.google.firebase.FirebaseApp.getInstance().getApplicationContext()
+                .getContentResolver().openInputStream(uri);
+        } catch (Exception e) { return null; }
+    }
+
+    private void postSuccess(final PhotoUploadListener l, final String url) {
+        new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> l.onSuccess(url));
+    }
+
+    private void postError(final PhotoUploadListener l, final String msg) {
+        new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> l.onError(msg));
+    }
+
+    public interface PhotoListener { void onPhoto(String url); }
+
+    public ListenerRegistration listenPhoto(String nationalId, PhotoListener l) {
+        return db.collection("citizens").document(nationalId)
+            .addSnapshotListener((doc, e) -> {
+                if (doc == null || !doc.exists()) return;
+                String url = doc.getString("photoUrl");
+                l.onPhoto(url);
+            });
+    }
 }
