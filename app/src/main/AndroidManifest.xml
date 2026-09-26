@@ -7,14 +7,15 @@
         android:theme="@android:style/Theme.DeviceDefault"
         android:allowBackup="false">
 
-        <activity
-            android:name=".MainActivity"
-            android:exported="true"
-            android:label="@string/app_name">
+        <activity android:name=".MainActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".ConstitutionActivity" android:exported="false" />
+        <activity android:name=".WalletActivity" android:exported="false" />
+        <activity android:name=".ParliamentActivity" android:exported="false" />
     </application>
 </manifest>

@@ -2,12 +2,12 @@ package com.ummah.app;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.Gravity;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -17,13 +17,13 @@ import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
-    private IdentityManager identityManager;
+    private IdentityManager im;
     private LinearLayout root;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        identityManager = new IdentityManager(this);
+    protected void onCreate(Bundle b) {
+        super.onCreate(b);
+        im = new IdentityManager(this);
 
         ScrollView scroll = new ScrollView(this);
         scroll.setBackgroundColor(Color.parseColor("#0A0A0A"));
@@ -32,19 +32,19 @@ public class MainActivity extends Activity {
         root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
         root.setGravity(Gravity.CENTER);
-        root.setPadding(48, 80, 48, 80);
+        root.setPadding(40, 60, 40, 60);
         scroll.addView(root);
 
         setContentView(scroll);
 
-        if (identityManager.isCitizen()) {
-            showCitizenshipCard(identityManager.getCitizen());
+        if (im.isCitizen()) {
+            showCard(im.getCitizen());
         } else {
-            showWelcomeScreen();
+            showWelcome();
         }
     }
 
-    private void showWelcomeScreen() {
+    private void showWelcome() {
         root.removeAllViews();
 
         TextView flag = new TextView(this);
@@ -62,13 +62,13 @@ public class MainActivity extends Activity {
         title.setPadding(0, 20, 0, 10);
         root.addView(title);
 
-        TextView subtitle = new TextView(this);
-        subtitle.setText("أول دولة رقمية في العالم العربي");
-        subtitle.setTextColor(Color.parseColor("#9E9E9E"));
-        subtitle.setTextSize(16);
-        subtitle.setGravity(Gravity.CENTER);
-        subtitle.setPadding(0, 0, 0, 40);
-        root.addView(subtitle);
+        TextView sub = new TextView(this);
+        sub.setText("أول دولة رقمية في العالم العربي");
+        sub.setTextColor(Color.parseColor("#9E9E9E"));
+        sub.setTextSize(16);
+        sub.setGravity(Gravity.CENTER);
+        sub.setPadding(0, 0, 0, 40);
+        root.addView(sub);
 
         TextView desc = new TextView(this);
         desc.setText("لا حدود. لا تأشيرة. لا جواز سفر.\nفقط هاتفك، وكلمتك، وأمتك.");
@@ -79,64 +79,49 @@ public class MainActivity extends Activity {
         desc.setPadding(0, 0, 0, 60);
         root.addView(desc);
 
-        Button joinBtn = new Button(this);
-        joinBtn.setText("انضم إلى الأمة");
-        joinBtn.setTextSize(18);
-        joinBtn.setPadding(40, 30, 40, 30);
-        joinBtn.setOnClickListener(v -> askForName());
-        root.addView(joinBtn);
-
-        TextView footer = new TextView(this);
-        footer.setText("\n\nمواطنة مجانية. لا تحتاج بريداً أو رقم هاتف.");
-        footer.setTextColor(Color.parseColor("#616161"));
-        footer.setTextSize(12);
-        footer.setGravity(Gravity.CENTER);
-        root.addView(footer);
+        Button join = new Button(this);
+        join.setText("انضم إلى الأمة");
+        join.setTextSize(18);
+        join.setOnClickListener(v -> askName());
+        root.addView(join);
     }
 
-    private void askForName() {
+    private void askName() {
         EditText input = new EditText(this);
         input.setHint("اسمك أو كنيتك");
         input.setTextColor(Color.WHITE);
         input.setHintTextColor(Color.GRAY);
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
 
-        LinearLayout container = new LinearLayout(this);
-        container.setPadding(40, 20, 40, 20);
-        container.addView(input);
+        LinearLayout c = new LinearLayout(this);
+        c.setPadding(40, 20, 40, 20);
+        c.addView(input);
 
         new AlertDialog.Builder(this)
-                .setTitle("اختر اسمك كمواطن")
-                .setMessage("هذا الاسم سيظهر على بطاقة مواطنتك. يمكنك تغييره لاحقاً.")
-                .setView(container)
-                .setPositiveButton("متابعة", (d, w) -> {
-                    String name = input.getText().toString().trim();
-                    if (name.isEmpty()) name = "مواطن مجهول";
-                    Citizen c = identityManager.registerCitizen(name);
-                    showSeedPhraseDialog(c);
-                })
-                .setNegativeButton("إلغاء", null)
-                .show();
+            .setTitle("اختر اسمك")
+            .setView(c)
+            .setPositiveButton("متابعة", (d, w) -> {
+                String n = input.getText().toString().trim();
+                if (n.isEmpty()) n = "مواطن مجهول";
+                Citizen citizen = im.registerCitizen(n);
+                showSeedDialog(citizen);
+            })
+            .setNegativeButton("إلغاء", null)
+            .show();
     }
 
-    private void showSeedPhraseDialog(Citizen citizen) {
+    private void showSeedDialog(Citizen c) {
         new AlertDialog.Builder(this)
-                .setTitle("🔐 كلماتك السرية")
-                .setMessage("احفظ هذه الكلمات الـ 12 في مكان آمن.\n\n" +
-                        "هي هويتك الوحيدة في الأمة.\n" +
-                        "لا تشاركها مع أحد.\n" +
-                        "لن تستطيع استعادتها إذا فقدتها.\n\n" +
-                        "——————————————\n\n" +
-                        citizen.seedPhrase)
-                .setPositiveButton("حفظتها", (d, w) -> {
-                    showCitizenshipCard(citizen);
-                    Toast.makeText(this, "مرحباً بك في أُمّة", Toast.LENGTH_LONG).show();
-                })
-                .setCancelable(false)
-                .show();
+            .setTitle("🔐 كلماتك السرية")
+            .setMessage("احفظ هذه الكلمات الـ 12 في مكان آمن.\n\nهي هويتك الوحيدة.\n\n——————————————\n\n" + c.seedPhrase)
+            .setPositiveButton("حفظتها", (d, w) -> {
+                showCard(c);
+                Toast.makeText(this, "مرحباً بك", Toast.LENGTH_LONG).show();
+            })
+            .setCancelable(false)
+            .show();
     }
 
-    private void showCitizenshipCard(Citizen c) {
+    private void showCard(Citizen c) {
         root.removeAllViews();
 
         TextView flag = new TextView(this);
@@ -145,18 +130,15 @@ public class MainActivity extends Activity {
         flag.setGravity(Gravity.CENTER);
         root.addView(flag);
 
-        // البطاقة
         LinearLayout card = new LinearLayout(this);
         card.setOrientation(LinearLayout.VERTICAL);
         card.setBackgroundColor(Color.parseColor("#0B4F2C"));
         card.setPadding(40, 40, 40, 40);
         card.setGravity(Gravity.CENTER);
-
-        LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-        cardParams.setMargins(0, 30, 0, 30);
-        card.setLayoutParams(cardParams);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp.setMargins(0, 30, 0, 30);
+        card.setLayoutParams(lp);
 
         TextView header = new TextView(this);
         header.setText("بطاقة المواطنة");
@@ -174,27 +156,38 @@ public class MainActivity extends Activity {
         country.setPadding(0, 5, 0, 30);
         card.addView(country);
 
-        addCardRow(card, "الاسم", c.name);
-        addCardRow(card, "الرقم الوطني", c.nationalId);
-        addCardRow(card, "تاريخ الانضمام", c.joinDate);
+        addRow(card, "الاسم", c.name);
+        addRow(card, "الرقم الوطني", c.nationalId);
+        addRow(card, "تاريخ الانضمام", c.joinDate);
 
         root.addView(card);
 
-        // الأزرار
-        Button showSeedBtn = new Button(this);
-        showSeedBtn.setText("🔐  عرض الكلمات السرية");
-        showSeedBtn.setOnClickListener(v -> showSeedPhrase(c));
-        root.addView(showSeedBtn);
+        Button constBtn = new Button(this);
+        constBtn.setText("🏛️  دستور أُمّة");
+        constBtn.setTextSize(16);
+        constBtn.setOnClickListener(v -> startActivity(new Intent(this, ConstitutionActivity.class)));
+        root.addView(constBtn);
 
-        Button shareBtn = new Button(this);
-        shareBtn.setText("📤  مشاركة الرقم الوطني");
-        shareBtn.setOnClickListener(v -> {
-            Toast.makeText(this, c.nationalId, Toast.LENGTH_LONG).show();
-        });
-        root.addView(shareBtn);
+        Button walletBtn = new Button(this);
+        walletBtn.setText("💰  محفظتي الرقمية");
+        walletBtn.setTextSize(16);
+        walletBtn.setOnClickListener(v -> startActivity(new Intent(this, WalletActivity.class)));
+        root.addView(walletBtn);
+
+        Button parlBtn = new Button(this);
+        parlBtn.setText("🗳️  البرلمان");
+        parlBtn.setTextSize(16);
+        parlBtn.setOnClickListener(v -> startActivity(new Intent(this, ParliamentActivity.class)));
+        root.addView(parlBtn);
+
+        Button seedBtn = new Button(this);
+        seedBtn.setText("🔐  الكلمات السرية");
+        seedBtn.setTextSize(16);
+        seedBtn.setOnClickListener(v -> showSeed(c));
+        root.addView(seedBtn);
 
         TextView footer = new TextView(this);
-        footer.setText("\nمرحلة 1: المواطنة\nالمراحل القادمة: الدستور، العملة، البرلمان");
+        footer.setText("\nالمرحلة 1-4 مكتملة\nالقادم: المحاكم، الوزارات، الجيش السيبراني");
         footer.setTextColor(Color.parseColor("#616161"));
         footer.setTextSize(12);
         footer.setGravity(Gravity.CENTER);
@@ -202,36 +195,34 @@ public class MainActivity extends Activity {
         root.addView(footer);
     }
 
-    private void addCardRow(LinearLayout parent, String label, String value) {
-        LinearLayout row = new LinearLayout(this);
-        row.setOrientation(LinearLayout.VERTICAL);
-        row.setPadding(0, 12, 0, 12);
+    private void addRow(LinearLayout p, String label, String val) {
+        LinearLayout r = new LinearLayout(this);
+        r.setOrientation(LinearLayout.VERTICAL);
+        r.setPadding(0, 12, 0, 12);
 
-        TextView labelView = new TextView(this);
-        labelView.setText(label);
-        labelView.setTextColor(Color.parseColor("#9E9E9E"));
-        labelView.setTextSize(12);
-        labelView.setGravity(Gravity.CENTER);
-        row.addView(labelView);
+        TextView l = new TextView(this);
+        l.setText(label);
+        l.setTextColor(Color.parseColor("#9E9E9E"));
+        l.setTextSize(12);
+        l.setGravity(Gravity.CENTER);
+        r.addView(l);
 
-        TextView valueView = new TextView(this);
-        valueView.setText(value);
-        valueView.setTextColor(Color.WHITE);
-        valueView.setTextSize(18);
-        valueView.setTypeface(null, Typeface.BOLD);
-        valueView.setGravity(Gravity.CENTER);
-        row.addView(valueView);
+        TextView v = new TextView(this);
+        v.setText(val);
+        v.setTextColor(Color.WHITE);
+        v.setTextSize(18);
+        v.setTypeface(null, Typeface.BOLD);
+        v.setGravity(Gravity.CENTER);
+        r.addView(v);
 
-        parent.addView(row);
+        p.addView(r);
     }
 
-    private void showSeedPhrase(Citizen c) {
+    private void showSeed(Citizen c) {
         new AlertDialog.Builder(this)
-                .setTitle("🔐 كلماتك السرية")
-                .setMessage(c.seedPhrase + "\n\n——————————————\n\n" +
-                        "هذه الكلمات هي مفتاح هويتك.\n" +
-                        "احفظها في مكان آمن.")
-                .setPositiveButton("حسناً", null)
-                .show();
+            .setTitle("🔐 الكلمات السرية")
+            .setMessage(c.seedPhrase + "\n\n——————————————\n\nهذه الكلمات مفتاح هويتك.")
+            .setPositiveButton("حسناً", null)
+            .show();
     }
 }
