@@ -410,6 +410,32 @@ public class MainActivity extends Activity {
         p.addView(v);
     }
 
+    private void startHeartbeat(final Citizen c) {
+        if (heartbeatHandler != null) return;
+        heartbeatHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+        final Runnable task = new Runnable() {
+            @Override public void run() {
+                fm.updateLastSeen(c.nationalId);
+                heartbeatHandler.postDelayed(this, 30000); // كل 30 ثانية
+            }
+        };
+        heartbeatHandler.post(task);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Citizen c = im.getCitizen();
+        if (c != null) fm.setOffline(c.nationalId);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Citizen c = im.getCitizen();
+        if (c != null) fm.updateLastSeen(c.nationalId);
+    }
+
     private void showSeed(final Citizen c) {
         new AlertDialog.Builder(this)
             .setTitle("🔐 الكلمات السرية")

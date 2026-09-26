@@ -708,4 +708,19 @@ public class FirebaseManager {
         g.timestamp = t != null ? t : 0;
         return g;
     }
+
+    // ==================== تتبع آخر ظهور ====================
+    public void updateLastSeen(String nationalId) {
+        java.util.Map<String, Object> u = new HashMap<>();
+        u.put("lastSeen", System.currentTimeMillis());
+        u.put("online", true);
+        db.collection("citizens").document(nationalId).update(u);
+    }
+
+    public void setOffline(String nationalId) {
+        java.util.Map<String, Object> u = new HashMap<>();
+        u.put("lastSeen", System.currentTimeMillis());
+        u.put("online", false);
+        db.collection("citizens").document(nationalId).update(u);
+    }
 }
