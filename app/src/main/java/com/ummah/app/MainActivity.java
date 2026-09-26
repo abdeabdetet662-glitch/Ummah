@@ -176,21 +176,51 @@ public class MainActivity extends Activity {
             .setPositiveButton("متابعة", (d, w) -> {
                 String n = input.getText().toString().trim();
                 if (n.isEmpty()) n = "مواطن مجهول";
-                Citizen citizen = im.registerCitizen(n);
-                currentCitizen = citizen;
-                fm.registerCitizen(citizen, wm.getBalance(), new FirebaseManager.OnDone() {
-                    @Override public void onSuccess() {
-                        String hash = im.hashSeed(citizen.seedPhrase);
-                        fm.saveSeedHash(citizen.nationalId, hash);
-                        showSeedDialog(citizen);
-                    }
-                    @Override public void onError(String msg) {
-                        Toast.makeText(MainActivity.this, "خطأ: " + msg, Toast.LENGTH_LONG).show();
-                    }
-                });
+                askCountry(n);
             })
             .setNegativeButton("إلغاء", null)
             .show();
+    }
+
+    private void askCountry(final String name) {
+        final String detected = im.detectCountry(this);
+        final String detectedName = CountryList.getName(detected);
+
+        new AlertDialog.Builder(this)
+            .setTitle("🌍 من أين أنت؟")
+            .setMessage("كشفنا تلقائياً:\n\n" + detectedName + "\n\nهل هذا بلدك؟ أو اختر يدوياً.")
+            .setPositiveButton("✅ نعم", (d, w) -> registerNow(name, detected))
+            .setNegativeButton("🖐️ اختيار يدوي", (d, w) -> showCountryPicker(name))
+            .setCancelable(false)
+            .show();
+    }
+
+    private void showCountryPicker(final String name) {
+        final java.util.Map<String, String> countries = CountryList.getCountries();
+        final String[] keys = countries.keySet().toArray(new String[0]);
+        final String[] labels = new String[keys.length];
+        for (int i = 0; i < keys.length; i++) labels[i] = countries.get(keys[i]);
+
+        new AlertDialog.Builder(this)
+            .setTitle("اختر بلدك")
+            .setItems(labels, (d, which) -> registerNow(name, keys[which]))
+            .setNegativeButton("رجوع", (d, w) -> askCountry(name))
+            .show();
+    }
+
+    private void registerNow(String name, String country) {
+        Citizen citizen = im.registerCitizen(name, country);
+        currentCitizen = citizen;
+        fm.registerCitizen(citizen, wm.getBalance(), new FirebaseManager.OnDone() {
+            @Override public void onSuccess() {
+                String hash = im.hashSeed(citizen.seedPhrase);
+                fm.saveSeedHash(citizen.nationalId, hash);
+                showSeedDialog(citizen);
+            }
+            @Override public void onError(String msg) {
+                Toast.makeText(MainActivity.this, "خطأ: " + msg, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void showSeedDialog(final Citizen c) {
@@ -247,6 +277,7 @@ public class MainActivity extends Activity {
 
         addRow(card, "الاسم", c.name, 20);
         addRow(card, "الرقم الوطني", c.nationalId, 13);
+        addRow(card, "البلد", CountryList.getName(c.country), 16);
         addRow(card, "تاريخ الانضمام", c.joinDate, 14);
 
         root.addView(card);

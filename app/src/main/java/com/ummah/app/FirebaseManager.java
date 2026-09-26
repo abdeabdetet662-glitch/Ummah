@@ -49,6 +49,7 @@ public class FirebaseManager {
         data.put("nationalId", c.nationalId);
         data.put("joinDate", c.joinDate);
         data.put("balance", balance);
+        data.put("country", c.country);
         data.put("uid", getUid());
         data.put("createdAt", System.currentTimeMillis());
 
@@ -334,6 +335,7 @@ public class FirebaseManager {
         public String nationalId;
         public String name;
         public String joinDate;
+        public String country;
         public int balance;
     }
 
@@ -349,6 +351,7 @@ public class FirebaseManager {
                     c.nationalId = d.getId();
                     c.name = d.getString("name");
                     c.joinDate = d.getString("joinDate");
+                    c.country = d.getString("country");
                     Long b = d.getLong("balance");
                     c.balance = b != null ? b.intValue() : 0;
                     list.add(c);
@@ -370,6 +373,7 @@ public class FirebaseManager {
                     c.nationalId = doc.getId();
                     c.name = doc.getString("name");
                     c.joinDate = doc.getString("joinDate");
+                    c.country = doc.getString("country");
                     Long b = doc.getLong("balance");
                     c.balance = b != null ? b.intValue() : 0;
                     cb.onFound(c);
@@ -533,6 +537,7 @@ public class FirebaseManager {
                 c.nationalId = d.getId();
                 c.name = d.getString("name");
                 c.joinDate = d.getString("joinDate");
+                c.country = d.getString("country");
                 Long b = d.getLong("balance");
                 c.balance = b != null ? b.intValue() : 0;
                 l.onFound(c);
