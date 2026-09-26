@@ -1,9 +1,7 @@
 package com.ummah.app;
 
 import android.app.Activity;
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -14,24 +12,22 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.Locale;
+import com.google.firebase.firestore.ListenerRegistration;
 
 public class WalletActivity extends Activity {
     private IdentityManager im;
-    private WalletManager wm;
-    private TextView internalBalanceView;
-    private TextView ethBalanceView;
-    private String ethAddress;
+    private FirebaseManager fm;
+    private TextView balanceView;
+    private ListenerRegistration balReg;
 
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
         im = new IdentityManager(this);
-        wm = new WalletManager(this);
+        fm = FirebaseManager.get();
 
         Citizen c = im.getCitizen();
         if (c == null) { finish(); return; }
-        ethAddress = CryptoWallet.deriveEthereumAddress(c.seedPhrase);
 
         ScrollView scroll = new ScrollView(this);
         scroll.setBackgroundColor(Color.parseColor("#0A0A0A"));
@@ -41,148 +37,136 @@ public class WalletActivity extends Activity {
         root.setPadding(36, 60, 36, 60);
         scroll.addView(root);
 
+        // ============ العنوان الرئيسي ============
         TextView title = new TextView(this);
-        title.setText("💰 محفظتك الحقيقية");
+        title.setText("💰 محفظتي");
         title.setTextColor(Color.parseColor("#D4AF37"));
-        title.setTextSize(26);
+        title.setTextSize(28);
         title.setTypeface(null, Typeface.BOLD);
         title.setGravity(Gravity.CENTER);
         root.addView(title);
 
         TextView sub = new TextView(this);
-        sub.setText("Ethereum • USDT • كل عملات ERC-20");
+        sub.setText("الدينار الداخلي لدولة أُمّة");
         sub.setTextColor(Color.parseColor("#9E9E9E"));
-        sub.setTextSize(12);
+        sub.setTextSize(13);
         sub.setGravity(Gravity.CENTER);
-        sub.setPadding(0, 8, 0, 30);
+        sub.setPadding(0, 8, 0, 50);
         root.addView(sub);
 
-        // رصيد ETH الحقيقي
-        TextView ethLabel = new TextView(this);
-        ethLabel.setText("💎 رصيد ETH الحقيقي");
-        ethLabel.setTextColor(Color.parseColor("#9E9E9E"));
-        ethLabel.setTextSize(13);
-        ethLabel.setGravity(Gravity.CENTER);
-        root.addView(ethLabel);
+        // ============ الرصيد (الأكبر) ============
+        TextView balanceLabel = new TextView(this);
+        balanceLabel.setText("رصيدك:");
+        balanceLabel.setTextColor(Color.parseColor("#9E9E9E"));
+        balanceLabel.setTextSize(14);
+        balanceLabel.setGravity(Gravity.CENTER);
+        root.addView(balanceLabel);
 
-        ethBalanceView = new TextView(this);
-        ethBalanceView.setText("...");
-        ethBalanceView.setTextColor(Color.parseColor("#D4AF37"));
-        ethBalanceView.setTextSize(42);
-        ethBalanceView.setTypeface(null, Typeface.BOLD);
-        ethBalanceView.setGravity(Gravity.CENTER);
-        ethBalanceView.setPadding(0, 10, 0, 30);
-        root.addView(ethBalanceView);
+        balanceView = new TextView(this);
+        balanceView.setText("...");
+        balanceView.setTextColor(Color.parseColor("#D4AF37"));
+        balanceView.setTextSize(64);
+        balanceView.setTypeface(null, Typeface.BOLD);
+        balanceView.setGravity(Gravity.CENTER);
+        balanceView.setPadding(0, 15, 0, 10);
+        root.addView(balanceView);
 
-        // عنوان ETH
-        TextView addrLabel = new TextView(this);
-        addrLabel.setText("📮 عنوان محفظتك:");
-        addrLabel.setTextColor(Color.parseColor("#9E9E9E"));
-        addrLabel.setTextSize(12);
-        addrLabel.setGravity(Gravity.CENTER);
-        root.addView(addrLabel);
+        TextView currencyLabel = new TextView(this);
+        currencyLabel.setText("Đ دينار أُمّة");
+        currencyLabel.setTextColor(Color.parseColor("#9E9E9E"));
+        currencyLabel.setTextSize(14);
+        currencyLabel.setGravity(Gravity.CENTER);
+        currencyLabel.setPadding(0, 0, 0, 40);
+        root.addView(currencyLabel);
 
-        TextView addrView = new TextView(this);
-        addrView.setText(ethAddress);
-        addrView.setTextColor(Color.WHITE);
-        addrView.setTextSize(10);
-        addrView.setTypeface(Typeface.MONOSPACE);
-        addrView.setGravity(Gravity.CENTER);
-        addrView.setPadding(20, 15, 20, 15);
-        addrView.setBackgroundColor(Color.parseColor("#141414"));
-        LinearLayout.LayoutParams al = new LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        al.setMargins(0, 8, 0, 0);
-        addrView.setLayoutParams(al);
-        root.addView(addrView);
+        // ============ الأزرار ============
 
-        Button copyBtn = new Button(this);
-        copyBtn.setText("📋  نسخ العنوان");
-        copyBtn.setTextSize(14);
-        copyBtn.setOnClickListener(v -> {
-            ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-            cm.setPrimaryClip(ClipData.newPlainText("ETH", ethAddress));
-            Toast.makeText(this, "تم النسخ", Toast.LENGTH_SHORT).show();
-        });
-        root.addView(copyBtn);
-
-        Button refreshBtn = new Button(this);
-        refreshBtn.setText("🔄  تحديث الرصيد");
-        refreshBtn.setTextSize(14);
-        refreshBtn.setOnClickListener(v -> loadEthBalance());
-        root.addView(refreshBtn);
-
-        // فاصل
-        TextView sep = new TextView(this);
-        sep.setText("\n────────────────\n");
-        sep.setTextColor(Color.parseColor("#333333"));
-        sep.setGravity(Gravity.CENTER);
-        root.addView(sep);
-
-        // الرصيد الداخلي
-        TextView dLabel = new TextView(this);
-        dLabel.setText("🪙 الدينار الداخلي (Đ)");
-        dLabel.setTextColor(Color.parseColor("#9E9E9E"));
-        dLabel.setTextSize(13);
-        dLabel.setGravity(Gravity.CENTER);
-        root.addView(dLabel);
-
-        internalBalanceView = new TextView(this);
-        internalBalanceView.setText(wm.getBalance() + " Đ");
-        internalBalanceView.setTextColor(Color.parseColor("#D4AF37"));
-        internalBalanceView.setTextSize(28);
-        internalBalanceView.setTypeface(null, Typeface.BOLD);
-        internalBalanceView.setGravity(Gravity.CENTER);
-        internalBalanceView.setPadding(0, 10, 0, 20);
-        root.addView(internalBalanceView);
-
-        Button daily = new Button(this);
-        daily.setText("🎁  مكافأة اليوم (+5 Đ)");
-        daily.setTextSize(14);
-        daily.setEnabled(wm.canClaimDaily());
-        daily.setOnClickListener(v -> {
-            if (wm.claimDaily()) {
-                internalBalanceView.setText(wm.getBalance() + " Đ");
-                daily.setEnabled(false);
-                Toast.makeText(this, "+5 Đ", Toast.LENGTH_SHORT).show();
-            }
-        });
-        root.addView(daily);
-
-        TextView hint = new TextView(this);
-        hint.setText("\nالدينار: للتفاعل داخل الدولة.\nETH: قابل للتحويل لأي محفظة في العالم.");
-        hint.setTextColor(Color.parseColor("#616161"));
-        hint.setTextSize(11);
-        hint.setGravity(Gravity.CENTER);
-        hint.setLineSpacing(6, 1);
-        hint.setPadding(0, 30, 0, 0);
-        root.addView(hint);
-
+        // زر الإرسال / الاستقبال (الأهم)
         Button transferBtn = new Button(this);
-        transferBtn.setText("💸  إرسال / استقبال دينار");
-        transferBtn.setTextSize(14);
-        transferBtn.setOnClickListener(v -> {
-            startActivity(new android.content.Intent(WalletActivity.this, TransferActivity.class));
-        });
+        transferBtn.setText("💸  إرسال / استقبال");
+        transferBtn.setTextSize(17);
+        transferBtn.setPadding(20, 25, 20, 25);
+        transferBtn.setOnClickListener(v ->
+            startActivity(new Intent(WalletActivity.this, TransferActivity.class)));
         root.addView(transferBtn);
 
+        // زر رقمي للاستقبال
+        Button myIdBtn = new Button(this);
+        myIdBtn.setText("📥  رقمي للاستقبال");
+        myIdBtn.setTextSize(15);
+        myIdBtn.setOnClickListener(v -> {
+            new android.app.AlertDialog.Builder(WalletActivity.this)
+                .setTitle("رقمك للاستقبال")
+                .setMessage("أعطِ هذا الرقم لمن يريد أن يرسل لك ديناراً:\n\n" + c.nationalId)
+                .setPositiveButton("حسناً", null)
+                .show();
+        });
+        root.addView(myIdBtn);
+
+        // زر شحن تجريبي
+        Button topupBtn = new Button(this);
+        topupBtn.setText("🧪  شحن تجريبي (+100 Đ)");
+        topupBtn.setTextSize(14);
+        topupBtn.setOnClickListener(v -> {
+            fm.addBalance(c.nationalId, 100, new FirebaseManager.OnDone() {
+                @Override public void onSuccess() {
+                    Toast.makeText(WalletActivity.this, "+100 Đ", Toast.LENGTH_SHORT).show();
+                }
+                @Override public void onError(String msg) {
+                    Toast.makeText(WalletActivity.this, "خطأ: " + msg, Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
+        root.addView(topupBtn);
+
+        // ============ معلومات ============
+        TextView sep = new TextView(this);
+        sep.setText("\n━━━━━━━━━━━━━━━━\n");
+        sep.setTextColor(Color.parseColor("#333333"));
+        sep.setGravity(Gravity.CENTER);
+        sep.setPadding(0, 40, 0, 20);
+        root.addView(sep);
+
+        TextView info = new TextView(this);
+        info.setText("طرق كسب الدينار:\n\n" +
+                "🎁  مكافأة يومية: +5 Đ\n" +
+                "🗳️  التصويت على اقتراح: +5 Đ\n" +
+                "📝  تقديم اقتراح: +20 Đ\n" +
+                "👑  الفوز بالانتخابات: +500 Đ");
+        info.setTextColor(Color.parseColor("#9E9E9E"));
+        info.setTextSize(13);
+        info.setLineSpacing(8, 1);
+        info.setGravity(Gravity.CENTER);
+        info.setPadding(0, 20, 0, 40);
+        root.addView(info);
+
+        TextView footer = new TextView(this);
+        footer.setText("دولة أُمّة الرقمية\nدينار واحد = تفاعل واحد");
+        footer.setTextColor(Color.parseColor("#616161"));
+        footer.setTextSize(11);
+        footer.setGravity(Gravity.CENTER);
+        root.addView(footer);
+
         setContentView(scroll);
-        loadEthBalance();
+        startBalanceListener();
     }
 
-    private void loadEthBalance() {
-        ethBalanceView.setText("...");
-        CryptoRpc.getEthBalance(ethAddress, new CryptoRpc.BalanceCallback() {
-            @Override public void onBalance(double eth) {
-                if (eth < 0.000001) {
-                    ethBalanceView.setText("0.000000\nETH");
-                } else {
-                    ethBalanceView.setText(String.format(Locale.US, "%.6f\nETH", eth));
-                }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (balReg != null) balReg.remove();
+    }
+
+    private void startBalanceListener() {
+        Citizen c = im.getCitizen();
+        if (c == null) return;
+        if (balReg != null) balReg.remove();
+        balReg = fm.listenBalance(c.nationalId, new FirebaseManager.BalanceListener() {
+            @Override public void onBalance(int balance) {
+                runOnUiThread(() -> balanceView.setText(String.valueOf(balance)));
             }
             @Override public void onError(String message) {
-                ethBalanceView.setText("—");
-                Toast.makeText(WalletActivity.this, "تعذّر الاتصال بالشبكة", Toast.LENGTH_SHORT).show();
+                runOnUiThread(() -> balanceView.setText("—"));
             }
         });
     }

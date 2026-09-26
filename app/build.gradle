@@ -11,8 +11,8 @@ android {
         applicationId "com.ummah.app"
         minSdk 21
         targetSdk 34
-        versionCode 4
-        versionName "4.0"
+        versionCode 5
+        versionName "5.0"
     }
 
     buildTypes {
@@ -29,8 +29,7 @@ android {
     packagingOptions {
         resources {
             excludes += ['META-INF/DEPENDENCIES', 'META-INF/LICENSE', 'META-INF/LICENSE.txt',
-                         'META-INF/NOTICE', 'META-INF/NOTICE.txt',
-                         'META-INF/versions/9/OSGI-INF/MANIFEST.MF']
+                         'META-INF/NOTICE', 'META-INF/NOTICE.txt']
         }
     }
 }
@@ -39,5 +38,4 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:32.7.0')
     implementation 'com.google.firebase:firebase-auth'
     implementation 'com.google.firebase:firebase-firestore'
-    implementation 'org.bouncycastle:bcprov-jdk18on:1.77'
 }
