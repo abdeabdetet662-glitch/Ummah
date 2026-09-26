@@ -5,8 +5,10 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -23,7 +25,10 @@ public class MainActivity extends Activity {
     private WalletManager wm;
     private LinearLayout root;
     private ListenerRegistration countReg;
+    private ListenerRegistration balReg;
     private TextView countView;
+    private TextView balanceView;
+    private Citizen currentCitizen;
 
     @Override
     protected void onCreate(Bundle b) {
@@ -39,7 +44,7 @@ public class MainActivity extends Activity {
         root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
         root.setGravity(Gravity.CENTER);
-        root.setPadding(40, 60, 40, 60);
+        root.setPadding(40, 50, 40, 50);
         scroll.addView(root);
 
         setContentView(scroll);
@@ -47,33 +52,31 @@ public class MainActivity extends Activity {
         fm.signIn(new FirebaseManager.OnDone() {
             @Override public void onSuccess() {
                 if (im.isCitizen()) {
-                    checkAndSyncCitizen(im.getCitizen());
+                    currentCitizen = im.getCitizen();
+                    syncAndShow(currentCitizen);
                 } else {
                     showWelcome();
                 }
             }
             @Override public void onError(String msg) {
                 Toast.makeText(MainActivity.this, "خطأ اتصال: " + msg, Toast.LENGTH_LONG).show();
-                if (im.isCitizen()) showCard(im.getCitizen());
-                else showWelcome();
+                if (im.isCitizen()) {
+                    currentCitizen = im.getCitizen();
+                    showCard(currentCitizen);
+                } else {
+                    showWelcome();
+                }
             }
         });
     }
 
-    private void checkAndSyncCitizen(final Citizen c) {
+    private void syncAndShow(final Citizen c) {
         fm.lookupCitizen(c.nationalId, new FirebaseManager.LookupListener() {
-            @Override public void onFound(String name) {
-                // موجود في Firebase، اعرض البطاقة
-                showCard(c);
-            }
+            @Override public void onFound(String name) { showCard(c); }
             @Override public void onNotFound() {
-                // غير موجود، سجّله في Firebase
                 Toast.makeText(MainActivity.this, "جاري مزامنة حسابك...", Toast.LENGTH_SHORT).show();
                 fm.registerCitizen(c, wm.getBalance(), new FirebaseManager.OnDone() {
-                    @Override public void onSuccess() {
-                        showCard(c);
-                        Toast.makeText(MainActivity.this, "✅ تم تفعيل حسابك", Toast.LENGTH_LONG).show();
-                    }
+                    @Override public void onSuccess() { showCard(c); }
                     @Override public void onError(String msg) {
                         Toast.makeText(MainActivity.this, "خطأ: " + msg, Toast.LENGTH_LONG).show();
                         showCard(c);
@@ -87,14 +90,27 @@ public class MainActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         if (countReg != null) countReg.remove();
+        if (balReg != null) balReg.remove();
     }
 
-    private void startCountListener() {
+    private void startListeners() {
         if (countReg != null) countReg.remove();
         countReg = fm.listenCitizensCount(c ->
             runOnUiThread(() -> {
-                if (countView != null) countView.setText("👥  " + c + " مواطن في الدولة");
+                if (countView != null) countView.setText("👥 " + c + " مواطن");
             }));
+
+        if (balReg != null) balReg.remove();
+        if (currentCitizen != null) {
+            balReg = fm.listenBalance(currentCitizen.nationalId, new FirebaseManager.BalanceListener() {
+                @Override public void onBalance(final int balance) {
+                    runOnUiThread(() -> {
+                        if (balanceView != null) balanceView.setText(balance + " Đ");
+                    });
+                }
+                @Override public void onError(String m) {}
+            });
+        }
     }
 
     private void showWelcome() {
@@ -126,17 +142,20 @@ public class MainActivity extends Activity {
         countView = new TextView(this);
         countView.setText("...");
         countView.setTextColor(Color.parseColor("#D4AF37"));
-        countView.setTextSize(20);
+        countView.setTextSize(18);
         countView.setTypeface(null, Typeface.BOLD);
         countView.setGravity(Gravity.CENTER);
         countView.setPadding(0, 0, 0, 40);
         root.addView(countView);
 
-        startCountListener();
+        startListeners();
 
         Button join = new Button(this);
         join.setText("انضم إلى الأمة");
         join.setTextSize(18);
+        join.setPadding(40, 30, 40, 30);
+        join.setTextColor(Color.WHITE);
+        join.setBackground(makeBg("#0B4F2C", 12));
         join.setOnClickListener(v -> askName());
         root.addView(join);
     }
@@ -158,6 +177,7 @@ public class MainActivity extends Activity {
                 String n = input.getText().toString().trim();
                 if (n.isEmpty()) n = "مواطن مجهول";
                 Citizen citizen = im.registerCitizen(n);
+                currentCitizen = citizen;
                 fm.registerCitizen(citizen, wm.getBalance(), new FirebaseManager.OnDone() {
                     @Override public void onSuccess() { showSeedDialog(citizen); }
                     @Override public void onError(String msg) {
@@ -172,141 +192,163 @@ public class MainActivity extends Activity {
     private void showSeedDialog(Citizen c) {
         new AlertDialog.Builder(this)
             .setTitle("🔐 كلماتك السرية")
-            .setMessage("احفظ هذه الكلمات الـ 12 في مكان آمن.\n\n" + c.seedPhrase)
+            .setMessage("احفظ هذه الكلمات الـ 12 في مكان آمن:\n\n" + c.seedPhrase +
+                    "\n\nهي هويتك الوحيدة.")
             .setPositiveButton("حفظتها", (d, w) -> {
                 showCard(c);
-                Toast.makeText(this, "مرحباً بك", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "مرحباً بك في أُمّة", Toast.LENGTH_LONG).show();
             })
             .setCancelable(false)
             .show();
     }
 
     private void showCard(Citizen c) {
+        currentCitizen = c;
         root.removeAllViews();
 
+        // علم
         TextView flag = new TextView(this);
         flag.setText("🌍");
-        flag.setTextSize(50);
+        flag.setTextSize(36);
         flag.setGravity(Gravity.CENTER);
         root.addView(flag);
 
+        // البطاقة الخضراء
         LinearLayout card = new LinearLayout(this);
         card.setOrientation(LinearLayout.VERTICAL);
-        card.setBackgroundColor(Color.parseColor("#0B4F2C"));
-        card.setPadding(40, 40, 40, 40);
+        card.setBackground(makeBg("#0B4F2C", 16));
+        card.setPadding(30, 24, 30, 24);
         card.setGravity(Gravity.CENTER);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lp.setMargins(0, 20, 0, 20);
+        lp.setMargins(0, 12, 0, 16);
         card.setLayoutParams(lp);
 
         TextView h = new TextView(this);
         h.setText("بطاقة المواطنة");
         h.setTextColor(Color.parseColor("#D4AF37"));
-        h.setTextSize(18);
+        h.setTextSize(14);
         h.setTypeface(null, Typeface.BOLD);
         h.setGravity(Gravity.CENTER);
         card.addView(h);
 
-        addRow(card, "الاسم", c.name);
-        addRow(card, "الرقم الوطني", c.nationalId);
-        addRow(card, "تاريخ الانضمام", c.joinDate);
+        addRow(card, "الاسم", c.name, 20);
+        addRow(card, "الرقم الوطني", c.nationalId, 13);
+        addRow(card, "تاريخ الانضمام", c.joinDate, 14);
 
         root.addView(card);
 
+        // الرصيد الكبير
+        TextView balLabel = new TextView(this);
+        balLabel.setText("رصيدك");
+        balLabel.setTextColor(Color.parseColor("#9E9E9E"));
+        balLabel.setTextSize(12);
+        balLabel.setGravity(Gravity.CENTER);
+        root.addView(balLabel);
+
+        balanceView = new TextView(this);
+        balanceView.setText("...");
+        balanceView.setTextColor(Color.parseColor("#D4AF37"));
+        balanceView.setTextSize(44);
+        balanceView.setTypeface(null, Typeface.BOLD);
+        balanceView.setGravity(Gravity.CENTER);
+        balanceView.setPadding(0, 6, 0, 6);
+        root.addView(balanceView);
+
         countView = new TextView(this);
         countView.setText("...");
-        countView.setTextColor(Color.parseColor("#D4AF37"));
-        countView.setTextSize(15);
-        countView.setTypeface(null, Typeface.BOLD);
+        countView.setTextColor(Color.parseColor("#9E9E9E"));
+        countView.setTextSize(12);
         countView.setGravity(Gravity.CENTER);
-        countView.setPadding(0, 0, 0, 24);
+        countView.setPadding(0, 0, 0, 30);
         root.addView(countView);
 
-        startCountListener();
+        startListeners();
 
-        Button chatBtn = new Button(this);
-        chatBtn.setText("💬  دردشة أُمّة العامة");
-        chatBtn.setTextSize(16);
-        chatBtn.setOnClickListener(v -> startActivity(new Intent(this, ChatActivity.class)));
-        root.addView(chatBtn);
+        // ============ الأزرار المرتّبة بالألوان ============
 
-        Button constBtn = new Button(this);
-        constBtn.setText("🏛️  دستور أُمّة");
-        constBtn.setTextSize(16);
-        constBtn.setOnClickListener(v -> startActivity(new Intent(this, ConstitutionActivity.class)));
-        root.addView(constBtn);
+        // 1. المحفظة (أخضر - الأهم)
+        addColoredButton("💰  محفظتي", "#1B5E20", WalletActivity.class);
 
-        Button newsBtn = new Button(this);
-        newsBtn.setText("📰  أخبار أُمّة");
-        newsBtn.setTextSize(16);
-        newsBtn.setOnClickListener(v -> startActivity(new Intent(this, NewsActivity.class)));
-        root.addView(newsBtn);
+        // 2. الدردشة (أزرق)
+        addColoredButton("💬  دردشة أُمّة", "#0D47A1", ChatActivity.class);
 
-        Button walletBtn = new Button(this);
-        walletBtn.setText("💰  محفظتي");
-        walletBtn.setTextSize(16);
-        walletBtn.setOnClickListener(v -> startActivity(new Intent(this, WalletActivity.class)));
-        root.addView(walletBtn);
+        // 3. دليل المواطنين (أزرق فاتح)
+        addColoredButton("👥  دليل المواطنين", "#1565C0", CitizensActivity.class);
 
-        Button citizensBtn = new Button(this);
-        citizensBtn.setText("👥  دليل المواطنين");
-        citizensBtn.setTextSize(16);
-        citizensBtn.setOnClickListener(v -> startActivity(new Intent(this, CitizensActivity.class)));
-        root.addView(citizensBtn);
+        // 4. المتصدرون (ذهبي)
+        addColoredButton("🏆  المتصدرون", "#B8860B", LeaderboardActivity.class);
 
-        Button treasuryBtn = new Button(this);
-        treasuryBtn.setText("🏦  الخزينة العامة");
-        treasuryBtn.setTextSize(16);
-        treasuryBtn.setOnClickListener(v -> startActivity(new Intent(this, TreasuryActivity.class)));
-        root.addView(treasuryBtn);
+        // 5. الأخبار (بنفسجي)
+        addColoredButton("📰  أخبار أُمّة", "#4A148C", NewsActivity.class);
 
-        Button leaderBtn = new Button(this);
-        leaderBtn.setText("🏆  المتصدرون");
-        leaderBtn.setTextSize(16);
-        leaderBtn.setOnClickListener(v -> startActivity(new Intent(this, LeaderboardActivity.class)));
-        root.addView(leaderBtn);
+        // 6. البرلمان (تركوازي)
+        addColoredButton("🗳️  البرلمان", "#00695C", ParliamentActivity.class);
 
-        Button parlBtn = new Button(this);
-        parlBtn.setText("🗳️  البرلمان");
-        parlBtn.setTextSize(16);
-        parlBtn.setOnClickListener(v -> startActivity(new Intent(this, ParliamentActivity.class)));
-        root.addView(parlBtn);
+        // 7. الانتخابات (أحمر داكن)
+        addColoredButton("👑  الانتخابات الرئاسية", "#7B1FA2", ElectionActivity.class);
 
-        Button electBtn = new Button(this);
-        electBtn.setText("👑  الانتخابات الرئاسية");
-        electBtn.setTextSize(16);
-        electBtn.setOnClickListener(v -> startActivity(new Intent(this, ElectionActivity.class)));
-        root.addView(electBtn);
+        // 8. الدستور (ذهبي داكن)
+        addColoredButton("🏛️  دستور أُمّة", "#795548", ConstitutionActivity.class);
 
+        // 9. الخزينة (أخضر مزرق)
+        addColoredButton("🏦  الخزينة العامة", "#1A237E", TreasuryActivity.class);
+
+        // 10. الكلمات السرية (رمادي - الأسفل)
         Button seedBtn = new Button(this);
         seedBtn.setText("🔐  الكلمات السرية");
-        seedBtn.setTextSize(16);
+        seedBtn.setTextSize(15);
+        seedBtn.setTextColor(Color.parseColor("#CCCCCC"));
+        seedBtn.setBackground(makeBg("#212121", 10));
+        LinearLayout.LayoutParams slp = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        slp.setMargins(0, 8, 0, 0);
+        seedBtn.setLayoutParams(slp);
         seedBtn.setOnClickListener(v -> showSeed(c));
         root.addView(seedBtn);
     }
 
-    private void addRow(LinearLayout p, String label, String val) {
-        LinearLayout r = new LinearLayout(this);
-        r.setOrientation(LinearLayout.VERTICAL);
-        r.setPadding(0, 10, 0, 10);
+    private void addColoredButton(String text, String colorHex, final Class<?> activityClass) {
+        Button btn = new Button(this);
+        btn.setText(text);
+        btn.setTextSize(16);
+        btn.setTextColor(Color.WHITE);
+        btn.setTypeface(null, Typeface.BOLD);
+        btn.setBackground(makeBg(colorHex, 10));
+        btn.setPadding(20, 32, 20, 32);
 
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp.setMargins(0, 8, 0, 0);
+        btn.setLayoutParams(lp);
+
+        btn.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, activityClass)));
+        root.addView(btn);
+    }
+
+    private GradientDrawable makeBg(String colorHex, int cornerRadius) {
+        GradientDrawable g = new GradientDrawable();
+        g.setColor(Color.parseColor(colorHex));
+        g.setCornerRadius(cornerRadius * 3);
+        return g;
+    }
+
+    private void addRow(LinearLayout p, String label, String val, int valSize) {
         TextView l = new TextView(this);
         l.setText(label);
         l.setTextColor(Color.parseColor("#9E9E9E"));
         l.setTextSize(11);
         l.setGravity(Gravity.CENTER);
-        r.addView(l);
+        l.setPadding(0, 8, 0, 2);
+        p.addView(l);
 
         TextView v = new TextView(this);
         v.setText(val);
         v.setTextColor(Color.WHITE);
-        v.setTextSize(16);
+        v.setTextSize(valSize);
         v.setTypeface(null, Typeface.BOLD);
         v.setGravity(Gravity.CENTER);
-        r.addView(v);
-
-        p.addView(r);
+        p.addView(v);
     }
 
     private void showSeed(Citizen c) {
