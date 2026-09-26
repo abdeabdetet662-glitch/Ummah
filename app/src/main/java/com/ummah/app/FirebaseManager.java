@@ -528,7 +528,7 @@ public class FirebaseManager {
         db.collection("citizens").whereEqualTo("seedHash", seedHash).limit(1).get()
             .addOnSuccessListener(q -> {
                 if (q.isEmpty()) { l.onNotFound(); return; }
-                com.google.firebase.firestore.QueryDocumentSnapshot d = q.getDocuments().get(0);
+                com.google.firebase.firestore.DocumentSnapshot d = q.getDocuments().get(0);
                 CitizenItem c = new CitizenItem();
                 c.nationalId = d.getId();
                 c.name = d.getString("name");

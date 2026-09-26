@@ -179,7 +179,11 @@ public class MainActivity extends Activity {
                 Citizen citizen = im.registerCitizen(n);
                 currentCitizen = citizen;
                 fm.registerCitizen(citizen, wm.getBalance(), new FirebaseManager.OnDone() {
-                    @Override public void onSuccess() { showSeedDialog(citizen); }
+                    @Override public void onSuccess() {
+                        String hash = im.hashSeed(citizen.seedPhrase);
+                        fm.saveSeedHash(citizen.nationalId, hash);
+                        showSeedDialog(citizen);
+                    }
                     @Override public void onError(String msg) {
                         Toast.makeText(MainActivity.this, "خطأ: " + msg, Toast.LENGTH_LONG).show();
                     }
