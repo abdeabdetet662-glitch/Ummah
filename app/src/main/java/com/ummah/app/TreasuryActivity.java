@@ -77,11 +77,7 @@ public class TreasuryActivity extends Activity {
         root.addView(contributeBtn);
 
         TextView info = new TextView(this);
-        info.setText("\n\nالخزينة العامة ممولة من تبرعات المواطنين.\n" +
-                "تُستخدم لتمويل المشاريع العامة،\n" +
-                "ومنح المحتاجين، ومكافآت المبدعين.\n\n" +
-                "كل دينار تراه هنا هو مساهمة\n" +
-                "من مواطن حقيقي في مكان ما في العالم.");
+        info.setText("\n\nالخزينة العامة ممولة من تبرعات المواطنين.\nتُستخدم لتمويل المشاريع العامة، ومنح المحتاجين، ومكافآت المبدعين.");
         info.setTextColor(Color.parseColor("#9E9E9E"));
         info.setTextSize(13);
         info.setLineSpacing(8, 1);
@@ -128,28 +124,31 @@ public class TreasuryActivity extends Activity {
             .setPositiveButton("ساهم", (d, w) -> {
                 String s = input.getText().toString().trim();
                 if (s.isEmpty()) return;
-                int amount;
-                try { amount = Integer.parseInt(s); }
-                catch (Exception e) { amount = 0; }
-                if (amount <= 0) {
+                int parsedAmount;
+                try { parsedAmount = Integer.parseInt(s); }
+                catch (Exception e) { parsedAmount = 0; }
+                if (parsedAmount <= 0) {
                     Toast.makeText(this, "مبلغ غير صالح", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if (!wm.spend(amount)) {
+                if (!wm.spend(parsedAmount)) {
                     Toast.makeText(this, "رصيدك غير كافٍ", Toast.LENGTH_LONG).show();
                     return;
                 }
-                fm.contributeToTreasury(amount, new FirebaseManager.OnDone() {
+                final int finalAmount = parsedAmount;
+                fm.contributeToTreasury(finalAmount, new FirebaseManager.OnDone() {
                     @Override public void onSuccess() {
-                        Citizen c = im.getCitizen();
-                        if (c != null) fm.addBalance(c.nationalId, -amount, new FirebaseManager.OnDone() {
-                            @Override public void onSuccess() {}
-                            @Override public void onError(String m) {}
-                        });
+                        Citizen cit = im.getCitizen();
+                        if (cit != null) {
+                            fm.addBalance(cit.nationalId, -finalAmount, new FirebaseManager.OnDone() {
+                                @Override public void onSuccess() {}
+                                @Override public void onError(String m) {}
+                            });
+                        }
                         Toast.makeText(TreasuryActivity.this, "✅ شكراً لمساهمتك", Toast.LENGTH_LONG).show();
                     }
                     @Override public void onError(String msg) {
-                        wm.add(amount);
+                        wm.add(finalAmount);
                         Toast.makeText(TreasuryActivity.this, "خطأ: " + msg, Toast.LENGTH_SHORT).show();
                     }
                 });
