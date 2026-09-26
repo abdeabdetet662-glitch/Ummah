@@ -119,6 +119,16 @@ public class WalletActivity extends Activity {
         });
         root.addView(topupBtn);
 
+        // زر تحديث يدوي
+        Button refreshBtn = new Button(this);
+        refreshBtn.setText("🔄  تحديث الرصيد");
+        refreshBtn.setTextSize(14);
+        refreshBtn.setOnClickListener(v -> {
+            Toast.makeText(WalletActivity.this, "جاري التحديث...", Toast.LENGTH_SHORT).show();
+            startBalanceListener();
+        });
+        root.addView(refreshBtn);
+
         // ============ معلومات ============
         TextView sep = new TextView(this);
         sep.setText("\n━━━━━━━━━━━━━━━━\n");
