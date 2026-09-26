@@ -174,4 +174,12 @@ public class FirebaseManager {
                 l.onTransfers(list);
             });
     }
+
+    public void addBalance(String nationalId, int amount, OnDone cb) {
+        db.collection("citizens").document(nationalId)
+            .update("balance", com.google.firebase.firestore.FieldValue.increment(amount))
+            .addOnSuccessListener(a -> cb.onSuccess())
+            .addOnFailureListener(e -> cb.onError(e.getMessage()));
+    }
 }
+
