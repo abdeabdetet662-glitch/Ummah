@@ -41,6 +41,8 @@ public class FirebaseManager {
             .addOnFailureListener(e -> cb.onError(e.getMessage()));
     }
 
+    // ==================== المواطنون ====================
+
     public void registerCitizen(Citizen c, int balance, OnDone cb) {
         Map<String, Object> data = new HashMap<>();
         data.put("name", c.name);
@@ -76,6 +78,33 @@ public class FirebaseManager {
                 Long b = doc.getLong("balance");
                 l.onBalance(b != null ? b.intValue() : 0);
             });
+    }
+
+    public void addBalance(String nationalId, int amount, OnDone cb) {
+        db.collection("citizens").document(nationalId)
+            .update("balance", com.google.firebase.firestore.FieldValue.increment(amount))
+            .addOnSuccessListener(a -> cb.onSuccess())
+            .addOnFailureListener(e -> cb.onError(e.getMessage()));
+    }
+
+    // ==================== التحويلات ====================
+
+    public interface LookupListener {
+        void onFound(String name);
+        void onNotFound();
+    }
+
+    public void lookupCitizen(String nationalId, LookupListener l) {
+        db.collection("citizens").document(nationalId).get()
+            .addOnSuccessListener(doc -> {
+                if (doc.exists()) {
+                    String name = doc.getString("name");
+                    l.onFound(name != null ? name : "مجهول");
+                } else {
+                    l.onNotFound();
+                }
+            })
+            .addOnFailureListener(e -> l.onNotFound());
     }
 
     public void transfer(String senderId, String receiverId, int amount, String note, OnDone cb) {
@@ -121,24 +150,6 @@ public class FirebaseManager {
           });
     }
 
-    public interface LookupListener {
-        void onFound(String name);
-        void onNotFound();
-    }
-
-    public void lookupCitizen(String nationalId, LookupListener l) {
-        db.collection("citizens").document(nationalId).get()
-            .addOnSuccessListener(doc -> {
-                if (doc.exists()) {
-                    String name = doc.getString("name");
-                    l.onFound(name != null ? name : "مجهول");
-                } else {
-                    l.onNotFound();
-                }
-            })
-            .addOnFailureListener(e -> l.onNotFound());
-    }
-
     public interface TransferListener {
         void onTransfers(java.util.List<TransferItem> list);
     }
@@ -175,14 +186,106 @@ public class FirebaseManager {
             });
     }
 
-    public void addBalance(String nationalId, int amount, OnDone cb) {
-        db.collection("citizens").document(nationalId)
-            .update("balance", com.google.firebase.firestore.FieldValue.increment(amount))
+    // ==================== الدستور ====================
+
+    public void submitConstitutionVote(String nationalId, int articleNum, boolean yes, OnDone cb) {
+        Map<String, Object> v = new HashMap<>();
+        v.put("nationalId", nationalId);
+        v.put("article", articleNum);
+        v.put("yes", yes);
+        v.put("timestamp", System.currentTimeMillis());
+
+        db.collection("constitution_votes").document(nationalId + "_art" + articleNum).set(v)
             .addOnSuccessListener(a -> cb.onSuccess())
             .addOnFailureListener(e -> cb.onError(e.getMessage()));
     }
 
-    // ============ الأخبار ============
+    public interface ConstitutionVotesListener { void onVotes(int[] yes, int[] no); }
+
+    public ListenerRegistration listenConstitutionVotes(ConstitutionVotesListener l) {
+        return db.collection("constitution_votes").addSnapshotListener((snap, e) -> {
+            if (snap == null) return;
+            int[] yes = new int[11];
+            int[] no = new int[11];
+            for (com.google.firebase.firestore.QueryDocumentSnapshot d : snap) {
+                Long art = d.getLong("article");
+                Boolean y = d.getBoolean("yes");
+                if (art == null || y == null) continue;
+                int i = art.intValue();
+                if (i < 1 || i > 10) continue;
+                if (y) yes[i]++; else no[i]++;
+            }
+            l.onVotes(yes, no);
+        });
+    }
+
+    // ==================== البرلمان ====================
+
+    public interface ProposalsListener { void onProposals(java.util.List<Proposal> list); }
+
+    public ListenerRegistration listenProposals(ProposalsListener l) {
+        return db.collection("proposals")
+            .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
+            .limit(50)
+            .addSnapshotListener((snap, e) -> {
+                if (snap == null) return;
+                java.util.List<Proposal> list = new java.util.ArrayList<>();
+                for (com.google.firebase.firestore.QueryDocumentSnapshot d : snap) {
+                    Proposal p = new Proposal(
+                        d.getId(),
+                        d.getString("title") != null ? d.getString("title") : "",
+                        d.getString("body") != null ? d.getString("body") : "",
+                        d.getString("author") != null ? d.getString("author") : "مجهول"
+                    );
+                    Long y = d.getLong("yes");
+                    Long n = d.getLong("no");
+                    p.yes = y != null ? y.intValue() : 0;
+                    p.no = n != null ? n.intValue() : 0;
+                    list.add(p);
+                }
+                l.onProposals(list);
+            });
+    }
+
+    public void submitProposal(Proposal p, OnDone cb) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("title", p.title);
+        data.put("body", p.body);
+        data.put("author", p.author);
+        data.put("yes", 0);
+        data.put("no", 0);
+        data.put("timestamp", System.currentTimeMillis());
+
+        db.collection("proposals").add(data)
+            .addOnSuccessListener(doc -> { p.id = doc.getId(); cb.onSuccess(); })
+            .addOnFailureListener(e -> cb.onError(e.getMessage()));
+    }
+
+    public void voteProposal(String proposalId, String nationalId, boolean yes, OnDone cb) {
+        String voteDocId = proposalId + "_" + nationalId;
+
+        db.collection("proposal_votes").document(voteDocId).get()
+            .addOnSuccessListener(doc -> {
+                if (doc.exists()) { cb.onError("لقد صوّتت مسبقاً"); return; }
+                Map<String, Object> v = new HashMap<>();
+                v.put("proposalId", proposalId);
+                v.put("nationalId", nationalId);
+                v.put("yes", yes);
+                v.put("timestamp", System.currentTimeMillis());
+
+                db.collection("proposal_votes").document(voteDocId).set(v)
+                    .addOnSuccessListener(a ->
+                        db.collection("proposals").document(proposalId)
+                            .update(yes ? "yes" : "no",
+                                com.google.firebase.firestore.FieldValue.increment(1))
+                            .addOnSuccessListener(x -> cb.onSuccess())
+                            .addOnFailureListener(e -> cb.onError(e.getMessage())))
+                    .addOnFailureListener(e -> cb.onError(e.getMessage()));
+            });
+    }
+
+    // ==================== الأخبار ====================
+
     public interface NewsListener { void onNews(java.util.List<NewsItem> list); }
 
     public static class NewsItem {
@@ -193,7 +296,7 @@ public class FirebaseManager {
     }
 
     public void postNews(String author, String content, OnDone cb) {
-        java.util.Map<String, Object> n = new HashMap<>();
+        Map<String, Object> n = new HashMap<>();
         n.put("author", author);
         n.put("content", content);
         n.put("timestamp", System.currentTimeMillis());
@@ -223,7 +326,8 @@ public class FirebaseManager {
             });
     }
 
-    // ============ دليل المواطنين ============
+    // ==================== دليل المواطنين ====================
+
     public interface CitizensListListener { void onList(java.util.List<CitizenItem> list); }
 
     public static class CitizenItem {
@@ -253,6 +357,11 @@ public class FirebaseManager {
             });
     }
 
+    public interface CitizenLookup {
+        void onFound(CitizenItem c);
+        void onNotFound();
+    }
+
     public void searchCitizenByExactId(String nationalId, CitizenLookup cb) {
         db.collection("citizens").document(nationalId).get()
             .addOnSuccessListener(doc -> {
@@ -271,12 +380,8 @@ public class FirebaseManager {
             .addOnFailureListener(e -> cb.onNotFound());
     }
 
-    public interface CitizenLookup {
-        void onFound(CitizenItem c);
-        void onNotFound();
-    }
+    // ==================== الخزينة ====================
 
-    // ============ الخزينة العامة ============
     public ListenerRegistration listenTreasury(BalanceListener l) {
         return db.collection("treasury").document("main")
             .addSnapshotListener((doc, e) -> {
@@ -291,7 +396,7 @@ public class FirebaseManager {
         db.collection("treasury").document("main").get()
             .addOnSuccessListener(doc -> {
                 if (!doc.exists()) {
-                    java.util.Map<String, Object> data = new HashMap<>();
+                    Map<String, Object> data = new HashMap<>();
                     data.put("balance", amount);
                     data.put("createdAt", System.currentTimeMillis());
                     db.collection("treasury").document("main").set(data)
@@ -307,7 +412,8 @@ public class FirebaseManager {
             .addOnFailureListener(e -> cb.onError(e.getMessage()));
     }
 
-    // ============ الدردشة ============
+    // ==================== الدردشة ====================
+
     public static class ChatMessage {
         public String id;
         public String author;
@@ -318,9 +424,8 @@ public class FirebaseManager {
 
     public interface ChatListener { void onMessages(java.util.List<ChatMessage> list); }
 
-    // دردشة عامة
     public void sendGlobalMessage(String author, String nationalId, String text, OnDone cb) {
-        java.util.Map<String, Object> m = new HashMap<>();
+        Map<String, Object> m = new HashMap<>();
         m.put("author", author);
         m.put("nationalId", nationalId);
         m.put("text", text);
@@ -338,20 +443,26 @@ public class FirebaseManager {
                 if (snap == null) return;
                 java.util.List<ChatMessage> list = new java.util.ArrayList<>();
                 for (com.google.firebase.firestore.QueryDocumentSnapshot d : snap) {
-                    list.add(toMsg(d));
+                    ChatMessage m = new ChatMessage();
+                    m.id = d.getId();
+                    m.author = d.getString("author");
+                    m.nationalId = d.getString("nationalId");
+                    m.text = d.getString("text");
+                    Long t = d.getLong("timestamp");
+                    m.timestamp = t != null ? t : 0;
+                    list.add(m);
                 }
                 l.onMessages(list);
             });
     }
 
-    // دردشة خاصة
     private String chatId(String a, String b) {
         return a.compareTo(b) < 0 ? a + "_" + b : b + "_" + a;
     }
 
     public void sendPrivateMessage(String fromId, String fromName, String toId, String text, OnDone cb) {
         String cid = chatId(fromId, toId);
-        java.util.Map<String, Object> m = new HashMap<>();
+        Map<String, Object> m = new HashMap<>();
         m.put("fromId", fromId);
         m.put("fromName", fromName);
         m.put("toId", toId);
@@ -382,16 +493,5 @@ public class FirebaseManager {
                 }
                 l.onMessages(list);
             });
-    }
-
-    private ChatMessage toMsg(com.google.firebase.firestore.QueryDocumentSnapshot d) {
-        ChatMessage m = new ChatMessage();
-        m.id = d.getId();
-        m.author = d.getString("author");
-        m.nationalId = d.getString("nationalId");
-        m.text = d.getString("text");
-        Long t = d.getLong("timestamp");
-        m.timestamp = t != null ? t : 0;
-        return m;
     }
 }
