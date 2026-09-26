@@ -294,7 +294,16 @@ public class MainActivity extends Activity {
         // 9. الخزينة (أخضر مزرق)
         addColoredButton("🏦  الخزينة العامة", "#1A237E", TreasuryActivity.class);
 
-        // 10. الكلمات السرية (رمادي - الأسفل)
+        // 10. المكافأة اليومية (برتقالي)
+        addColoredButton("🎁  مكافأة اليوم", "#E65100", DailyRewardActivity.class);
+
+        // 11. الإحصائيات (رمادي فاتح)
+        addColoredButton("📊  إحصائيات الدولة", "#37474F", StatsActivity.class);
+
+        // 12. استعادة الحساب (بني فاتح)
+        addColoredButton("🔐  استعادة الحساب", "#4E342E", AccountRecoveryActivity.class);
+
+        // 13. الكلمات السرية (رمادي - الأسفل)
         Button seedBtn = new Button(this);
         seedBtn.setText("🔐  الكلمات السرية");
         seedBtn.setTextSize(15);

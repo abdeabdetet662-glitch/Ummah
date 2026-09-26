@@ -18,7 +18,6 @@ public class IdentityManager {
     private static final String KEY_DATE = "join_date";
     private static final String KEY_SEED = "seed_phrase";
 
-    // كلمات عربية لها معنى - تُستخدم لتوليد العبارة السرية
     private static final String[] WORDS = {
         "حرية", "عدالة", "كرامة", "أمل", "سلام", "نور", "حق",
         "خير", "علم", "أمان", "إرادة", "شجاعة", "صدق", "وفاء",
@@ -36,9 +35,7 @@ public class IdentityManager {
         this.prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
     }
 
-    public boolean isCitizen() {
-        return prefs.contains(KEY_ID);
-    }
+    public boolean isCitizen() { return prefs.contains(KEY_ID); }
 
     public Citizen getCitizen() {
         if (!isCitizen()) return null;
@@ -65,6 +62,28 @@ public class IdentityManager {
         return new Citizen(nationalId, name, joinDate, seedPhrase);
     }
 
+    public Citizen restoreCitizen(String id, String name, String date, String seed) {
+        prefs.edit()
+                .putString(KEY_ID, id)
+                .putString(KEY_NAME, name)
+                .putString(KEY_DATE, date)
+                .putString(KEY_SEED, seed)
+                .apply();
+        return new Citizen(id, name, date, seed);
+    }
+
+    public String hashSeed(String seed) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] h = md.digest(seed.getBytes(StandardCharsets.UTF_8));
+            StringBuilder sb = new StringBuilder();
+            for (byte b : h) sb.append(String.format("%02x", b));
+            return sb.toString();
+        } catch (Exception e) {
+            return seed;
+        }
+    }
+
     private String generateSeedPhrase() {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 12; i++) {
@@ -83,7 +102,6 @@ public class IdentityManager {
                 hex.append(String.format("%02X", hash[i]));
             }
             String h = hex.toString();
-            // تنسيق: UMM-XXXX-XXXX-XXXX
             return "UMM-" + h.substring(0, 4) + "-" + h.substring(4, 8) + "-" + h.substring(8, 12);
         } catch (Exception e) {
             return "UMM-0000-0000-0000";

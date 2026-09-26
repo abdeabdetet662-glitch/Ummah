@@ -494,4 +494,59 @@ public class FirebaseManager {
                 l.onMessages(list);
             });
     }
+
+    // ============ الإحصائيات ============
+    public interface StatsListener {
+        void onStats(int citizens, int transfers, int totalTransferred, int news, int proposals);
+    }
+
+    public void loadStats(StatsListener l) {
+        final int[] s = new int[5];
+        db.collection("citizens").get().addOnSuccessListener(q -> {
+            s[0] = q.size();
+            db.collection("transfers").get().addOnSuccessListener(q2 -> {
+                s[1] = q2.size();
+                int total = 0;
+                for (com.google.firebase.firestore.QueryDocumentSnapshot d : q2) {
+                    Long a = d.getLong("amount");
+                    if (a != null) total += a.intValue();
+                }
+                s[2] = total;
+                db.collection("news").get().addOnSuccessListener(q3 -> {
+                    s[3] = q3.size();
+                    db.collection("proposals").get().addOnSuccessListener(q4 -> {
+                        s[4] = q4.size();
+                        l.onStats(s[0], s[1], s[2], s[3], s[4]);
+                    });
+                });
+            });
+        });
+    }
+
+    // ============ استعادة الحساب ============
+    public void lookupBySeedHash(String seedHash, SeedLookup l) {
+        db.collection("citizens").whereEqualTo("seedHash", seedHash).limit(1).get()
+            .addOnSuccessListener(q -> {
+                if (q.isEmpty()) { l.onNotFound(); return; }
+                com.google.firebase.firestore.QueryDocumentSnapshot d = q.getDocuments().get(0);
+                CitizenItem c = new CitizenItem();
+                c.nationalId = d.getId();
+                c.name = d.getString("name");
+                c.joinDate = d.getString("joinDate");
+                Long b = d.getLong("balance");
+                c.balance = b != null ? b.intValue() : 0;
+                l.onFound(c);
+            })
+            .addOnFailureListener(e -> l.onNotFound());
+    }
+
+    public interface SeedLookup {
+        void onFound(CitizenItem c);
+        void onNotFound();
+    }
+
+    // حفظ بصمة الكلمات السرية عند التسجيل
+    public void saveSeedHash(String nationalId, String seedHash) {
+        db.collection("citizens").document(nationalId).update("seedHash", seedHash);
+    }
 }

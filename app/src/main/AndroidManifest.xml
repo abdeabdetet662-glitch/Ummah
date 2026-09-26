@@ -27,5 +27,8 @@
         <activity android:name=".LeaderboardActivity" android:exported="false" />
         <activity android:name=".ChatActivity" android:exported="false" />
         <activity android:name=".PrivateChatActivity" android:exported="false" />
+        <activity android:name=".DailyRewardActivity" android:exported="false" />
+        <activity android:name=".StatsActivity" android:exported="false" />
+        <activity android:name=".AccountRecoveryActivity" android:exported="false" />
     </application>
 </manifest>
