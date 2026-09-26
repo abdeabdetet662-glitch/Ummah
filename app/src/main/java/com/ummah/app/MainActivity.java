@@ -193,11 +193,20 @@ public class MainActivity extends Activity {
             .show();
     }
 
-    private void showSeedDialog(Citizen c) {
+    private void showSeedDialog(final Citizen c) {
         new AlertDialog.Builder(this)
             .setTitle("🔐 كلماتك السرية")
             .setMessage("احفظ هذه الكلمات الـ 12 في مكان آمن:\n\n" + c.seedPhrase +
                     "\n\nهي هويتك الوحيدة.")
+            .setNeutralButton("📋 نسخ", (d, w) -> {
+                android.content.ClipboardManager cm = (android.content.ClipboardManager)
+                        getSystemService(android.content.Context.CLIPBOARD_SERVICE);
+                cm.setPrimaryClip(android.content.ClipData.newPlainText("Seed", c.seedPhrase));
+                Toast.makeText(MainActivity.this, "✅ تم نسخ الكلمات. احفظها في مكان آمن!",
+                        Toast.LENGTH_LONG).show();
+                // إعادة عرض النافذة
+                showSeedDialog(c);
+            })
             .setPositiveButton("حفظتها", (d, w) -> {
                 showCard(c);
                 Toast.makeText(this, "مرحباً بك في أُمّة", Toast.LENGTH_LONG).show();
@@ -304,7 +313,13 @@ public class MainActivity extends Activity {
         // 11. الإحصائيات (رمادي فاتح)
         addColoredButton("📊  إحصائيات الدولة", "#37474F", StatsActivity.class);
 
-        // 12. استعادة الحساب (بني فاتح)
+        // 12. المحكمة
+        addColoredButton("⚖️  محكمة أُمّة", "#5D4037", CourtActivity.class);
+
+        // 13. الهدايا
+        addColoredButton("🎁  الهدايا", "#C2185B", GiftsActivity.class);
+
+        // 14. استعادة الحساب (بني فاتح)
         addColoredButton("🔐  استعادة الحساب", "#4E342E", AccountRecoveryActivity.class);
 
         // 13. الكلمات السرية (رمادي - الأسفل)
@@ -364,10 +379,17 @@ public class MainActivity extends Activity {
         p.addView(v);
     }
 
-    private void showSeed(Citizen c) {
+    private void showSeed(final Citizen c) {
         new AlertDialog.Builder(this)
             .setTitle("🔐 الكلمات السرية")
             .setMessage(c.seedPhrase)
+            .setNeutralButton("📋 نسخ", (d, w) -> {
+                android.content.ClipboardManager cm = (android.content.ClipboardManager)
+                        getSystemService(android.content.Context.CLIPBOARD_SERVICE);
+                cm.setPrimaryClip(android.content.ClipData.newPlainText("Seed", c.seedPhrase));
+                Toast.makeText(MainActivity.this, "✅ تم نسخ الكلمات",
+                        Toast.LENGTH_LONG).show();
+            })
             .setPositiveButton("حسناً", null)
             .show();
     }

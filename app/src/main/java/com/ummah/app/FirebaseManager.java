@@ -549,4 +549,128 @@ public class FirebaseManager {
     public void saveSeedHash(String nationalId, String seedHash) {
         db.collection("citizens").document(nationalId).update("seedHash", seedHash);
     }
+
+    // ==================== المحكمة ====================
+    public static class CourtCase {
+        public String id;
+        public String plaintiffId;
+        public String plaintiffName;
+        public String defendantId;
+        public String defendantName;
+        public String claim;
+        public String recommendation;
+        public String status; // open, agreed, appealed, closed
+        public long timestamp;
+    }
+
+    public interface CasesListener { void onCases(java.util.List<CourtCase> list); }
+
+    public void fileCase(String plaintiffId, String plaintiffName,
+                         String defendantId, String defendantName,
+                         String claim, String recommendation, OnDone cb) {
+        Map<String, Object> c = new HashMap<>();
+        c.put("plaintiffId", plaintiffId);
+        c.put("plaintiffName", plaintiffName);
+        c.put("defendantId", defendantId);
+        c.put("defendantName", defendantName);
+        c.put("claim", claim);
+        c.put("recommendation", recommendation);
+        c.put("status", "open");
+        c.put("timestamp", System.currentTimeMillis());
+
+        db.collection("court_cases").add(c)
+            .addOnSuccessListener(doc -> cb.onSuccess())
+            .addOnFailureListener(e -> cb.onError(e.getMessage()));
+    }
+
+    public ListenerRegistration listenCases(CasesListener l) {
+        return db.collection("court_cases")
+            .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
+            .limit(50)
+            .addSnapshotListener((snap, e) -> {
+                if (snap == null) return;
+                java.util.List<CourtCase> list = new java.util.ArrayList<>();
+                for (com.google.firebase.firestore.QueryDocumentSnapshot d : snap) {
+                    CourtCase c = new CourtCase();
+                    c.id = d.getId();
+                    c.plaintiffId = d.getString("plaintiffId");
+                    c.plaintiffName = d.getString("plaintiffName");
+                    c.defendantId = d.getString("defendantId");
+                    c.defendantName = d.getString("defendantName");
+                    c.claim = d.getString("claim");
+                    c.recommendation = d.getString("recommendation");
+                    c.status = d.getString("status");
+                    Long t = d.getLong("timestamp");
+                    c.timestamp = t != null ? t : 0;
+                    list.add(c);
+                }
+                l.onCases(list);
+            });
+    }
+
+    public void updateCaseStatus(String caseId, String status, OnDone cb) {
+        db.collection("court_cases").document(caseId)
+            .update("status", status)
+            .addOnSuccessListener(a -> cb.onSuccess())
+            .addOnFailureListener(e -> cb.onError(e.getMessage()));
+    }
+
+    // ==================== الهدايا ====================
+    public void sendGift(String fromId, String fromName, String toId,
+                         String giftEmoji, String giftName, int cost, OnDone cb) {
+        // خصم من الرصيد أولاً
+        db.collection("citizens").document(fromId).get()
+            .addOnSuccessListener(doc -> {
+                Long bal = doc.getLong("balance");
+                int cur = bal != null ? bal.intValue() : 0;
+                if (cur < cost) { cb.onError("رصيدك غير كافٍ"); return; }
+
+                Map<String, Object> gift = new HashMap<>();
+                gift.put("fromId", fromId);
+                gift.put("fromName", fromName);
+                gift.put("toId", toId);
+                gift.put("giftEmoji", giftEmoji);
+                gift.put("giftName", giftName);
+                gift.put("cost", cost);
+                gift.put("timestamp", System.currentTimeMillis());
+
+                db.collection("gifts").add(gift)
+                    .addOnSuccessListener(x -> {
+                        db.collection("citizens").document(fromId)
+                            .update("balance", com.google.firebase.firestore.FieldValue.increment(-cost));
+                        cb.onSuccess();
+                    })
+                    .addOnFailureListener(e -> cb.onError(e.getMessage()));
+            })
+            .addOnFailureListener(e -> cb.onError(e.getMessage()));
+    }
+
+    public static class GiftItem {
+        public String fromName;
+        public String giftEmoji;
+        public String giftName;
+        public long timestamp;
+    }
+
+    public interface GiftsListener { void onGifts(java.util.List<GiftItem> list); }
+
+    public ListenerRegistration listenGiftsFor(String nationalId, GiftsListener l) {
+        return db.collection("gifts")
+            .whereEqualTo("toId", nationalId)
+            .limit(50)
+            .addSnapshotListener((snap, e) -> {
+                if (snap == null) return;
+                java.util.List<GiftItem> list = new java.util.ArrayList<>();
+                for (com.google.firebase.firestore.QueryDocumentSnapshot d : snap) {
+                    GiftItem g = new GiftItem();
+                    g.fromName = d.getString("fromName");
+                    g.giftEmoji = d.getString("giftEmoji");
+                    g.giftName = d.getString("giftName");
+                    Long t = d.getLong("timestamp");
+                    g.timestamp = t != null ? t : 0;
+                    list.add(g);
+                }
+                l.onGifts(list);
+            });
+    }
 }
