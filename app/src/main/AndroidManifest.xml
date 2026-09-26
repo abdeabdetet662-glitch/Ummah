@@ -4,24 +4,33 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:label="لوحة أُمّة"
+        android:label="أُمّة"
         android:icon="@mipmap/ic_launcher"
         android:theme="@android:style/Theme.DeviceDefault"
         android:allowBackup="false">
 
-        <activity android:name=".AdminLoginActivity" android:exported="true">
+        <activity android:name=".MainActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <activity android:name=".AdminMainActivity" android:exported="false" />
-        <activity android:name=".AdminCitizensActivity" android:exported="false" />
-        <activity android:name=".AdminComplaintsActivity" android:exported="false" />
-        <activity android:name=".AdminVotesActivity" android:exported="false" />
-        <activity android:name=".AdminChatActivity" android:exported="false" />
-        <activity android:name=".AdminTreasuryActivity" android:exported="false" />
-        <activity android:name=".AdminElectionActivity" android:exported="false" />
+        <activity android:name=".ConstitutionActivity" android:exported="false" />
+        <activity android:name=".WalletActivity" android:exported="false" />
+        <activity android:name=".ParliamentActivity" android:exported="false" />
+        <activity android:name=".TransferActivity" android:exported="false" />
+        <activity android:name=".ElectionActivity" android:exported="false" />
+        <activity android:name=".NewsActivity" android:exported="false" />
+        <activity android:name=".CitizensActivity" android:exported="false" />
+        <activity android:name=".TreasuryActivity" android:exported="false" />
+        <activity android:name=".LeaderboardActivity" android:exported="false" />
+        <activity android:name=".ChatActivity" android:exported="false" />
+        <activity android:name=".PrivateChatActivity" android:exported="false" />
+        <activity android:name=".DailyRewardActivity" android:exported="false" />
+        <activity android:name=".StatsActivity" android:exported="false" />
+        <activity android:name=".AccountRecoveryActivity" android:exported="false" />
+        <activity android:name=".CourtActivity" android:exported="false" />
+        <activity android:name=".GiftsActivity" android:exported="false" />
     </application>
 </manifest>
