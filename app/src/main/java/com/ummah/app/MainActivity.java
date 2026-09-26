@@ -312,6 +312,9 @@ public class MainActivity extends Activity {
 
         // ============ الأزرار المرتّبة بالألوان ============
 
+        // 0. ملفي الشخصي (بني)
+        addColoredButton("👤  ملفي الشخصي", "#5D4037", ProfileActivity.class);
+
         // 1. المحفظة (أخضر - الأهم)
         addColoredButton("💰  محفظتي", "#1B5E20", WalletActivity.class);
 
