@@ -723,4 +723,40 @@ public class FirebaseManager {
         u.put("online", false);
         db.collection("citizens").document(nationalId).update(u);
     }
+
+    // ==================== الإبلاغ ====================
+    public void reportMessage(String reporterId, String reporterName,
+                              String reportedId, String reportedName,
+                              String messageId, String messageText, OnDone cb) {
+        java.util.Map<String, Object> r = new HashMap<>();
+        r.put("reporterId", reporterId);
+        r.put("reporterName", reporterName);
+        r.put("reportedId", reportedId);
+        r.put("reportedName", reportedName);
+        r.put("messageId", messageId);
+        r.put("messageText", messageText);
+        r.put("timestamp", System.currentTimeMillis());
+
+        db.collection("reports").add(r)
+            .addOnSuccessListener(doc -> cb.onSuccess())
+            .addOnFailureListener(e -> cb.onError(e.getMessage()));
+    }
+
+    // ==================== فحص الحالة ====================
+    public interface StatusListener {
+        void onStatus(boolean blocked, boolean muted, long mutedUntil);
+        void onError(String msg);
+    }
+
+    public void checkMyStatus(String nationalId, StatusListener l) {
+        db.collection("citizens").document(nationalId).get()
+            .addOnSuccessListener(doc -> {
+                if (!doc.exists()) { l.onStatus(false, false, 0); return; }
+                Boolean b = doc.getBoolean("blocked");
+                Boolean m = doc.getBoolean("muted");
+                Long mu = doc.getLong("mutedUntil");
+                l.onStatus(b != null && b, m != null && m, mu != null ? mu : 0);
+            })
+            .addOnFailureListener(e -> l.onStatus(false, false, 0));
+    }
 }

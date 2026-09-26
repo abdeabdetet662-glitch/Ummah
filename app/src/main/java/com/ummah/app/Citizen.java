@@ -5,7 +5,13 @@ public class Citizen {
     public String name;
     public String joinDate;
     public String seedPhrase;
-    public String country; // رمز مثل DZ, EG, SA
+    public String country;
+    public int balance;
+    public long lastSeen;
+    public boolean online;
+    public boolean blocked;
+    public boolean muted;
+    public long mutedUntil;
 
     public Citizen(String nationalId, String name, String joinDate, String seedPhrase, String country) {
         this.nationalId = nationalId;

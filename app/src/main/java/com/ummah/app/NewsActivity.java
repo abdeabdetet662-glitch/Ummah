@@ -130,8 +130,31 @@ public class NewsActivity extends Activity {
     }
 
     private void showPostDialog() {
-        Citizen me = im.getCitizen();
+        final Citizen me = im.getCitizen();
         if (me == null) return;
+
+        // تحقق من الحالة
+        fm.checkMyStatus(me.nationalId, new FirebaseManager.StatusListener() {
+            @Override public void onStatus(boolean blocked, boolean muted, long until) {
+                if (blocked) {
+                    runOnUiThread(() -> Toast.makeText(NewsActivity.this,
+                            "🚫 أنت محظور من النشر", Toast.LENGTH_LONG).show());
+                    return;
+                }
+                if (muted && until > System.currentTimeMillis()) {
+                    runOnUiThread(() -> Toast.makeText(NewsActivity.this,
+                            "🔇 أنت مكتوم مؤقتاً", Toast.LENGTH_LONG).show());
+                    return;
+                }
+                runOnUiThread(() -> showPostDialogReal(me));
+            }
+            @Override public void onError(String msg) {
+                runOnUiThread(() -> showPostDialogReal(me));
+            }
+        });
+    }
+
+    private void showPostDialogReal(final Citizen me) {
 
         final EditText input = new EditText(this);
         input.setHint("اكتب ما تريد...");

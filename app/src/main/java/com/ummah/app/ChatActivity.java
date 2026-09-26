@@ -1,6 +1,7 @@
 package com.ummah.app;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -26,8 +27,12 @@ public class ChatActivity extends Activity {
     private LinearLayout messagesContainer;
     private ScrollView scroll;
     private EditText input;
+    private Button sendBtn;
     private ListenerRegistration reg;
     private Citizen me;
+    private boolean isBlocked = false;
+    private boolean isMuted = false;
+    private long mutedUntil = 0;
 
     @Override
     protected void onCreate(Bundle b) {
@@ -41,7 +46,6 @@ public class ChatActivity extends Activity {
         root.setOrientation(LinearLayout.VERTICAL);
         root.setBackgroundColor(Color.parseColor("#0A0A0A"));
 
-        // الرأس
         TextView title = new TextView(this);
         title.setText("💬 دردشة أُمّة العامة");
         title.setTextColor(Color.parseColor("#D4AF37"));
@@ -59,7 +63,6 @@ public class ChatActivity extends Activity {
         sub.setPadding(0, 0, 0, 20);
         root.addView(sub);
 
-        // منطقة الرسائل
         scroll = new ScrollView(this);
         scroll.setLayoutParams(new LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
@@ -69,7 +72,6 @@ public class ChatActivity extends Activity {
         scroll.addView(messagesContainer);
         root.addView(scroll);
 
-        // شريط الإرسال
         LinearLayout bar = new LinearLayout(this);
         bar.setOrientation(LinearLayout.HORIZONTAL);
         bar.setPadding(16, 10, 16, 16);
@@ -82,16 +84,17 @@ public class ChatActivity extends Activity {
         input.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
         bar.addView(input);
 
-        Button send = new Button(this);
-        send.setText("إرسال");
-        send.setTextSize(14);
-        send.setOnClickListener(v -> sendMessage());
-        bar.addView(send);
+        sendBtn = new Button(this);
+        sendBtn.setText("إرسال");
+        sendBtn.setTextSize(14);
+        sendBtn.setOnClickListener(v -> sendMessage());
+        bar.addView(sendBtn);
 
         root.addView(bar);
         setContentView(root);
 
         startListener();
+        checkStatus();
     }
 
     @Override
@@ -100,7 +103,45 @@ public class ChatActivity extends Activity {
         if (reg != null) reg.remove();
     }
 
+    private void checkStatus() {
+        fm.checkMyStatus(me.nationalId, new FirebaseManager.StatusListener() {
+            @Override public void onStatus(boolean blocked, boolean muted, long until) {
+                isBlocked = blocked;
+                isMuted = muted && until > System.currentTimeMillis();
+                mutedUntil = until;
+                runOnUiThread(() -> updateInputState());
+            }
+            @Override public void onError(String msg) {}
+        });
+    }
+
+    private void updateInputState() {
+        if (isBlocked) {
+            input.setEnabled(false);
+            input.setHint("🚫 أنت محظور من الإرسال");
+            sendBtn.setEnabled(false);
+        } else if (isMuted) {
+            long remaining = mutedUntil - System.currentTimeMillis();
+            long minutes = remaining / 60000;
+            input.setEnabled(false);
+            input.setHint("🔇 أنت مكتوم — " + minutes + " دقيقة");
+            sendBtn.setEnabled(false);
+        } else {
+            input.setEnabled(true);
+            input.setHint("اكتب رسالة...");
+            sendBtn.setEnabled(true);
+        }
+    }
+
     private void sendMessage() {
+        if (isBlocked) {
+            Toast.makeText(this, "🚫 أنت محظور من الإرسال", Toast.LENGTH_LONG).show();
+            return;
+        }
+        if (isMuted && mutedUntil > System.currentTimeMillis()) {
+            Toast.makeText(this, "🔇 أنت مكتوم مؤقتاً", Toast.LENGTH_LONG).show();
+            return;
+        }
         String text = input.getText().toString().trim();
         if (text.isEmpty()) return;
         input.setText("");
@@ -149,8 +190,6 @@ public class ChatActivity extends Activity {
         bubble.setOrientation(LinearLayout.VERTICAL);
         bubble.setBackgroundColor(mine ? Color.parseColor("#0B4F2C") : Color.parseColor("#1E1E1E"));
         bubble.setPadding(24, 16, 24, 16);
-        bubble.setLayoutParams(new LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 
         TextView author = new TextView(this);
         author.setText(m.author != null ? m.author : "مجهول");
@@ -166,13 +205,48 @@ public class ChatActivity extends Activity {
         text.setPadding(0, 6, 0, 4);
         bubble.addView(text);
 
+        LinearLayout bottomRow = new LinearLayout(this);
+        bottomRow.setOrientation(LinearLayout.HORIZONTAL);
+        bottomRow.setGravity(Gravity.CENTER_VERTICAL);
+
         TextView date = new TextView(this);
         date.setText(new SimpleDateFormat("HH:mm", Locale.US).format(new Date(m.timestamp)));
         date.setTextColor(Color.parseColor("#757575"));
         date.setTextSize(9);
-        bubble.addView(date);
+        bottomRow.addView(date);
 
+        // زر الإبلاغ (فقط لرسائل الآخرين)
+        if (!mine && m.nationalId != null) {
+            TextView reportBtn = new TextView(this);
+            reportBtn.setText("  🚩");
+            reportBtn.setTextSize(12);
+            reportBtn.setPadding(12, 0, 0, 0);
+            reportBtn.setOnClickListener(v -> reportMessage(m));
+            bottomRow.addView(reportBtn);
+        }
+
+        bubble.addView(bottomRow);
         wrapper.addView(bubble);
         return wrapper;
+    }
+
+    private void reportMessage(final FirebaseManager.ChatMessage m) {
+        new AlertDialog.Builder(this)
+            .setTitle("🚩 إبلاغ عن الرسالة")
+            .setMessage("هل تريد الإبلاغ عن هذه الرسالة؟\n\n\"" + m.text + "\"\n\nمن: " + m.author)
+            .setPositiveButton("إبلاغ", (d, w) -> {
+                fm.reportMessage(me.nationalId, me.name, m.nationalId, m.author,
+                        m.id, m.text, new FirebaseManager.OnDone() {
+                    @Override public void onSuccess() {
+                        Toast.makeText(ChatActivity.this,
+                            "✅ تم الإبلاغ — شكراً لك", Toast.LENGTH_LONG).show();
+                    }
+                    @Override public void onError(String msg) {
+                        Toast.makeText(ChatActivity.this, "خطأ: " + msg, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            })
+            .setNegativeButton("إلغاء", null)
+            .show();
     }
 }
