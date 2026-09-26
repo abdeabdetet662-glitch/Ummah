@@ -2,6 +2,9 @@ package com.ummah.app;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -14,19 +17,26 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.firestore.ListenerRegistration;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
 public class TransferActivity extends Activity {
-    private WalletManager wm;
+    private FirebaseManager fm;
     private IdentityManager im;
-    private TransferManager tm;
     private TextView balanceView;
     private LinearLayout historyContainer;
+    private ListenerRegistration balReg;
+    private ListenerRegistration txReg;
 
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
-        wm = new WalletManager(this);
+        fm = FirebaseManager.get();
         im = new IdentityManager(this);
-        tm = new TransferManager(this);
 
         ScrollView scroll = new ScrollView(this);
         scroll.setBackgroundColor(Color.parseColor("#0A0A0A"));
@@ -36,73 +46,56 @@ public class TransferActivity extends Activity {
         scroll.addView(root);
 
         TextView title = new TextView(this);
-        title.setText("💸 إرسال دينار");
+        title.setText("💸 التحويلات");
         title.setTextColor(Color.parseColor("#D4AF37"));
-        title.setTextSize(28);
+        title.setTextSize(26);
         title.setTypeface(null, Typeface.BOLD);
         title.setGravity(Gravity.CENTER);
         root.addView(title);
 
         TextView sub = new TextView(this);
-        sub.setText("حوّل الدينار لمواطن آخر");
+        sub.setText("أرسل ديناراً لمواطن آخر في أي مكان في العالم");
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(12);
         sub.setGravity(Gravity.CENTER);
         sub.setPadding(0, 8, 0, 30);
         root.addView(sub);
 
-        // الرصيد الحالي
         TextView bLabel = new TextView(this);
-        bLabel.setText("رصيدك الحالي:");
+        bLabel.setText("رصيدك:");
         bLabel.setTextColor(Color.parseColor("#9E9E9E"));
         bLabel.setTextSize(12);
         bLabel.setGravity(Gravity.CENTER);
         root.addView(bLabel);
 
         balanceView = new TextView(this);
-        balanceView.setText(wm.getBalance() + " Đ");
+        balanceView.setText("...");
         balanceView.setTextColor(Color.parseColor("#D4AF37"));
-        balanceView.setTextSize(38);
+        balanceView.setTextSize(36);
         balanceView.setTypeface(null, Typeface.BOLD);
         balanceView.setGravity(Gravity.CENTER);
         balanceView.setPadding(0, 8, 0, 30);
         root.addView(balanceView);
 
-        // زر الإرسال
         Button sendBtn = new Button(this);
         sendBtn.setText("📤  إرسال دينار");
         sendBtn.setTextSize(16);
         sendBtn.setOnClickListener(v -> showSendDialog());
         root.addView(sendBtn);
 
-        // زر عرض رقمي للاستقبال
-        Button receiveBtn = new Button(this);
-        receiveBtn.setText("📥  رقمي للاستقبال");
-        receiveBtn.setTextSize(16);
-        receiveBtn.setOnClickListener(v -> showMyId());
-        root.addView(receiveBtn);
+        Button myIdBtn = new Button(this);
+        myIdBtn.setText("📥  رقمي للاستقبال");
+        myIdBtn.setTextSize(14);
+        myIdBtn.setOnClickListener(v -> showMyId());
+        root.addView(myIdBtn);
 
-        // زر استقبال تجريبي (للتجربة)
-        Button fakeBtn = new Button(this);
-        fakeBtn.setText("🧪  استقبال تجريبي (+50 Đ)");
-        fakeBtn.setTextSize(14);
-        fakeBtn.setOnClickListener(v -> {
-            tm.addFakeReceive(50);
-            wm.add(50);
-            balanceView.setText(wm.getBalance() + " Đ");
-            Toast.makeText(this, "+50 Đ", Toast.LENGTH_SHORT).show();
-            refreshHistory();
-        });
-        root.addView(fakeBtn);
-
-        // فاصل
         TextView sep = new TextView(this);
         sep.setText("\n━━━ سجل التحويلات ━━━\n");
         sep.setTextColor(Color.parseColor("#D4AF37"));
         sep.setTextSize(14);
         sep.setTypeface(null, Typeface.BOLD);
         sep.setGravity(Gravity.CENTER);
-        sep.setPadding(0, 40, 0, 20);
+        sep.setPadding(0, 30, 0, 16);
         root.addView(sep);
 
         historyContainer = new LinearLayout(this);
@@ -110,12 +103,40 @@ public class TransferActivity extends Activity {
         root.addView(historyContainer);
 
         setContentView(scroll);
-        refreshHistory();
+
+        startBalance();
+        startTxListener();
     }
 
-    private void refreshHistory() {
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (balReg != null) balReg.remove();
+        if (txReg != null) txReg.remove();
+    }
+
+    private void startBalance() {
+        Citizen c = im.getCitizen();
+        if (c == null) return;
+        balReg = fm.listenBalance(c.nationalId, new FirebaseManager.BalanceListener() {
+            @Override public void onBalance(int balance) {
+                runOnUiThread(() -> balanceView.setText(balance + " Đ"));
+            }
+            @Override public void onError(String m) {}
+        });
+    }
+
+    private void startTxListener() {
+        Citizen c = im.getCitizen();
+        if (c == null) return;
+        txReg = fm.listenMyTransfers(c.nationalId, list ->
+            runOnUiThread(() -> refreshHistory(list)));
+    }
+
+    private void refreshHistory(List<FirebaseManager.TransferItem> list) {
         historyContainer.removeAllViews();
-        java.util.List<TransferManager.Transfer> list = tm.getSent();
+        Citizen me = im.getCitizen();
+        if (me == null) return;
 
         if (list.isEmpty()) {
             TextView empty = new TextView(this);
@@ -128,7 +149,8 @@ public class TransferActivity extends Activity {
             return;
         }
 
-        for (TransferManager.Transfer t : list) {
+        for (FirebaseManager.TransferItem t : list) {
+            boolean isSender = me.nationalId.equals(t.from);
             LinearLayout card = new LinearLayout(this);
             card.setOrientation(LinearLayout.VERTICAL);
             card.setBackgroundColor(Color.parseColor("#141414"));
@@ -138,35 +160,43 @@ public class TransferActivity extends Activity {
             lp.setMargins(0, 0, 0, 12);
             card.setLayoutParams(lp);
 
-            TextView to = new TextView(this);
-            to.setText("← إلى: " + t.toId);
-            to.setTextColor(Color.WHITE);
-            to.setTextSize(14);
-            to.setTypeface(null, Typeface.BOLD);
-            card.addView(to);
+            TextView dir = new TextView(this);
+            dir.setText(isSender ? "📤 أرسلت" : "📥 استقبلت");
+            dir.setTextColor(isSender ? Color.parseColor("#F44336") : Color.parseColor("#4CAF50"));
+            dir.setTextSize(13);
+            dir.setTypeface(null, Typeface.BOLD);
+            card.addView(dir);
+
+            TextView other = new TextView(this);
+            other.setText((isSender ? "إلى: " : "من: ") + (isSender ? t.to : t.from));
+            other.setTextColor(Color.WHITE);
+            other.setTextSize(12);
+            other.setPadding(0, 6, 0, 4);
+            card.addView(other);
 
             TextView amt = new TextView(this);
-            amt.setText("- " + t.amount + " Đ");
-            amt.setTextColor(Color.parseColor("#F44336"));
-            amt.setTextSize(18);
+            amt.setText((isSender ? "- " : "+ ") + t.amount + " Đ");
+            amt.setTextColor(isSender ? Color.parseColor("#F44336") : Color.parseColor("#4CAF50"));
+            amt.setTextSize(20);
             amt.setTypeface(null, Typeface.BOLD);
-            amt.setPadding(0, 6, 0, 4);
+            amt.setPadding(0, 4, 0, 4);
             card.addView(amt);
-
-            TextView date = new TextView(this);
-            date.setText(t.date);
-            date.setTextColor(Color.parseColor("#757575"));
-            date.setTextSize(11);
-            card.addView(date);
 
             if (t.note != null && !t.note.isEmpty()) {
                 TextView n = new TextView(this);
                 n.setText("📝 " + t.note);
                 n.setTextColor(Color.parseColor("#9E9E9E"));
                 n.setTextSize(12);
-                n.setPadding(0, 6, 0, 0);
                 card.addView(n);
             }
+
+            TextView date = new TextView(this);
+            String d = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US).format(new Date(t.timestamp));
+            date.setText(d);
+            date.setTextColor(Color.parseColor("#616161"));
+            date.setTextSize(10);
+            date.setPadding(0, 6, 0, 0);
+            card.addView(date);
 
             historyContainer.addView(card);
         }
@@ -178,14 +208,14 @@ public class TransferActivity extends Activity {
         c.setPadding(40, 20, 40, 20);
 
         final EditText idInput = new EditText(this);
-        idInput.setHint("الرقم الوطني للمواطن (UMM-XXXX-...)");
+        idInput.setHint("الرقم الوطني (UMM-XXXX-XXXX-XXXX)");
         idInput.setTextColor(Color.WHITE);
         idInput.setHintTextColor(Color.GRAY);
         idInput.setInputType(InputType.TYPE_CLASS_TEXT);
         c.addView(idInput);
 
         final EditText amtInput = new EditText(this);
-        amtInput.setHint("المبلغ (بالدينار)");
+        amtInput.setHint("المبلغ (دينار)");
         amtInput.setTextColor(Color.WHITE);
         amtInput.setHintTextColor(Color.GRAY);
         amtInput.setInputType(InputType.TYPE_CLASS_NUMBER);
@@ -195,7 +225,6 @@ public class TransferActivity extends Activity {
         noteInput.setHint("ملاحظة (اختياري)");
         noteInput.setTextColor(Color.WHITE);
         noteInput.setHintTextColor(Color.GRAY);
-        noteInput.setInputType(InputType.TYPE_CLASS_TEXT);
         c.addView(noteInput);
 
         new AlertDialog.Builder(this)
@@ -205,40 +234,27 @@ public class TransferActivity extends Activity {
                 String toId = idInput.getText().toString().trim();
                 String amtStr = amtInput.getText().toString().trim();
                 String note = noteInput.getText().toString().trim();
-
-                if (toId.isEmpty()) {
-                    Toast.makeText(this, "أدخل الرقم الوطني", Toast.LENGTH_SHORT).show();
+                Citizen me = im.getCitizen();
+                if (me == null) return;
+                if (toId.isEmpty() || amtStr.isEmpty()) {
+                    Toast.makeText(this, "املأ الحقول", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if (amtStr.isEmpty()) {
-                    Toast.makeText(this, "أدخل المبلغ", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
                 int amount;
                 try { amount = Integer.parseInt(amtStr); }
                 catch (Exception e) { amount = 0; }
-
                 if (amount <= 0) {
-                    Toast.makeText(this, "المبلغ غير صالح", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "مبلغ غير صالح", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
-                Citizen me = im.getCitizen();
-                if (me != null && me.nationalId.equals(toId)) {
-                    Toast.makeText(this, "لا يمكنك الإرسال لنفسك", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                if (!wm.spend(amount)) {
-                    Toast.makeText(this, "رصيدك غير كافٍ", Toast.LENGTH_LONG).show();
-                    return;
-                }
-
-                tm.addSent(toId, amount, note);
-                balanceView.setText(wm.getBalance() + " Đ");
-                refreshHistory();
-                Toast.makeText(this, "✅ أُرسل " + amount + " Đ", Toast.LENGTH_LONG).show();
+                fm.transfer(me.nationalId, toId, amount, note, new FirebaseManager.OnDone() {
+                    @Override public void onSuccess() {
+                        Toast.makeText(TransferActivity.this, "✅ تم التحويل", Toast.LENGTH_LONG).show();
+                    }
+                    @Override public void onError(String msg) {
+                        Toast.makeText(TransferActivity.this, "❌ " + msg, Toast.LENGTH_LONG).show();
+                    }
+                });
             })
             .setNegativeButton("إلغاء", null)
             .show();
@@ -247,13 +263,15 @@ public class TransferActivity extends Activity {
     private void showMyId() {
         Citizen me = im.getCitizen();
         if (me == null) return;
-
         new AlertDialog.Builder(this)
             .setTitle("📥 رقمك للاستقبال")
-            .setMessage("أعطِ هذا الرقم لمن يريد أن يرسل لك ديناراً:\n\n" +
-                    me.nationalId + "\n\n" +
-                    "اسمك: " + me.name)
-            .setPositiveButton("حسناً", null)
+            .setMessage("أعطِ هذا الرقم لمن يريد أن يرسل لك:\n\n" + me.nationalId)
+            .setPositiveButton("نسخ", (d, w) -> {
+                ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                cm.setPrimaryClip(ClipData.newPlainText("ID", me.nationalId));
+                Toast.makeText(this, "تم النسخ", Toast.LENGTH_SHORT).show();
+            })
+            .setNegativeButton("إغلاق", null)
             .show();
     }
 }
