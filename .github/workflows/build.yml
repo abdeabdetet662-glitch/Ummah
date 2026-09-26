@@ -1,4 +1,4 @@
-name: Build Ummah APK
+name: Build Ummah Admin
 
 on:
   push:
@@ -18,12 +18,11 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Accept Android licenses and install packages
+      - name: Install Android SDK packages
         run: |
           SDK=/usr/local/lib/android/sdk
           yes | $SDK/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null 2>&1 || true
           yes | $SDK/cmdline-tools/latest/bin/sdkmanager "platforms;android-34" "build-tools;34.0.0" > /dev/null 2>&1 || true
-          echo "Android SDK ready"
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
@@ -35,6 +34,5 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: Ummah-debug-apk
+          name: UmmahAdmin-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: warn
