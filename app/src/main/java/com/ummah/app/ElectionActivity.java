@@ -278,7 +278,7 @@ public class ElectionActivity extends Activity {
                     Toast.makeText(this, "لا يوجد مرشحون", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                com.google.firebase.firestore.QueryDocumentSnapshot d = q.getDocuments().get(0);
+                com.google.firebase.firestore.DocumentSnapshot d = q.getDocuments().get(0);
                 String name = d.getString("name");
                 String slogan = d.getString("slogan");
                 Long v = d.getLong("votes");
