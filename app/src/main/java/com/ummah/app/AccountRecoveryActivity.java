@@ -105,7 +105,8 @@ public class AccountRecoveryActivity extends Activity {
                     .setPositiveButton("استعادة", (d, w) -> {
                         // إعادة التسجيل في IdentityManager
                         IdentityManager im = new IdentityManager(AccountRecoveryActivity.this);
-                        im.restoreCitizen(c.nationalId, c.name, c.joinDate, seed);
+                        String country = c.country != null ? c.country : "DZ";
+                        im.restoreCitizen(c.nationalId, c.name, c.joinDate, seed, country);
                         Toast.makeText(AccountRecoveryActivity.this,
                                 "✅ تم الاستعادة. أعد تشغيل التطبيق.", Toast.LENGTH_LONG).show();
                         finish();
