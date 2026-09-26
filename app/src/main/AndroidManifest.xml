@@ -20,5 +20,6 @@
         <activity android:name=".ConstitutionActivity" android:exported="false" />
         <activity android:name=".WalletActivity" android:exported="false" />
         <activity android:name=".ParliamentActivity" android:exported="false" />
+        <activity android:name=".TransferActivity" android:exported="false" />
     </application>
 </manifest>

@@ -158,6 +158,14 @@ public class WalletActivity extends Activity {
         hint.setPadding(0, 30, 0, 0);
         root.addView(hint);
 
+        Button transferBtn = new Button(this);
+        transferBtn.setText("💸  إرسال / استقبال دينار");
+        transferBtn.setTextSize(14);
+        transferBtn.setOnClickListener(v -> {
+            startActivity(new android.content.Intent(WalletActivity.this, TransferActivity.class));
+        });
+        root.addView(transferBtn);
+
         setContentView(scroll);
         loadEthBalance();
     }
