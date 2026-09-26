@@ -212,6 +212,11 @@ public class TransferActivity extends Activity {
         idInput.setTextColor(Color.WHITE);
         idInput.setHintTextColor(Color.GRAY);
         idInput.setInputType(InputType.TYPE_CLASS_TEXT);
+
+        // prefill_id من CitizensActivity
+        String prefill = getIntent().getStringExtra("prefill_id");
+        if (prefill != null) idInput.setText(prefill);
+
         c.addView(idInput);
 
         final EditText amtInput = new EditText(this);

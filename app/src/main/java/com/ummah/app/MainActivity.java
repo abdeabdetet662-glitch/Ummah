@@ -225,11 +225,23 @@ public class MainActivity extends Activity {
 
         startCountListener();
 
+        Button chatBtn = new Button(this);
+        chatBtn.setText("💬  دردشة أُمّة العامة");
+        chatBtn.setTextSize(16);
+        chatBtn.setOnClickListener(v -> startActivity(new Intent(this, ChatActivity.class)));
+        root.addView(chatBtn);
+
         Button constBtn = new Button(this);
         constBtn.setText("🏛️  دستور أُمّة");
         constBtn.setTextSize(16);
         constBtn.setOnClickListener(v -> startActivity(new Intent(this, ConstitutionActivity.class)));
         root.addView(constBtn);
+
+        Button newsBtn = new Button(this);
+        newsBtn.setText("📰  أخبار أُمّة");
+        newsBtn.setTextSize(16);
+        newsBtn.setOnClickListener(v -> startActivity(new Intent(this, NewsActivity.class)));
+        root.addView(newsBtn);
 
         Button walletBtn = new Button(this);
         walletBtn.setText("💰  محفظتي");
@@ -237,11 +249,35 @@ public class MainActivity extends Activity {
         walletBtn.setOnClickListener(v -> startActivity(new Intent(this, WalletActivity.class)));
         root.addView(walletBtn);
 
+        Button citizensBtn = new Button(this);
+        citizensBtn.setText("👥  دليل المواطنين");
+        citizensBtn.setTextSize(16);
+        citizensBtn.setOnClickListener(v -> startActivity(new Intent(this, CitizensActivity.class)));
+        root.addView(citizensBtn);
+
+        Button treasuryBtn = new Button(this);
+        treasuryBtn.setText("🏦  الخزينة العامة");
+        treasuryBtn.setTextSize(16);
+        treasuryBtn.setOnClickListener(v -> startActivity(new Intent(this, TreasuryActivity.class)));
+        root.addView(treasuryBtn);
+
+        Button leaderBtn = new Button(this);
+        leaderBtn.setText("🏆  المتصدرون");
+        leaderBtn.setTextSize(16);
+        leaderBtn.setOnClickListener(v -> startActivity(new Intent(this, LeaderboardActivity.class)));
+        root.addView(leaderBtn);
+
         Button parlBtn = new Button(this);
         parlBtn.setText("🗳️  البرلمان");
         parlBtn.setTextSize(16);
         parlBtn.setOnClickListener(v -> startActivity(new Intent(this, ParliamentActivity.class)));
         root.addView(parlBtn);
+
+        Button electBtn = new Button(this);
+        electBtn.setText("👑  الانتخابات الرئاسية");
+        electBtn.setTextSize(16);
+        electBtn.setOnClickListener(v -> startActivity(new Intent(this, ElectionActivity.class)));
+        root.addView(electBtn);
 
         Button seedBtn = new Button(this);
         seedBtn.setText("🔐  الكلمات السرية");

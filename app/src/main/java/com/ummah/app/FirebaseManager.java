@@ -181,5 +181,217 @@ public class FirebaseManager {
             .addOnSuccessListener(a -> cb.onSuccess())
             .addOnFailureListener(e -> cb.onError(e.getMessage()));
     }
-}
 
+    // ============ الأخبار ============
+    public interface NewsListener { void onNews(java.util.List<NewsItem> list); }
+
+    public static class NewsItem {
+        public String id;
+        public String author;
+        public String content;
+        public long timestamp;
+    }
+
+    public void postNews(String author, String content, OnDone cb) {
+        java.util.Map<String, Object> n = new HashMap<>();
+        n.put("author", author);
+        n.put("content", content);
+        n.put("timestamp", System.currentTimeMillis());
+
+        db.collection("news").add(n)
+            .addOnSuccessListener(doc -> cb.onSuccess())
+            .addOnFailureListener(e -> cb.onError(e.getMessage()));
+    }
+
+    public ListenerRegistration listenNews(NewsListener l) {
+        return db.collection("news")
+            .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
+            .limit(50)
+            .addSnapshotListener((snap, e) -> {
+                if (snap == null) return;
+                java.util.List<NewsItem> list = new java.util.ArrayList<>();
+                for (com.google.firebase.firestore.QueryDocumentSnapshot d : snap) {
+                    NewsItem n = new NewsItem();
+                    n.id = d.getId();
+                    n.author = d.getString("author");
+                    n.content = d.getString("content");
+                    Long t = d.getLong("timestamp");
+                    n.timestamp = t != null ? t : 0;
+                    list.add(n);
+                }
+                l.onNews(list);
+            });
+    }
+
+    // ============ دليل المواطنين ============
+    public interface CitizensListListener { void onList(java.util.List<CitizenItem> list); }
+
+    public static class CitizenItem {
+        public String nationalId;
+        public String name;
+        public String joinDate;
+        public int balance;
+    }
+
+    public ListenerRegistration listenTopCitizens(int limit, CitizensListListener l) {
+        return db.collection("citizens")
+            .orderBy("balance", com.google.firebase.firestore.Query.Direction.DESCENDING)
+            .limit(limit)
+            .addSnapshotListener((snap, e) -> {
+                if (snap == null) return;
+                java.util.List<CitizenItem> list = new java.util.ArrayList<>();
+                for (com.google.firebase.firestore.QueryDocumentSnapshot d : snap) {
+                    CitizenItem c = new CitizenItem();
+                    c.nationalId = d.getId();
+                    c.name = d.getString("name");
+                    c.joinDate = d.getString("joinDate");
+                    Long b = d.getLong("balance");
+                    c.balance = b != null ? b.intValue() : 0;
+                    list.add(c);
+                }
+                l.onList(list);
+            });
+    }
+
+    public void searchCitizenByExactId(String nationalId, CitizenLookup cb) {
+        db.collection("citizens").document(nationalId).get()
+            .addOnSuccessListener(doc -> {
+                if (doc.exists()) {
+                    CitizenItem c = new CitizenItem();
+                    c.nationalId = doc.getId();
+                    c.name = doc.getString("name");
+                    c.joinDate = doc.getString("joinDate");
+                    Long b = doc.getLong("balance");
+                    c.balance = b != null ? b.intValue() : 0;
+                    cb.onFound(c);
+                } else {
+                    cb.onNotFound();
+                }
+            })
+            .addOnFailureListener(e -> cb.onNotFound());
+    }
+
+    public interface CitizenLookup {
+        void onFound(CitizenItem c);
+        void onNotFound();
+    }
+
+    // ============ الخزينة العامة ============
+    public ListenerRegistration listenTreasury(BalanceListener l) {
+        return db.collection("treasury").document("main")
+            .addSnapshotListener((doc, e) -> {
+                if (e != null) { l.onError(e.getMessage()); return; }
+                if (doc == null || !doc.exists()) { l.onBalance(0); return; }
+                Long b = doc.getLong("balance");
+                l.onBalance(b != null ? b.intValue() : 0);
+            });
+    }
+
+    public void contributeToTreasury(int amount, OnDone cb) {
+        db.collection("treasury").document("main").get()
+            .addOnSuccessListener(doc -> {
+                if (!doc.exists()) {
+                    java.util.Map<String, Object> data = new HashMap<>();
+                    data.put("balance", amount);
+                    data.put("createdAt", System.currentTimeMillis());
+                    db.collection("treasury").document("main").set(data)
+                        .addOnSuccessListener(a -> cb.onSuccess())
+                        .addOnFailureListener(e -> cb.onError(e.getMessage()));
+                } else {
+                    db.collection("treasury").document("main")
+                        .update("balance", com.google.firebase.firestore.FieldValue.increment(amount))
+                        .addOnSuccessListener(a -> cb.onSuccess())
+                        .addOnFailureListener(e -> cb.onError(e.getMessage()));
+                }
+            })
+            .addOnFailureListener(e -> cb.onError(e.getMessage()));
+    }
+
+    // ============ الدردشة ============
+    public static class ChatMessage {
+        public String id;
+        public String author;
+        public String nationalId;
+        public String text;
+        public long timestamp;
+    }
+
+    public interface ChatListener { void onMessages(java.util.List<ChatMessage> list); }
+
+    // دردشة عامة
+    public void sendGlobalMessage(String author, String nationalId, String text, OnDone cb) {
+        java.util.Map<String, Object> m = new HashMap<>();
+        m.put("author", author);
+        m.put("nationalId", nationalId);
+        m.put("text", text);
+        m.put("timestamp", System.currentTimeMillis());
+        db.collection("global_chat").add(m)
+            .addOnSuccessListener(d -> cb.onSuccess())
+            .addOnFailureListener(e -> cb.onError(e.getMessage()));
+    }
+
+    public ListenerRegistration listenGlobalChat(ChatListener l) {
+        return db.collection("global_chat")
+            .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.ASCENDING)
+            .limit(200)
+            .addSnapshotListener((snap, e) -> {
+                if (snap == null) return;
+                java.util.List<ChatMessage> list = new java.util.ArrayList<>();
+                for (com.google.firebase.firestore.QueryDocumentSnapshot d : snap) {
+                    list.add(toMsg(d));
+                }
+                l.onMessages(list);
+            });
+    }
+
+    // دردشة خاصة
+    private String chatId(String a, String b) {
+        return a.compareTo(b) < 0 ? a + "_" + b : b + "_" + a;
+    }
+
+    public void sendPrivateMessage(String fromId, String fromName, String toId, String text, OnDone cb) {
+        String cid = chatId(fromId, toId);
+        java.util.Map<String, Object> m = new HashMap<>();
+        m.put("fromId", fromId);
+        m.put("fromName", fromName);
+        m.put("toId", toId);
+        m.put("text", text);
+        m.put("timestamp", System.currentTimeMillis());
+        db.collection("chats").document(cid).collection("messages").add(m)
+            .addOnSuccessListener(d -> cb.onSuccess())
+            .addOnFailureListener(e -> cb.onError(e.getMessage()));
+    }
+
+    public ListenerRegistration listenPrivateChat(String myId, String otherId, ChatListener l) {
+        String cid = chatId(myId, otherId);
+        return db.collection("chats").document(cid).collection("messages")
+            .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.ASCENDING)
+            .limit(200)
+            .addSnapshotListener((snap, e) -> {
+                if (snap == null) return;
+                java.util.List<ChatMessage> list = new java.util.ArrayList<>();
+                for (com.google.firebase.firestore.QueryDocumentSnapshot d : snap) {
+                    ChatMessage m = new ChatMessage();
+                    m.id = d.getId();
+                    m.author = d.getString("fromName");
+                    m.nationalId = d.getString("fromId");
+                    m.text = d.getString("text");
+                    Long t = d.getLong("timestamp");
+                    m.timestamp = t != null ? t : 0;
+                    list.add(m);
+                }
+                l.onMessages(list);
+            });
+    }
+
+    private ChatMessage toMsg(com.google.firebase.firestore.QueryDocumentSnapshot d) {
+        ChatMessage m = new ChatMessage();
+        m.id = d.getId();
+        m.author = d.getString("author");
+        m.nationalId = d.getString("nationalId");
+        m.text = d.getString("text");
+        Long t = d.getLong("timestamp");
+        m.timestamp = t != null ? t : 0;
+        return m;
+    }
+}
