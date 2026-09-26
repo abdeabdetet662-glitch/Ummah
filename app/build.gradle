@@ -15,9 +15,22 @@ android {
         versionName "5.0"
     }
 
+    signingConfigs {
+        release {
+            storeFile file("../ummah-release.keystore")
+            storePassword "ummah2026"
+            keyAlias "ummah"
+            keyPassword "ummah2026"
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+        debug {
+            signingConfig signingConfigs.release
         }
     }
 

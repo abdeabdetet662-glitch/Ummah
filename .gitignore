@@ -12,3 +12,5 @@ local.properties
 *.jks
 *.keystore
 *.log
+ummah-release.keystore
+keystore-base64.txt

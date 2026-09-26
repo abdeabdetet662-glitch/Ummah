@@ -1,4 +1,4 @@
-name: Build Ummah Admin
+name: Build Ummah APK
 
 on:
   push:
@@ -27,12 +27,16 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      - name: Build Debug APK
-        run: ./gradlew assembleDebug --no-daemon --stacktrace
+      - name: Decode Keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > ummah-release.keystore
+
+      - name: Build Release APK
+        run: ./gradlew assembleRelease --no-daemon --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: UmmahAdmin-debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: Ummah-release-apk
+          path: app/build/outputs/apk/release/app-release.apk
