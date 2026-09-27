@@ -2,6 +2,8 @@ package com.ummah.app;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import androidx.core.app.ActivityCompat;
@@ -13,8 +15,17 @@ import java.util.List;
 public class PermissionHelper {
 
     public static final int REQ_ALL = 1001;
+    private static final String PREFS = "ummah_permissions";
+    private static final String KEY_ASKED = "asked_once";
 
     public static void requestAll(Activity activity) {
+        SharedPreferences prefs = activity.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+
+        // إذا سألنا من قبل، ما نسألش مرة أخرى
+        if (prefs.getBoolean(KEY_ASKED, false)) {
+            return;
+        }
+
         List<String> needed = new ArrayList<>();
 
         if (Build.VERSION.SDK_INT >= 33) {
@@ -30,13 +41,16 @@ public class PermissionHelper {
                 needed.add(Manifest.permission.READ_MEDIA_IMAGES);
             }
         } else {
-            // Android 6 - 12
+            // Android 6-12
             if (ContextCompat.checkSelfPermission(activity,
                     Manifest.permission.READ_EXTERNAL_STORAGE)
                     != PackageManager.PERMISSION_GRANTED) {
                 needed.add(Manifest.permission.READ_EXTERNAL_STORAGE);
             }
         }
+
+        // نسجل أننا سألنا، حتى لو رفض المستخدم
+        prefs.edit().putBoolean(KEY_ASKED, true).apply();
 
         if (!needed.isEmpty()) {
             ActivityCompat.requestPermissions(activity,
