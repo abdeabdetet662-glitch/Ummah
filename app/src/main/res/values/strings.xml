@@ -9,4 +9,5 @@
     <string name="seed_warning">احفظ هذه الكلمات في مكان آمن. لا تشاركها مع أحد. هي هويتك الوحيدة.</string>
     <string name="join_date">تاريخ الانضمام</string>
     <string name="citizen_name">اسم المواطن</string>
+    <string name="file_provider_authority">com.ummah.app.fileprovider</string>
 </resources>

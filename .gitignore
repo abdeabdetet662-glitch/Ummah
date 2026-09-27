@@ -15,3 +15,6 @@ local.properties
 ummah-release.keystore
 keystore-base64.txt
 app-release.apk
+
+# Backup folder (local only)
+_backup_pre_material/
