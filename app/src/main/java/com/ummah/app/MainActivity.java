@@ -49,6 +49,7 @@ public class MainActivity extends Activity {
         scroll.addView(root);
 
         setContentView(scroll);
+        PermissionHelper.requestAll(this);
 
         fm.signIn(new FirebaseManager.OnDone() {
             @Override public void onSuccess() {
