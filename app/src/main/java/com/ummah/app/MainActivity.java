@@ -10,6 +10,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -22,11 +23,16 @@ public class MainActivity extends Activity {
     private IdentityManager im;
     private FirebaseManager fm;
     private WalletManager wm;
+    private UnreadManager um;
     private LinearLayout root;
     private ListenerRegistration countReg;
     private ListenerRegistration balReg;
+    private ListenerRegistration unreadReg;
     private TextView countView;
     private TextView balanceView;
+    private FrameLayout chatBadgeContainer;
+    private FrameLayout giftsBadgeContainer;
+    private FrameLayout electionBadgeContainer;
     private Citizen currentCitizen;
     private android.os.Handler heartbeatHandler;
 
@@ -36,6 +42,7 @@ public class MainActivity extends Activity {
         im = new IdentityManager(this);
         wm = new WalletManager(this);
         fm = FirebaseManager.get();
+        um = new UnreadManager();
 
         ScrollView scroll = new ScrollView(this);
         scroll.setBackgroundColor(Color.parseColor("#0A0A0A"));
@@ -48,6 +55,7 @@ public class MainActivity extends Activity {
         scroll.addView(root);
 
         setContentView(scroll);
+        NotificationHelper.createChannels(this);
         PermissionHelper.requestAll(this);
 
         fm.signIn(new FirebaseManager.OnDone() {
@@ -92,6 +100,7 @@ public class MainActivity extends Activity {
         super.onDestroy();
         if (countReg != null) countReg.remove();
         if (balReg != null) balReg.remove();
+        if (unreadReg != null) unreadReg.remove();
     }
 
     private void startListeners() {
@@ -252,13 +261,13 @@ public class MainActivity extends Activity {
         addPrimaryButton(getString(R.string.btn_profile), ProfileActivity.class);
 
         addSectionTitle(getString(R.string.section_communication));
-        addBadgedSecondaryButton(getString(R.string.btn_chat), ChatActivity.class, 3);
+        chatBadgeContainer = addBadgedSecondaryButton(getString(R.string.btn_chat), ChatActivity.class, 0);
         addSecondaryButton(getString(R.string.btn_citizens), CitizensActivity.class);
         addSecondaryButton(getString(R.string.btn_leaderboard), LeaderboardActivity.class);
 
         addSectionTitle(getString(R.string.section_governance));
         addSecondaryButton(getString(R.string.btn_parliament), ParliamentActivity.class);
-        addBadgedSecondaryButton(getString(R.string.btn_election), ElectionActivity.class, 1);
+        electionBadgeContainer = addBadgedSecondaryButton(getString(R.string.btn_election), ElectionActivity.class, 0);
         addSecondaryButton(getString(R.string.btn_constitution), ConstitutionActivity.class);
         addSecondaryButton(getString(R.string.btn_court), CourtActivity.class);
         addSecondaryButton(getString(R.string.btn_treasury), TreasuryActivity.class);
@@ -266,7 +275,7 @@ public class MainActivity extends Activity {
         addSectionTitle(getString(R.string.section_other));
         addSecondaryButton(getString(R.string.btn_news), NewsActivity.class);
         addSecondaryButton(getString(R.string.btn_stats), StatsActivity.class);
-        addBadgedSecondaryButton(getString(R.string.btn_gifts), GiftsActivity.class, 1);
+        giftsBadgeContainer = addBadgedSecondaryButton(getString(R.string.btn_gifts), GiftsActivity.class, 0);
         addSecondaryButton(getString(R.string.btn_recovery), AccountRecoveryActivity.class);
 
         Button seedBtn = new Button(this);
@@ -282,6 +291,8 @@ public class MainActivity extends Activity {
         seedBtn.setLayoutParams(slp);
         seedBtn.setOnClickListener(v -> showSeed(c));
         root.addView(seedBtn);
+
+        startUnreadListener();
     }
 
     private void addSectionTitle(String text) {
@@ -324,10 +335,12 @@ public class MainActivity extends Activity {
         root.addView(btn);
     }
 
-    private void addBadgedSecondaryButton(String text, final Class<?> activityClass, int badgeCount) {
+    private FrameLayout addBadgedSecondaryButton(String text, final Class<?> activityClass, int badgeCount) {
         Button btn = UiHelper.secondaryButton(this, text);
         btn.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, activityClass)));
-        root.addView(BadgeHelper.withBadge(this, btn, badgeCount));
+        FrameLayout container = BadgeHelper.withBadge(this, btn, badgeCount);
+        root.addView(container);
+        return container;
     }
 
     private void addRow(LinearLayout p, String label, String val, int valSize, String valColor) {
@@ -346,6 +359,44 @@ public class MainActivity extends Activity {
         v.setTypeface(null, Typeface.BOLD);
         v.setGravity(Gravity.CENTER);
         p.addView(v);
+    }
+
+    private void startUnreadListener() {
+        if (currentCitizen == null) return;
+        if (unreadReg != null) unreadReg.remove();
+        unreadReg = um.listen(currentCitizen.nationalId, (chat, gifts, election) -> {
+            runOnUiThread(() -> {
+                updateBadge(chatBadgeContainer, chat);
+                updateBadge(giftsBadgeContainer, gifts);
+                updateBadge(electionBadgeContainer, election);
+
+                if (chat > 0) {
+                    NotificationHelper.showBadgeNotification(this, 1001,
+                        "💬 رسائل جديدة", "عندك " + chat + " رسالة في دردشة أُمّة", chat);
+                } else {
+                    NotificationHelper.clearAll(this);
+                }
+            });
+        });
+    }
+
+    private void updateBadge(FrameLayout container, int count) {
+        if (container == null) return;
+        for (int i = container.getChildCount() - 1; i >= 1; i--) {
+            container.removeViewAt(i);
+        }
+        if (count > 0) {
+            TextView badge = BadgeHelper.createBadge(this, count);
+            FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.WRAP_CONTENT,
+                    FrameLayout.LayoutParams.WRAP_CONTENT);
+            lp.gravity = Gravity.TOP | Gravity.START;
+            lp.topMargin = 6;
+            lp.leftMargin = 12;
+            badge.setLayoutParams(lp);
+            container.addView(badge);
+            badge.bringToFront();
+        }
     }
 
     private void askName() {
