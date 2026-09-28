@@ -9,6 +9,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class ChatActivity extends Activity {
+
     private FirebaseManager fm;
     private IdentityManager im;
     private LinearLayout messagesContainer;
@@ -44,49 +46,82 @@ public class ChatActivity extends Activity {
 
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(Color.parseColor("#0A0A0A"));
+        root.setBackgroundResource(R.drawable.bg_screen);
+
+        // ═══ Header ═══
+        LinearLayout header = new LinearLayout(this);
+        header.setOrientation(LinearLayout.VERTICAL);
+        header.setGravity(Gravity.CENTER);
+        header.setPadding(20, 40, 20, 20);
 
         TextView title = new TextView(this);
-        title.setText("💬 دردشة أُمّة العامة");
+        title.setText("💬  دردشة أُمّة");
         title.setTextColor(Color.parseColor("#D4AF37"));
-        title.setTextSize(18);
+        title.setTextSize(22);
         title.setTypeface(null, Typeface.BOLD);
         title.setGravity(Gravity.CENTER);
-        title.setPadding(0, 40, 0, 10);
-        root.addView(title);
+        title.setLetterSpacing(0.05f);
+        header.addView(title);
 
         TextView sub = new TextView(this);
-        sub.setText("كل مواطني العالم هنا");
+        sub.setText("✦  كل مواطني العالم هنا  ✦");
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(11);
         sub.setGravity(Gravity.CENTER);
-        sub.setPadding(0, 0, 0, 20);
-        root.addView(sub);
+        sub.setPadding(0, 6, 0, 0);
+        header.addView(sub);
 
+        View line = new View(this);
+        LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, 1);
+        llp.setMargins(60, 16, 60, 0);
+        line.setLayoutParams(llp);
+        line.setBackgroundColor(Color.parseColor("#2A3D32"));
+        header.addView(line);
+
+        root.addView(header);
+
+        // ═══ منطقة الرسائل ═══
         scroll = new ScrollView(this);
         scroll.setLayoutParams(new LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
+                LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
         messagesContainer = new LinearLayout(this);
         messagesContainer.setOrientation(LinearLayout.VERTICAL);
         messagesContainer.setPadding(20, 10, 20, 10);
         scroll.addView(messagesContainer);
         root.addView(scroll);
 
+        // ═══ شريط الإدخال ═══
         LinearLayout bar = new LinearLayout(this);
         bar.setOrientation(LinearLayout.HORIZONTAL);
-        bar.setPadding(16, 10, 16, 16);
-        bar.setBackgroundColor(Color.parseColor("#141414"));
+        bar.setGravity(Gravity.CENTER_VERTICAL);
+        bar.setPadding(16, 14, 16, 20);
+        bar.setBackgroundColor(Color.parseColor("#0F1A14"));
 
         input = new EditText(this);
         input.setHint("اكتب رسالة...");
         input.setTextColor(Color.WHITE);
-        input.setHintTextColor(Color.GRAY);
-        input.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+        input.setHintTextColor(Color.parseColor("#666666"));
+        input.setTextSize(15);
+        input.setBackgroundResource(R.drawable.bg_chat_input);
+        input.setPadding(40, 28, 40, 28);
+        input.setMinHeight(110);
+        LinearLayout.LayoutParams inputLp = new LinearLayout.LayoutParams(
+                0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+        inputLp.setMargins(0, 0, 12, 0);
+        input.setLayoutParams(inputLp);
         bar.addView(input);
 
         sendBtn = new Button(this);
-        sendBtn.setText("إرسال");
-        sendBtn.setTextSize(14);
+        sendBtn.setText("➤");
+        sendBtn.setTextSize(22);
+        sendBtn.setTextColor(Color.parseColor("#0A0A0A"));
+        sendBtn.setTypeface(null, Typeface.BOLD);
+        sendBtn.setBackgroundResource(R.drawable.bg_send_btn);
+        sendBtn.setPadding(0, 0, 0, 0);
+        LinearLayout.LayoutParams slp = new LinearLayout.LayoutParams(120, 120);
+        sendBtn.setLayoutParams(slp);
+        sendBtn.setElevation(10f);
         sendBtn.setOnClickListener(v -> sendMessage());
         bar.addView(sendBtn);
 
@@ -120,16 +155,19 @@ public class ChatActivity extends Activity {
             input.setEnabled(false);
             input.setHint("🚫 أنت محظور من الإرسال");
             sendBtn.setEnabled(false);
+            sendBtn.setAlpha(0.4f);
         } else if (isMuted) {
             long remaining = mutedUntil - System.currentTimeMillis();
             long minutes = remaining / 60000;
             input.setEnabled(false);
             input.setHint("🔇 أنت مكتوم — " + minutes + " دقيقة");
             sendBtn.setEnabled(false);
+            sendBtn.setAlpha(0.4f);
         } else {
             input.setEnabled(true);
             input.setHint("اكتب رسالة...");
             sendBtn.setEnabled(true);
+            sendBtn.setAlpha(1f);
         }
     }
 
@@ -160,13 +198,34 @@ public class ChatActivity extends Activity {
     private void render(List<FirebaseManager.ChatMessage> list) {
         messagesContainer.removeAllViews();
         if (list.isEmpty()) {
+            LinearLayout emptyBox = new LinearLayout(this);
+            emptyBox.setOrientation(LinearLayout.VERTICAL);
+            emptyBox.setGravity(Gravity.CENTER);
+            emptyBox.setPadding(0, 80, 0, 0);
+
+            TextView icon = new TextView(this);
+            icon.setText("💬");
+            icon.setTextSize(60);
+            icon.setGravity(Gravity.CENTER);
+            emptyBox.addView(icon);
+
             TextView empty = new TextView(this);
-            empty.setText("لا توجد رسائل بعد. كن أول من يتكلم!");
-            empty.setTextColor(Color.parseColor("#616161"));
-            empty.setTextSize(13);
+            empty.setText("لا توجد رسائل بعد");
+            empty.setTextColor(Color.parseColor("#D4AF37"));
+            empty.setTextSize(16);
+            empty.setTypeface(null, Typeface.BOLD);
             empty.setGravity(Gravity.CENTER);
-            empty.setPadding(0, 40, 0, 0);
-            messagesContainer.addView(empty);
+            empty.setPadding(0, 20, 0, 6);
+            emptyBox.addView(empty);
+
+            TextView hint = new TextView(this);
+            hint.setText("كن أول من يتكلم!");
+            hint.setTextColor(Color.parseColor("#9E9E9E"));
+            hint.setTextSize(13);
+            hint.setGravity(Gravity.CENTER);
+            emptyBox.addView(hint);
+
+            messagesContainer.addView(emptyBox);
             return;
         }
         for (FirebaseManager.ChatMessage m : list) {
@@ -182,19 +241,19 @@ public class ChatActivity extends Activity {
         wrapper.setOrientation(LinearLayout.HORIZONTAL);
         wrapper.setGravity(mine ? Gravity.END : Gravity.START);
         LinearLayout.LayoutParams wlp = new LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
         wlp.setMargins(0, 6, 0, 6);
         wrapper.setLayoutParams(wlp);
 
-        // الصورة (لرسائل الآخرين)
-        android.widget.ImageView avatar = null;
+        // Avatar للأخرين
         if (!mine) {
-            avatar = new android.widget.ImageView(this);
-            LinearLayout.LayoutParams alp = new LinearLayout.LayoutParams(80, 80);
+            ImageView avatar = new ImageView(this);
+            LinearLayout.LayoutParams alp = new LinearLayout.LayoutParams(90, 90);
             alp.setMargins(0, 0, 12, 0);
             avatar.setLayoutParams(alp);
             avatar.setBackgroundColor(Color.parseColor("#1E1E1E"));
-            avatar.setScaleType(android.widget.ImageView.ScaleType.CENTER_CROP);
+            avatar.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
             if (m.photoUrl != null && !m.photoUrl.isEmpty()) {
                 com.bumptech.glide.Glide.with(this)
@@ -210,21 +269,23 @@ public class ChatActivity extends Activity {
 
         LinearLayout bubble = new LinearLayout(this);
         bubble.setOrientation(LinearLayout.VERTICAL);
-        bubble.setBackgroundColor(mine ? Color.parseColor("#0B4F2C") : Color.parseColor("#1E1E1E"));
-        bubble.setPadding(24, 16, 24, 16);
+        bubble.setBackgroundResource(mine ? R.drawable.bg_bubble_mine : R.drawable.bg_bubble_other);
+        bubble.setPadding(30, 20, 30, 18);
+        bubble.setElevation(4f);
 
         TextView author = new TextView(this);
         author.setText(m.author != null ? m.author : "مجهول");
-        author.setTextColor(Color.parseColor("#D4AF37"));
+        author.setTextColor(Color.parseColor(mine ? "#5D4037" : "#D4AF37"));
         author.setTextSize(11);
         author.setTypeface(null, Typeface.BOLD);
         bubble.addView(author);
 
         TextView text = new TextView(this);
         text.setText(m.text);
-        text.setTextColor(Color.WHITE);
+        text.setTextColor(Color.parseColor(mine ? "#0A0A0A" : "#FFFFFF"));
         text.setTextSize(15);
-        text.setPadding(0, 6, 0, 4);
+        text.setPadding(0, 6, 0, 6);
+        text.setLineSpacing(3, 1);
         bubble.addView(text);
 
         LinearLayout bottomRow = new LinearLayout(this);
@@ -233,7 +294,7 @@ public class ChatActivity extends Activity {
 
         TextView date = new TextView(this);
         date.setText(new SimpleDateFormat("HH:mm", Locale.US).format(new Date(m.timestamp)));
-        date.setTextColor(Color.parseColor("#757575"));
+        date.setTextColor(Color.parseColor(mine ? "#7A6520" : "#757575"));
         date.setTextSize(9);
         bottomRow.addView(date);
 
