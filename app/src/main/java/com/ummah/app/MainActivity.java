@@ -252,13 +252,13 @@ public class MainActivity extends Activity {
         addPrimaryButton(getString(R.string.btn_profile), ProfileActivity.class);
 
         addSectionTitle(getString(R.string.section_communication));
-        addSecondaryButton(getString(R.string.btn_chat), ChatActivity.class);
+        addBadgedSecondaryButton(getString(R.string.btn_chat), ChatActivity.class, 3);
         addSecondaryButton(getString(R.string.btn_citizens), CitizensActivity.class);
         addSecondaryButton(getString(R.string.btn_leaderboard), LeaderboardActivity.class);
 
         addSectionTitle(getString(R.string.section_governance));
         addSecondaryButton(getString(R.string.btn_parliament), ParliamentActivity.class);
-        addSecondaryButton(getString(R.string.btn_election), ElectionActivity.class);
+        addBadgedSecondaryButton(getString(R.string.btn_election), ElectionActivity.class, 1);
         addSecondaryButton(getString(R.string.btn_constitution), ConstitutionActivity.class);
         addSecondaryButton(getString(R.string.btn_court), CourtActivity.class);
         addSecondaryButton(getString(R.string.btn_treasury), TreasuryActivity.class);
@@ -266,7 +266,7 @@ public class MainActivity extends Activity {
         addSectionTitle(getString(R.string.section_other));
         addSecondaryButton(getString(R.string.btn_news), NewsActivity.class);
         addSecondaryButton(getString(R.string.btn_stats), StatsActivity.class);
-        addSecondaryButton(getString(R.string.btn_gifts), GiftsActivity.class);
+        addBadgedSecondaryButton(getString(R.string.btn_gifts), GiftsActivity.class, 1);
         addSecondaryButton(getString(R.string.btn_recovery), AccountRecoveryActivity.class);
 
         Button seedBtn = new Button(this);
@@ -322,6 +322,12 @@ public class MainActivity extends Activity {
         Button btn = UiHelper.secondaryButton(this, text);
         btn.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, activityClass)));
         root.addView(btn);
+    }
+
+    private void addBadgedSecondaryButton(String text, final Class<?> activityClass, int badgeCount) {
+        Button btn = UiHelper.secondaryButton(this, text);
+        btn.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, activityClass)));
+        root.addView(BadgeHelper.withBadge(this, btn, badgeCount));
     }
 
     private void addRow(LinearLayout p, String label, String val, int valSize, String valColor) {

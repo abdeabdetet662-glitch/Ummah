@@ -1,0 +1,69 @@
+package com.ummah.app;
+
+import android.content.Context;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.view.Gravity;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.TextView;
+
+public class BadgeHelper {
+
+    // زر مع badge أحمر
+    public static FrameLayout withBadge(Context ctx, Button button, int count) {
+        FrameLayout container = new FrameLayout(ctx);
+
+        FrameLayout.LayoutParams btnLp = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        button.setLayoutParams(btnLp);
+        container.addView(button);
+
+        if (count > 0) {
+            TextView badge = createBadge(ctx, count);
+            FrameLayout.LayoutParams badgeLp = new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            badgeLp.gravity = Gravity.TOP | Gravity.END;
+            badgeLp.topMargin = -8;
+            badgeLp.rightMargin = 4;
+            badge.setLayoutParams(badgeLp);
+            container.addView(badge);
+        }
+
+        FrameLayout.LayoutParams containerLp = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        containerLp.setMargins(0, 8, 0, 0);
+        container.setLayoutParams(containerLp);
+
+        return container;
+    }
+
+    // دائرة حمراء مع رقم
+    public static TextView createBadge(Context ctx, int count) {
+        TextView badge = new TextView(ctx);
+        String txt = count > 99 ? "99+" : String.valueOf(count);
+        badge.setText(txt);
+        badge.setTextColor(Color.WHITE);
+        badge.setTextSize(count > 9 ? 10 : 12);
+        badge.setTypeface(null, Typeface.BOLD);
+        badge.setGravity(Gravity.CENTER);
+        badge.setBackgroundResource(R.drawable.bg_badge_red);
+
+        int size = count > 9 ? 44 : 36;
+        int padding = 6;
+        badge.setMinWidth(size);
+        badge.setMinHeight(size);
+        badge.setPadding(padding, 0, padding, 0);
+
+        return badge;
+    }
+}
+
+    // نسخة مبسطة: ترجع FrameLayout جاهز
+    public static FrameLayout wrap(Context ctx, Button button, int count) {
+        return withBadge(ctx, button, count);
+    }
