@@ -24,15 +24,16 @@ public class MainActivity extends Activity {
     private FirebaseManager fm;
     private WalletManager wm;
     private UnreadManager um;
-    private LinearLayout root;
-    private ListenerRegistration countReg;
-    private ListenerRegistration balReg;
+    private GlobalChatListener globalListener;
     private ListenerRegistration unreadReg;
-    private TextView countView;
-    private TextView balanceView;
     private FrameLayout chatBadgeContainer;
     private FrameLayout giftsBadgeContainer;
     private FrameLayout electionBadgeContainer;
+    private LinearLayout root;
+    private ListenerRegistration countReg;
+    private ListenerRegistration balReg;
+    private TextView countView;
+    private TextView balanceView;
     private Citizen currentCitizen;
     private android.os.Handler heartbeatHandler;
 
@@ -100,7 +101,6 @@ public class MainActivity extends Activity {
         super.onDestroy();
         if (countReg != null) countReg.remove();
         if (balReg != null) balReg.remove();
-        if (unreadReg != null) unreadReg.remove();
     }
 
     private void startListeners() {
@@ -361,44 +361,6 @@ public class MainActivity extends Activity {
         p.addView(v);
     }
 
-    private void startUnreadListener() {
-        if (currentCitizen == null) return;
-        if (unreadReg != null) unreadReg.remove();
-        unreadReg = um.listen(currentCitizen.nationalId, (chat, gifts, election) -> {
-            runOnUiThread(() -> {
-                updateBadge(chatBadgeContainer, chat);
-                updateBadge(giftsBadgeContainer, gifts);
-                updateBadge(electionBadgeContainer, election);
-
-                if (chat > 0) {
-                    NotificationHelper.showBadgeNotification(this, 1001,
-                        "💬 رسائل جديدة", "عندك " + chat + " رسالة في دردشة أُمّة", chat);
-                } else {
-                    NotificationHelper.clearAll(this);
-                }
-            });
-        });
-    }
-
-    private void updateBadge(FrameLayout container, int count) {
-        if (container == null) return;
-        for (int i = container.getChildCount() - 1; i >= 1; i--) {
-            container.removeViewAt(i);
-        }
-        if (count > 0) {
-            TextView badge = BadgeHelper.createBadge(this, count);
-            FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.WRAP_CONTENT,
-                    FrameLayout.LayoutParams.WRAP_CONTENT);
-            lp.gravity = Gravity.TOP | Gravity.START;
-            lp.topMargin = 6;
-            lp.leftMargin = 12;
-            badge.setLayoutParams(lp);
-            container.addView(badge);
-            badge.bringToFront();
-        }
-    }
-
     private void askName() {
         EditText input = UiHelper.input(this, getString(R.string.hint_name));
 
@@ -516,5 +478,57 @@ public class MainActivity extends Activity {
         super.onResume();
         Citizen c = im.getCitizen();
         if (c != null) fm.updateLastSeen(c.nationalId);
+    }
+
+    private void startUnreadListener() {
+        if (currentCitizen == null) return;
+        if (unreadReg != null) unreadReg.remove();
+        unreadReg = um.listen(currentCitizen.nationalId, (chat, gifts, election) -> {
+            runOnUiThread(() -> {
+                updateBadge(chatBadgeContainer, chat);
+                updateBadge(giftsBadgeContainer, gifts);
+                updateBadge(electionBadgeContainer, election);
+
+                if (chat > 0) {
+                    NotificationHelper.showBadgeNotification(this, 1001,
+                        "\uD83D\uDCAC \u0631\u0633\u0627\u0626\u0644 \u062C\u062F\u064A\u062F\u0629",
+                        "\u0639\u0646\u062F\u0643 " + chat + " \u0631\u0633\u0627\u0644\u0629", chat);
+                }
+            });
+        });
+        startGlobalChatListener();
+    }
+
+    private void updateBadge(FrameLayout container, int count) {
+        if (container == null) return;
+        for (int i = container.getChildCount() - 1; i >= 1; i--) {
+            container.removeViewAt(i);
+        }
+        if (count > 0) {
+            TextView badge = BadgeHelper.createBadge(this, count);
+            FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.WRAP_CONTENT,
+                    FrameLayout.LayoutParams.WRAP_CONTENT);
+            lp.gravity = Gravity.TOP | Gravity.START;
+            lp.topMargin = 6;
+            lp.leftMargin = 12;
+            badge.setLayoutParams(lp);
+            container.addView(badge);
+            badge.bringToFront();
+        }
+    }
+
+    private void startGlobalChatListener() {
+        if (currentCitizen == null) return;
+        if (globalListener != null) globalListener.stop();
+        globalListener = new GlobalChatListener(this);
+        globalListener.start(currentCitizen.nationalId, (name, content, ts) -> {
+            runOnUiThread(() -> {
+                NotificationHelper.showBadgeNotification(
+                        MainActivity.this, 1001,
+                        "\uD83D\uDCAC " + name,
+                        content, 1);
+            });
+        });
     }
 }
