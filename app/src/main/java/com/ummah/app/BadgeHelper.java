@@ -13,6 +13,8 @@ public class BadgeHelper {
 
     public static FrameLayout withBadge(Context ctx, Button button, int count) {
         FrameLayout container = new FrameLayout(ctx);
+        container.setClipChildren(false);
+        container.setClipToPadding(false);
 
         FrameLayout.LayoutParams btnLp = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -25,11 +27,12 @@ public class BadgeHelper {
             FrameLayout.LayoutParams badgeLp = new FrameLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT);
-            badgeLp.gravity = Gravity.TOP | Gravity.END;
-            badgeLp.topMargin = -8;
-            badgeLp.rightMargin = 4;
+            badgeLp.gravity = Gravity.TOP | Gravity.START;
+            badgeLp.topMargin = 6;
+            badgeLp.leftMargin = 12;
             badge.setLayoutParams(badgeLp);
             container.addView(badge);
+            badge.bringToFront();
         }
 
         FrameLayout.LayoutParams containerLp = new FrameLayout.LayoutParams(
@@ -46,16 +49,16 @@ public class BadgeHelper {
         String txt = count > 99 ? "99+" : String.valueOf(count);
         badge.setText(txt);
         badge.setTextColor(Color.WHITE);
-        badge.setTextSize(count > 9 ? 10 : 12);
+        badge.setTextSize(count > 9 ? 11 : 13);
         badge.setTypeface(null, Typeface.BOLD);
         badge.setGravity(Gravity.CENTER);
         badge.setBackgroundResource(R.drawable.bg_badge_red);
+        badge.setElevation(10f);
 
-        int size = count > 9 ? 44 : 36;
-        int padding = 6;
+        int size = count > 9 ? 46 : 40;
         badge.setMinWidth(size);
         badge.setMinHeight(size);
-        badge.setPadding(padding, 0, padding, 0);
+        badge.setPadding(8, 0, 8, 0);
 
         return badge;
     }
