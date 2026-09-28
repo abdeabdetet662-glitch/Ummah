@@ -11,7 +11,6 @@ import android.widget.TextView;
 
 public class BadgeHelper {
 
-    // زر مع badge أحمر
     public static FrameLayout withBadge(Context ctx, Button button, int count) {
         FrameLayout container = new FrameLayout(ctx);
 
@@ -42,7 +41,6 @@ public class BadgeHelper {
         return container;
     }
 
-    // دائرة حمراء مع رقم
     public static TextView createBadge(Context ctx, int count) {
         TextView badge = new TextView(ctx);
         String txt = count > 99 ? "99+" : String.valueOf(count);
@@ -62,8 +60,3 @@ public class BadgeHelper {
         return badge;
     }
 }
-
-    // نسخة مبسطة: ترجع FrameLayout جاهز
-    public static FrameLayout wrap(Context ctx, Button button, int count) {
-        return withBadge(ctx, button, count);
-    }
