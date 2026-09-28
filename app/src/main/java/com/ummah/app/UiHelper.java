@@ -159,4 +159,89 @@ public class UiHelper {
         v.setLayoutParams(lp);
         return v;
     }
+
+    // بطاقة رقم كبير (للرصيد)
+    public static LinearLayout amountCard(Context ctx, String label, String amount, String currency) {
+        LinearLayout card = card(ctx);
+        card.setGravity(Gravity.CENTER);
+
+        TextView lbl = new TextView(ctx);
+        lbl.setText(label);
+        lbl.setTextColor(Color.parseColor("#9E9E9E"));
+        lbl.setTextSize(13);
+        lbl.setGravity(Gravity.CENTER);
+        card.addView(lbl);
+
+        TextView amt = new TextView(ctx);
+        amt.setText(amount);
+        amt.setTextColor(Color.parseColor("#D4AF37"));
+        amt.setTextSize(56);
+        amt.setTypeface(null, Typeface.BOLD);
+        amt.setGravity(Gravity.CENTER);
+        amt.setPadding(0, 12, 0, 12);
+        card.addView(amt);
+
+        if (currency != null && !currency.isEmpty()) {
+            TextView cur = new TextView(ctx);
+            cur.setText(currency);
+            cur.setTextColor(Color.parseColor("#9E9E9E"));
+            cur.setTextSize(14);
+            cur.setGravity(Gravity.CENTER);
+            card.addView(cur);
+        }
+
+        return card;
+    }
+
+    // بطاقة معلومة (سطرين)
+    public static LinearLayout infoCard(Context ctx, String title, String subtitle) {
+        LinearLayout card = card(ctx);
+        card.setGravity(Gravity.CENTER);
+
+        TextView t = new TextView(ctx);
+        t.setText(title);
+        t.setTextColor(Color.WHITE);
+        t.setTextSize(16);
+        t.setTypeface(null, Typeface.BOLD);
+        t.setGravity(Gravity.CENTER);
+        card.addView(t);
+
+        if (subtitle != null && !subtitle.isEmpty()) {
+            TextView s = new TextView(ctx);
+            s.setText(subtitle);
+            s.setTextColor(Color.parseColor("#9E9E9E"));
+            s.setTextSize(12);
+            s.setGravity(Gravity.CENTER);
+            s.setPadding(0, 6, 0, 0);
+            card.addView(s);
+        }
+
+        return card;
+    }
+
+    // زر إجراء (مع لون مخصص)
+    public static Button actionButton(Context ctx, String text, String colorHex) {
+        Button b = new Button(ctx);
+        b.setText(text);
+        b.setTextColor(Color.WHITE);
+        b.setTextSize(16);
+        b.setTypeface(null, Typeface.BOLD);
+        b.setAllCaps(false);
+        b.setPadding(50, 34, 50, 34);
+        b.setMinHeight(130);
+        b.setElevation(8f);
+
+        android.graphics.drawable.GradientDrawable g = new android.graphics.drawable.GradientDrawable();
+        g.setColor(Color.parseColor(colorHex));
+        g.setCornerRadius(48);
+        g.setStroke(2, Color.parseColor("#D4AF37"));
+        b.setBackground(g);
+
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp.setMargins(0, 10, 0, 10);
+        b.setLayoutParams(lp);
+        return b;
+    }
 }
