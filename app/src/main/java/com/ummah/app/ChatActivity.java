@@ -40,10 +40,9 @@ public class ChatActivity extends Activity {
     protected void onCreate(Bundle b) {
         super.onCreate(b);
         // FullscreenHelper.enable(this);  // DISABLED - crash
-        // اجعل النافذة تتكيف مع الكيبورد
         getWindow().setSoftInputMode(
-                android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
-                | android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+                android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+
         fm = FirebaseManager.get();
         im = new IdentityManager(this);
         me = im.getCitizen();

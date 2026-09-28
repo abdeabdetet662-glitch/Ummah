@@ -10,5 +10,7 @@
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:textColorPrimary">@color/white</item>
         <item name="android:textColorSecondary">@color/gray</item>
+        <item name="android:windowSoftInputMode">adjustPan</item>
+        <item name="android:windowTranslucentStatus">false</item>
     </style>
 </resources>
