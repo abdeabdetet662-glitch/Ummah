@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="UmmahButton.Primary">
+    <style name="UmmahButtonPrimary">
         <item name="android:background">@drawable/bg_button_primary</item>
         <item name="android:textColor">#0A0A0A</item>
         <item name="android:textSize">16sp</item>
@@ -15,7 +15,7 @@
         <item name="android:elevation">6dp</item>
     </style>
 
-    <style name="UmmahButton.Secondary">
+    <style name="UmmahButtonSecondary">
         <item name="android:background">@drawable/bg_button_secondary</item>
         <item name="android:textColor">@color/gold</item>
         <item name="android:textSize">16sp</item>
@@ -28,7 +28,7 @@
         <item name="android:minHeight">52dp</item>
     </style>
 
-    <style name="UmmahButton.Danger">
+    <style name="UmmahButtonDanger">
         <item name="android:background">@drawable/bg_button_danger</item>
         <item name="android:textColor">#FFFFFF</item>
         <item name="android:textSize">16sp</item>
@@ -41,7 +41,7 @@
         <item name="android:minHeight">52dp</item>
     </style>
 
-    <style name="UmmahInput">
+    <style name="UmmahInputField">
         <item name="android:background">@drawable/bg_input</item>
         <item name="android:textColor">#FFFFFF</item>
         <item name="android:textColorHint">#666666</item>
