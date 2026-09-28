@@ -1,11 +1,13 @@
 package com.ummah.app;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -15,6 +17,7 @@ import android.widget.Toast;
 import com.google.firebase.firestore.ListenerRegistration;
 
 public class WalletActivity extends Activity {
+
     private IdentityManager im;
     private FirebaseManager fm;
     private TextView balanceView;
@@ -30,120 +33,212 @@ public class WalletActivity extends Activity {
         if (c == null) { finish(); return; }
 
         ScrollView scroll = new ScrollView(this);
-        scroll.setBackgroundColor(Color.parseColor("#0A0A0A"));
+        scroll.setBackgroundResource(R.drawable.bg_screen);
+        scroll.setFillViewport(true);
+
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setGravity(Gravity.CENTER);
-        root.setPadding(36, 60, 36, 60);
+        root.setGravity(Gravity.CENTER_HORIZONTAL);
+        root.setPadding(40, 60, 40, 60);
         scroll.addView(root);
 
-        // ============ العنوان الرئيسي ============
+        // Header
+        LinearLayout header = new LinearLayout(this);
+        header.setOrientation(LinearLayout.HORIZONTAL);
+        header.setGravity(Gravity.CENTER);
+        header.setPadding(0, 0, 0, 20);
+
+        TextView coinIcon = new TextView(this);
+        coinIcon.setText("💰");
+        coinIcon.setTextSize(36);
+        header.addView(coinIcon);
+
         TextView title = new TextView(this);
-        title.setText("💰 محفظتي");
+        title.setText("  " + getString(R.string.btn_wallet).replace("💰", "").trim());
         title.setTextColor(Color.parseColor("#D4AF37"));
         title.setTextSize(28);
         title.setTypeface(null, Typeface.BOLD);
-        title.setGravity(Gravity.CENTER);
-        root.addView(title);
+        header.addView(title);
+
+        root.addView(header);
 
         TextView sub = new TextView(this);
         sub.setText("الدينار الداخلي لدولة أُمّة");
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(13);
         sub.setGravity(Gravity.CENTER);
-        sub.setPadding(0, 8, 0, 50);
+        sub.setLetterSpacing(0.05f);
+        sub.setPadding(0, 0, 0, 30);
         root.addView(sub);
 
-        // ============ الرصيد (الأكبر) ============
-        TextView balanceLabel = new TextView(this);
-        balanceLabel.setText("رصيدك:");
-        balanceLabel.setTextColor(Color.parseColor("#9E9E9E"));
-        balanceLabel.setTextSize(14);
-        balanceLabel.setGravity(Gravity.CENTER);
-        root.addView(balanceLabel);
+        // بطاقة الرصيد الفخمة
+        LinearLayout balanceCard = UiHelper.goldCard(this);
+        balanceCard.setGravity(Gravity.CENTER);
+
+        TextView balLabel = new TextView(this);
+        balLabel.setText("✦  رصيدك الحالي  ✦");
+        balLabel.setTextColor(Color.parseColor("#D4AF37"));
+        balLabel.setTextSize(13);
+        balLabel.setTypeface(null, Typeface.BOLD);
+        balLabel.setLetterSpacing(0.1f);
+        balLabel.setGravity(Gravity.CENTER);
+        balanceCard.addView(balLabel);
 
         balanceView = new TextView(this);
         balanceView.setText("...");
-        balanceView.setTextColor(Color.parseColor("#D4AF37"));
-        balanceView.setTextSize(64);
+        balanceView.setTextColor(Color.parseColor("#FFFFFF"));
+        balanceView.setTextSize(72);
         balanceView.setTypeface(null, Typeface.BOLD);
         balanceView.setGravity(Gravity.CENTER);
-        balanceView.setPadding(0, 15, 0, 10);
-        root.addView(balanceView);
+        balanceView.setPadding(0, 16, 0, 8);
+        balanceCard.addView(balanceView);
 
         TextView currencyLabel = new TextView(this);
-        currencyLabel.setText("Đ دينار أُمّة");
+        currencyLabel.setText("Đ  دينار أُمّة");
         currencyLabel.setTextColor(Color.parseColor("#9E9E9E"));
         currencyLabel.setTextSize(14);
         currencyLabel.setGravity(Gravity.CENTER);
-        currencyLabel.setPadding(0, 0, 0, 40);
-        root.addView(currencyLabel);
+        balanceCard.addView(currencyLabel);
 
-        // ============ الأزرار ============
+        root.addView(balanceCard);
 
-        // زر الإرسال / الاستقبال (الأهم)
-        Button transferBtn = new Button(this);
-        transferBtn.setText("💸  إرسال / استقبال");
-        transferBtn.setTextSize(17);
-        transferBtn.setPadding(20, 25, 20, 25);
+        // زر الإرسال / الاستقبال (رئيسي - ذهبي)
+        Button transferBtn = UiHelper.primaryButton(this, "💸  إرسال / استقبال");
         transferBtn.setOnClickListener(v ->
             startActivity(new Intent(WalletActivity.this, TransferActivity.class)));
         root.addView(transferBtn);
 
-        // زر رقمي للاستقبال
-        Button myIdBtn = new Button(this);
-        myIdBtn.setText("📥  رقمي للاستقبال");
-        myIdBtn.setTextSize(15);
-        myIdBtn.setOnClickListener(v -> {
-            new android.app.AlertDialog.Builder(WalletActivity.this)
+        // بطاقة رقمي للاستقبال
+        LinearLayout idCard = UiHelper.card(this);
+        idCard.setGravity(Gravity.CENTER);
+
+        TextView idLabel = new TextView(this);
+        idLabel.setText("📥  رقمك للاستقبال");
+        idLabel.setTextColor(Color.parseColor("#D4AF37"));
+        idLabel.setTextSize(14);
+        idLabel.setTypeface(null, Typeface.BOLD);
+        idLabel.setGravity(Gravity.CENTER);
+        idCard.addView(idLabel);
+
+        TextView idValue = new TextView(this);
+        idValue.setText(c.nationalId);
+        idValue.setTextColor(Color.WHITE);
+        idValue.setTextSize(16);
+        idValue.setTypeface(null, Typeface.BOLD);
+        idValue.setGravity(Gravity.CENTER);
+        idValue.setPadding(0, 12, 0, 12);
+        idValue.setLetterSpacing(0.05f);
+        idCard.addView(idValue);
+
+        Button showIdBtn = UiHelper.secondaryButton(this, "عرض الرقم");
+        showIdBtn.setOnClickListener(v -> {
+            new AlertDialog.Builder(WalletActivity.this)
                 .setTitle("رقمك للاستقبال")
                 .setMessage("أعطِ هذا الرقم لمن يريد أن يرسل لك ديناراً:\n\n" + c.nationalId)
-                .setPositiveButton("حسناً", null)
+                .setPositiveButton(getString(R.string.btn_ok), null)
                 .show();
         });
-        root.addView(myIdBtn);
+        idCard.addView(showIdBtn);
 
+        root.addView(idCard);
 
-        // زر تحديث يدوي
-        Button refreshBtn = new Button(this);
-        refreshBtn.setText("🔄  تحديث الرصيد");
-        refreshBtn.setTextSize(14);
+        // زر تحديث
+        Button refreshBtn = UiHelper.actionButton(this, "🔄  تحديث الرصيد", "#1B5E20");
         refreshBtn.setOnClickListener(v -> {
             Toast.makeText(WalletActivity.this, "جاري التحديث...", Toast.LENGTH_SHORT).show();
             startBalanceListener();
         });
         root.addView(refreshBtn);
 
-        // ============ معلومات ============
-        TextView sep = new TextView(this);
-        sep.setText("\n━━━━━━━━━━━━━━━━\n");
-        sep.setTextColor(Color.parseColor("#333333"));
-        sep.setGravity(Gravity.CENTER);
-        sep.setPadding(0, 40, 0, 20);
-        root.addView(sep);
+        // فاصل
+        View spacer = UiHelper.spacer(this, 30);
+        root.addView(spacer);
 
-        TextView info = new TextView(this);
-        info.setText("طرق كسب الدينار:\n\n" +
-                "🎁  مكافأة يومية: +5 Đ\n" +
-                "🗳️  التصويت على اقتراح: +5 Đ\n" +
-                "📝  تقديم اقتراح: +20 Đ\n" +
-                "👑  الفوز بالانتخابات: +500 Đ");
-        info.setTextColor(Color.parseColor("#9E9E9E"));
-        info.setTextSize(13);
-        info.setLineSpacing(8, 1);
-        info.setGravity(Gravity.CENTER);
-        info.setPadding(0, 20, 0, 40);
-        root.addView(info);
+        // عنوان قسم طرق الكسب
+        LinearLayout sectionTitle = new LinearLayout(this);
+        sectionTitle.setOrientation(LinearLayout.HORIZONTAL);
+        sectionTitle.setGravity(Gravity.CENTER_VERTICAL);
+        sectionTitle.setPadding(0, 20, 0, 20);
 
+        View lineL = new View(this);
+        LinearLayout.LayoutParams lineLlp = new LinearLayout.LayoutParams(0, 2, 1f);
+        lineL.setLayoutParams(lineLlp);
+        lineL.setBackgroundColor(Color.parseColor("#2A2A2A"));
+        sectionTitle.addView(lineL);
+
+        TextView secText = new TextView(this);
+        secText.setText("  💎  طرق كسب الدينار  ");
+        secText.setTextColor(Color.parseColor("#D4AF37"));
+        secText.setTextSize(15);
+        secText.setTypeface(null, Typeface.BOLD);
+        sectionTitle.addView(secText);
+
+        View lineR = new View(this);
+        LinearLayout.LayoutParams lineRlp = new LinearLayout.LayoutParams(0, 2, 1f);
+        lineR.setLayoutParams(lineRlp);
+        lineR.setBackgroundColor(Color.parseColor("#2A2A2A"));
+        sectionTitle.addView(lineR);
+
+        root.addView(sectionTitle);
+
+        // بطاقات طرق الكسب
+        addEarningCard(root, "🎁", "مكافأة يومية", "+5 Đ كل يوم");
+        addEarningCard(root, "🗳️", "التصويت على اقتراح", "+5 Đ لكل تصويت");
+        addEarningCard(root, "📝", "تقديم اقتراح", "+20 Đ لكل اقتراح");
+        addEarningCard(root, "👑", "الفوز بالانتخابات", "+500 Đ");
+
+        // Footer
         TextView footer = new TextView(this);
         footer.setText("دولة أُمّة الرقمية\nدينار واحد = تفاعل واحد");
         footer.setTextColor(Color.parseColor("#616161"));
         footer.setTextSize(11);
         footer.setGravity(Gravity.CENTER);
+        footer.setPadding(0, 40, 0, 0);
         root.addView(footer);
 
         setContentView(scroll);
         startBalanceListener();
+    }
+
+    private void addEarningCard(LinearLayout root, String emoji, String title, String subtitle) {
+        LinearLayout card = new LinearLayout(this);
+        card.setOrientation(LinearLayout.HORIZONTAL);
+        card.setGravity(Gravity.CENTER_VERTICAL);
+        card.setBackgroundResource(R.drawable.bg_card_premium);
+        card.setPadding(40, 30, 40, 30);
+
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp.setMargins(0, 8, 0, 8);
+        card.setLayoutParams(lp);
+
+        TextView emojiView = new TextView(this);
+        emojiView.setText(emoji);
+        emojiView.setTextSize(28);
+        emojiView.setPadding(0, 0, 20, 0);
+        card.addView(emojiView);
+
+        LinearLayout textCol = new LinearLayout(this);
+        textCol.setOrientation(LinearLayout.VERTICAL);
+        textCol.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+
+        TextView tv = new TextView(this);
+        tv.setText(title);
+        tv.setTextColor(Color.WHITE);
+        tv.setTextSize(15);
+        tv.setTypeface(null, Typeface.BOLD);
+        textCol.addView(tv);
+
+        TextView sv = new TextView(this);
+        sv.setText(subtitle);
+        sv.setTextColor(Color.parseColor("#D4AF37"));
+        sv.setTextSize(13);
+        sv.setPadding(0, 4, 0, 0);
+        textCol.addView(sv);
+
+        card.addView(textCol);
+
+        root.addView(card);
     }
 
     @Override
