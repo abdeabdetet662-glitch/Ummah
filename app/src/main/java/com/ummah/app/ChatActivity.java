@@ -39,7 +39,7 @@ public class ChatActivity extends Activity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
-        FullscreenHelper.enable(this);
+        // FullscreenHelper.enable(this);  // DISABLED - crash
         // اجعل النافذة تتكيف مع الكيبورد
         getWindow().setSoftInputMode(
                 android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
@@ -340,6 +340,6 @@ public class ChatActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        FullscreenHelper.enable(this);
+        // FullscreenHelper.enable(this);  // DISABLED - crash
     }
 }

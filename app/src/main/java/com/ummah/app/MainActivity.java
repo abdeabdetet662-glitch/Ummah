@@ -40,7 +40,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
-        FullscreenHelper.enable(this);
+        // FullscreenHelper.enable(this);  // DISABLED - crash
         im = new IdentityManager(this);
         wm = new WalletManager(this);
         fm = FirebaseManager.get();
@@ -477,7 +477,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        FullscreenHelper.enable(this);
+        // FullscreenHelper.enable(this);  // DISABLED - crash
         Citizen c = im.getCitizen();
         if (c != null) fm.updateLastSeen(c.nationalId);
     }
