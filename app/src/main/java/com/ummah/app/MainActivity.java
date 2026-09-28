@@ -60,7 +60,7 @@ public class MainActivity extends Activity {
                 }
             }
             @Override public void onError(String msg) {
-                Toast.makeText(MainActivity.this, "خطأ اتصال: " + msg, Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, getString(R.string.connection_error, msg), Toast.LENGTH_LONG).show();
                 if (im.isCitizen()) {
                     currentCitizen = im.getCitizen();
                     showCard(currentCitizen);
@@ -75,11 +75,11 @@ public class MainActivity extends Activity {
         fm.lookupCitizen(c.nationalId, new FirebaseManager.LookupListener() {
             @Override public void onFound(String name) { showCard(c); }
             @Override public void onNotFound() {
-                Toast.makeText(MainActivity.this, "جاري مزامنة حسابك...", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, getString(R.string.syncing), Toast.LENGTH_SHORT).show();
                 fm.registerCitizen(c, wm.getBalance(), new FirebaseManager.OnDone() {
                     @Override public void onSuccess() { showCard(c); }
                     @Override public void onError(String msg) {
-                        Toast.makeText(MainActivity.this, "خطأ: " + msg, Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, getString(R.string.error, msg), Toast.LENGTH_LONG).show();
                         showCard(c);
                     }
                 });
@@ -98,7 +98,7 @@ public class MainActivity extends Activity {
         if (countReg != null) countReg.remove();
         countReg = fm.listenCitizensCount(c ->
             runOnUiThread(() -> {
-                if (countView != null) countView.setText("👥 " + c + " مواطن");
+                if (countView != null) countView.setText(getString(R.string.citizens_count, c));
             }));
 
         if (balReg != null) balReg.remove();
@@ -106,7 +106,7 @@ public class MainActivity extends Activity {
             balReg = fm.listenBalance(currentCitizen.nationalId, new FirebaseManager.BalanceListener() {
                 @Override public void onBalance(final int balance) {
                     runOnUiThread(() -> {
-                        if (balanceView != null) balanceView.setText(balance + " Đ");
+                        if (balanceView != null) balanceView.setText(balance + " " + getString(R.string.currency_short));
                     });
                 }
                 @Override public void onError(String m) {}
@@ -114,13 +114,9 @@ public class MainActivity extends Activity {
         }
     }
 
-    // ═══════════════════════════════════════
-    //  شاشة الترحيب
-    // ═══════════════════════════════════════
     private void showWelcome() {
         root.removeAllViews();
 
-        // ═══ Hero ═══
         LinearLayout hero = new LinearLayout(this);
         hero.setOrientation(LinearLayout.VERTICAL);
         hero.setGravity(Gravity.CENTER);
@@ -132,33 +128,31 @@ public class MainActivity extends Activity {
         flag.setGravity(Gravity.CENTER);
         hero.addView(flag);
 
-        TextView title = UiHelper.goldTitle(this, "أُمّة", 56);
+        TextView title = UiHelper.goldTitle(this, getString(R.string.app_name), 56);
         title.setPadding(0, 20, 0, 4);
         hero.addView(title);
 
         TextView sub = new TextView(this);
-        sub.setText("أول دولة رقمية في العالم العربي");
+        sub.setText(getString(R.string.slogan));
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(15);
         sub.setGravity(Gravity.CENTER);
-        sub.setLetterSpacing(0.05f);
         hero.addView(sub);
 
         root.addView(hero);
 
-        // ═══ العدّاد ═══
         LinearLayout counterCard = UiHelper.card(this);
         counterCard.setGravity(Gravity.CENTER);
 
         TextView counterLabel = new TextView(this);
-        counterLabel.setText("المواطنون");
+        counterLabel.setText(getString(R.string.citizens_label));
         counterLabel.setTextColor(Color.parseColor("#9E9E9E"));
         counterLabel.setTextSize(12);
         counterLabel.setGravity(Gravity.CENTER);
         counterCard.addView(counterLabel);
 
         countView = new TextView(this);
-        countView.setText("...");
+        countView.setText(getString(R.string.loading));
         countView.setTextColor(Color.parseColor("#D4AF37"));
         countView.setTextSize(36);
         countView.setTypeface(null, Typeface.BOLD);
@@ -169,14 +163,12 @@ public class MainActivity extends Activity {
         root.addView(counterCard);
         startListeners();
 
-        // ═══ زر الانضمام ═══
-        Button join = UiHelper.primaryButton(this, "🚀  انضم إلى الأمة");
+        Button join = UiHelper.primaryButton(this, getString(R.string.join_button));
         join.setOnClickListener(v -> askName());
         root.addView(join);
 
-        // ═══ تلميح ═══
         TextView hint = new TextView(this);
-        hint.setText("انضم إلى آلاف المواطنين في أول دولة رقمية عربية");
+        hint.setText(getString(R.string.join_hint));
         hint.setTextColor(Color.parseColor("#666666"));
         hint.setTextSize(12);
         hint.setGravity(Gravity.CENTER);
@@ -184,14 +176,10 @@ public class MainActivity extends Activity {
         root.addView(hint);
     }
 
-    // ═══════════════════════════════════════
-    //  شاشة المواطن
-    // ═══════════════════════════════════════
     private void showCard(Citizen c) {
         currentCitizen = c;
         root.removeAllViews();
 
-        // ═══ Header صغير ═══
         LinearLayout header = new LinearLayout(this);
         header.setOrientation(LinearLayout.HORIZONTAL);
         header.setGravity(Gravity.CENTER);
@@ -203,7 +191,7 @@ public class MainActivity extends Activity {
         header.addView(flag);
 
         TextView appName = new TextView(this);
-        appName.setText("  أُمّة");
+        appName.setText("  " + getString(R.string.app_name));
         appName.setTextColor(Color.parseColor("#D4AF37"));
         appName.setTextSize(22);
         appName.setTypeface(null, Typeface.BOLD);
@@ -211,39 +199,36 @@ public class MainActivity extends Activity {
 
         root.addView(header);
 
-        // ═══ بطاقة المواطنة الذهبية ═══
         LinearLayout card = UiHelper.goldCard(this);
         card.setGravity(Gravity.CENTER);
 
         TextView cardTitle = new TextView(this);
-        cardTitle.setText("✦  بطاقة المواطنة  ✦");
+        cardTitle.setText(getString(R.string.citizenship_card));
         cardTitle.setTextColor(Color.parseColor("#D4AF37"));
         cardTitle.setTextSize(13);
         cardTitle.setTypeface(null, Typeface.BOLD);
         cardTitle.setGravity(Gravity.CENTER);
-        cardTitle.setLetterSpacing(0.1f);
         card.addView(cardTitle);
 
-        addRow(card, "الاسم", c.name, 24, "#FFFFFF");
-        addRow(card, "الرقم الوطني", c.nationalId, 14, "#D4AF37");
-        addRow(card, "البلد", CountryList.getName(c.country), 16, "#FFFFFF");
-        addRow(card, "تاريخ الانضمام", c.joinDate, 13, "#9E9E9E");
+        addRow(card, getString(R.string.label_name), c.name, 24, "#FFFFFF");
+        addRow(card, getString(R.string.label_national_id), c.nationalId, 14, "#D4AF37");
+        addRow(card, getString(R.string.label_country), CountryList.getName(c.country), 16, "#FFFFFF");
+        addRow(card, getString(R.string.label_join_date), c.joinDate, 13, "#9E9E9E");
 
         root.addView(card);
 
-        // ═══ الرصيد ═══
         LinearLayout balCard = UiHelper.card(this);
         balCard.setGravity(Gravity.CENTER);
 
         TextView balLabel = new TextView(this);
-        balLabel.setText("💰  رصيدك الحالي");
+        balLabel.setText(getString(R.string.balance_label));
         balLabel.setTextColor(Color.parseColor("#9E9E9E"));
         balLabel.setTextSize(12);
         balLabel.setGravity(Gravity.CENTER);
         balCard.addView(balLabel);
 
         balanceView = new TextView(this);
-        balanceView.setText("...");
+        balanceView.setText(getString(R.string.loading));
         balanceView.setTextColor(Color.parseColor("#D4AF37"));
         balanceView.setTextSize(48);
         balanceView.setTypeface(null, Typeface.BOLD);
@@ -252,7 +237,7 @@ public class MainActivity extends Activity {
         balCard.addView(balanceView);
 
         countView = new TextView(this);
-        countView.setText("...");
+        countView.setText(getString(R.string.loading));
         countView.setTextColor(Color.parseColor("#9E9E9E"));
         countView.setTextSize(12);
         countView.setGravity(Gravity.CENTER);
@@ -261,38 +246,31 @@ public class MainActivity extends Activity {
         root.addView(balCard);
         startListeners();
 
-        // ═══════════ الأقسام ═══════════
+        addSectionTitle(getString(R.string.section_main));
+        addPrimaryButton(getString(R.string.btn_wallet), WalletActivity.class);
+        addPrimaryButton(getString(R.string.btn_daily_reward), DailyRewardActivity.class);
+        addPrimaryButton(getString(R.string.btn_profile), ProfileActivity.class);
 
-        // ─── الرئيسية ───
-        addSectionTitle("⭐  الرئيسية");
-        addPrimaryButton("💰  محفظتي", WalletActivity.class);
-        addPrimaryButton("🎁  مكافأة اليوم", DailyRewardActivity.class);
-        addPrimaryButton("👤  ملفي الشخصي", ProfileActivity.class);
+        addSectionTitle(getString(R.string.section_communication));
+        addSecondaryButton(getString(R.string.btn_chat), ChatActivity.class);
+        addSecondaryButton(getString(R.string.btn_citizens), CitizensActivity.class);
+        addSecondaryButton(getString(R.string.btn_leaderboard), LeaderboardActivity.class);
 
-        // ─── التواصل ───
-        addSectionTitle("💬  التواصل");
-        addSecondaryButton("💬  دردشة أُمّة", ChatActivity.class);
-        addSecondaryButton("👥  دليل المواطنين", CitizensActivity.class);
-        addSecondaryButton("🏆  المتصدرون", LeaderboardActivity.class);
+        addSectionTitle(getString(R.string.section_governance));
+        addSecondaryButton(getString(R.string.btn_parliament), ParliamentActivity.class);
+        addSecondaryButton(getString(R.string.btn_election), ElectionActivity.class);
+        addSecondaryButton(getString(R.string.btn_constitution), ConstitutionActivity.class);
+        addSecondaryButton(getString(R.string.btn_court), CourtActivity.class);
+        addSecondaryButton(getString(R.string.btn_treasury), TreasuryActivity.class);
 
-        // ─── الحكم والسياسة ───
-        addSectionTitle("🏛️  الحكم والسياسة");
-        addSecondaryButton("🗳️  البرلمان", ParliamentActivity.class);
-        addSecondaryButton("👑  الانتخابات الرئاسية", ElectionActivity.class);
-        addSecondaryButton("📜  دستور أُمّة", ConstitutionActivity.class);
-        addSecondaryButton("⚖️  محكمة أُمّة", CourtActivity.class);
-        addSecondaryButton("🏦  الخزينة العامة", TreasuryActivity.class);
+        addSectionTitle(getString(R.string.section_other));
+        addSecondaryButton(getString(R.string.btn_news), NewsActivity.class);
+        addSecondaryButton(getString(R.string.btn_stats), StatsActivity.class);
+        addSecondaryButton(getString(R.string.btn_gifts), GiftsActivity.class);
+        addSecondaryButton(getString(R.string.btn_recovery), AccountRecoveryActivity.class);
 
-        // ─── أخرى ───
-        addSectionTitle("📌  أخرى");
-        addSecondaryButton("📰  أخبار أُمّة", NewsActivity.class);
-        addSecondaryButton("📊  إحصائيات الدولة", StatsActivity.class);
-        addSecondaryButton("🎁  الهدايا", GiftsActivity.class);
-        addSecondaryButton("🔐  استعادة الحساب", AccountRecoveryActivity.class);
-
-        // ─── زر الكلمات السرية (أسفل، رمادي) ───
         Button seedBtn = new Button(this);
-        seedBtn.setText("🔑  الكلمات السرية");
+        seedBtn.setText(getString(R.string.btn_seed));
         seedBtn.setTextSize(14);
         seedBtn.setTextColor(Color.parseColor("#888888"));
         seedBtn.setAllCaps(false);
@@ -306,10 +284,6 @@ public class MainActivity extends Activity {
         root.addView(seedBtn);
     }
 
-    // ═══════════════════════════════════════
-    //  Helpers
-    // ═══════════════════════════════════════
-
     private void addSectionTitle(String text) {
         LinearLayout container = new LinearLayout(this);
         container.setOrientation(LinearLayout.HORIZONTAL);
@@ -317,8 +291,7 @@ public class MainActivity extends Activity {
         container.setPadding(0, 32, 0, 12);
 
         View lineLeft = new View(this);
-        LinearLayout.LayoutParams lineLp = new LinearLayout.LayoutParams(
-            0, 2, 1f);
+        LinearLayout.LayoutParams lineLp = new LinearLayout.LayoutParams(0, 2, 1f);
         lineLeft.setLayoutParams(lineLp);
         lineLeft.setBackgroundColor(Color.parseColor("#2A2A2A"));
         container.addView(lineLeft);
@@ -331,8 +304,7 @@ public class MainActivity extends Activity {
         container.addView(title);
 
         View lineRight = new View(this);
-        LinearLayout.LayoutParams lineRlp = new LinearLayout.LayoutParams(
-            0, 2, 1f);
+        LinearLayout.LayoutParams lineRlp = new LinearLayout.LayoutParams(0, 2, 1f);
         lineRight.setLayoutParams(lineRlp);
         lineRight.setBackgroundColor(Color.parseColor("#2A2A2A"));
         container.addView(lineRight);
@@ -370,26 +342,22 @@ public class MainActivity extends Activity {
         p.addView(v);
     }
 
-    // ═══════════════════════════════════════
-    //  تسجيل المواطن
-    // ═══════════════════════════════════════
-
     private void askName() {
-        EditText input = UiHelper.input(this, "اسمك أو كنيتك");
+        EditText input = UiHelper.input(this, getString(R.string.hint_name));
 
         LinearLayout c = new LinearLayout(this);
         c.setPadding(40, 20, 40, 20);
         c.addView(input);
 
         new AlertDialog.Builder(this)
-            .setTitle("اختر اسمك")
+            .setTitle(getString(R.string.dialog_choose_name))
             .setView(c)
-            .setPositiveButton("متابعة", (d, w) -> {
+            .setPositiveButton(getString(R.string.btn_continue), (d, w) -> {
                 String n = input.getText().toString().trim();
-                if (n.isEmpty()) n = "مواطن مجهول";
+                if (n.isEmpty()) n = getString(R.string.unknown_citizen);
                 askCountry(n);
             })
-            .setNegativeButton("إلغاء", null)
+            .setNegativeButton(getString(R.string.btn_cancel), null)
             .show();
     }
 
@@ -398,10 +366,10 @@ public class MainActivity extends Activity {
         final String detectedName = CountryList.getName(detected);
 
         new AlertDialog.Builder(this)
-            .setTitle("🌍 من أين أنت؟")
-            .setMessage("كشفنا تلقائياً:\n\n" + detectedName + "\n\nهل هذا بلدك؟")
-            .setPositiveButton("✅ نعم", (d, w) -> registerNow(name, detected))
-            .setNegativeButton("🖐️ اختيار يدوي", (d, w) -> showCountryPicker(name))
+            .setTitle(getString(R.string.dialog_country))
+            .setMessage(getString(R.string.country_detected, detectedName))
+            .setPositiveButton(getString(R.string.btn_yes), (d, w) -> registerNow(name, detected))
+            .setNegativeButton(getString(R.string.btn_manual), (d, w) -> showCountryPicker(name))
             .setCancelable(false)
             .show();
     }
@@ -413,9 +381,9 @@ public class MainActivity extends Activity {
         for (int i = 0; i < keys.length; i++) labels[i] = countries.get(keys[i]);
 
         new AlertDialog.Builder(this)
-            .setTitle("اختر بلدك")
+            .setTitle(getString(R.string.dialog_choose_country))
             .setItems(labels, (d, which) -> registerNow(name, keys[which]))
-            .setNegativeButton("رجوع", (d, w) -> askCountry(name))
+            .setNegativeButton(getString(R.string.btn_back), (d, w) -> askCountry(name))
             .show();
     }
 
@@ -429,27 +397,25 @@ public class MainActivity extends Activity {
                 showSeedDialog(citizen);
             }
             @Override public void onError(String msg) {
-                Toast.makeText(MainActivity.this, "خطأ: " + msg, Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, getString(R.string.error, msg), Toast.LENGTH_LONG).show();
             }
         });
     }
 
     private void showSeedDialog(final Citizen c) {
         new AlertDialog.Builder(this)
-            .setTitle("🔐 كلماتك السرية")
-            .setMessage("احفظ هذه الكلمات الـ 12 في مكان آمن:\n\n" + c.seedPhrase +
-                    "\n\nهي هويتك الوحيدة.")
-            .setNeutralButton("📋 نسخ", (d, w) -> {
+            .setTitle(getString(R.string.dialog_seed_title))
+            .setMessage(getString(R.string.seed_warning, c.seedPhrase))
+            .setNeutralButton(getString(R.string.btn_copy), (d, w) -> {
                 android.content.ClipboardManager cm = (android.content.ClipboardManager)
                         getSystemService(android.content.Context.CLIPBOARD_SERVICE);
                 cm.setPrimaryClip(android.content.ClipData.newPlainText("Seed", c.seedPhrase));
-                Toast.makeText(MainActivity.this, "✅ تم نسخ الكلمات",
-                        Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, getString(R.string.seed_copied), Toast.LENGTH_LONG).show();
                 showSeedDialog(c);
             })
-            .setPositiveButton("حفظتها", (d, w) -> {
+            .setPositiveButton(getString(R.string.btn_saved), (d, w) -> {
                 showCard(c);
-                Toast.makeText(this, "مرحباً بك في أُمّة", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.welcome_toast), Toast.LENGTH_LONG).show();
             })
             .setCancelable(false)
             .show();
@@ -457,16 +423,15 @@ public class MainActivity extends Activity {
 
     private void showSeed(final Citizen c) {
         new AlertDialog.Builder(this)
-            .setTitle("🔐 الكلمات السرية")
+            .setTitle(getString(R.string.dialog_seed_title))
             .setMessage(c.seedPhrase)
-            .setNeutralButton("📋 نسخ", (d, w) -> {
+            .setNeutralButton(getString(R.string.btn_copy), (d, w) -> {
                 android.content.ClipboardManager cm = (android.content.ClipboardManager)
                         getSystemService(android.content.Context.CLIPBOARD_SERVICE);
                 cm.setPrimaryClip(android.content.ClipData.newPlainText("Seed", c.seedPhrase));
-                Toast.makeText(MainActivity.this, "✅ تم نسخ الكلمات",
-                        Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, getString(R.string.seed_copied), Toast.LENGTH_LONG).show();
             })
-            .setPositiveButton("حسناً", null)
+            .setPositiveButton(getString(R.string.btn_ok), null)
             .show();
     }
 
