@@ -26,6 +26,7 @@ public class WalletActivity extends Activity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
+        FullscreenHelper.enable(this);
         im = new IdentityManager(this);
         fm = FirebaseManager.get();
 
@@ -259,5 +260,11 @@ public class WalletActivity extends Activity {
                 runOnUiThread(() -> balanceView.setText("—"));
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        FullscreenHelper.enable(this);
     }
 }

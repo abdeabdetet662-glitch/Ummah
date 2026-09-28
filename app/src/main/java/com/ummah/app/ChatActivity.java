@@ -39,6 +39,11 @@ public class ChatActivity extends Activity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
+        FullscreenHelper.enable(this);
+        // اجعل النافذة تتكيف مع الكيبورد
+        getWindow().setSoftInputMode(
+                android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
+                | android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         fm = FirebaseManager.get();
         im = new IdentityManager(this);
         me = im.getCitizen();
@@ -330,5 +335,11 @@ public class ChatActivity extends Activity {
             })
             .setNegativeButton("إلغاء", null)
             .show();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        FullscreenHelper.enable(this);
     }
 }
