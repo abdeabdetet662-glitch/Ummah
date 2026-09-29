@@ -284,9 +284,22 @@ public class MyInventoryActivity extends Activity {
             card.addView(wearBtn);
         }
 
-        // زر بيع
+        // زر "بِع لمواطن" (يحدد السعر)
+        Button sellToListBtn = new Button(this);
+        sellToListBtn.setText("🏷️");
+        sellToListBtn.setTextSize(13);
+        sellToListBtn.setTextColor(Color.parseColor("#0A0A0A"));
+        sellToListBtn.setTypeface(null, Typeface.BOLD);
+        sellToListBtn.setBackgroundResource(R.drawable.bg_btn_gold_hero);
+        LinearLayout.LayoutParams sllLp = new LinearLayout.LayoutParams(150, 180);
+        sllLp.setMargins(0, 0, 8, 0);
+        sellToListBtn.setLayoutParams(sllLp);
+        sellToListBtn.setOnClickListener(v -> sellToList(item));
+        card.addView(sellToListBtn);
+
+        // زر بيع للتطبيق (70%)
         Button sellBtn = new Button(this);
-        sellBtn.setText("بِع");
+        sellBtn.setText("💰");
         sellBtn.setTextSize(13);
         sellBtn.setTextColor(Color.WHITE);
         sellBtn.setTypeface(null, Typeface.BOLD);
@@ -376,5 +389,41 @@ public class MyInventoryActivity extends Activity {
                         }
                     });
                 });
+    }
+
+
+    private void sellToList(MarketItem item) {
+        Citizen c = im.getCitizen();
+        if (c == null) return;
+
+        db.collection("users_inventory").document(c.nationalId)
+                .collection("items").document(item.id)
+                .get()
+                .addOnSuccessListener(doc -> {
+                    if (!doc.exists()) {
+                        Toast.makeText(this, "❌ المنتج غير موجود", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    Boolean listed = doc.getBoolean("listedForSale");
+                    if (listed != null && listed) {
+                        Toast.makeText(this, "⚠️ المنتج معروض للبيع مسبقاً", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+
+                    android.content.Intent i = new android.content.Intent(this, SellItemActivity.class);
+                    i.putExtra(SellItemActivity.EXTRA_ITEM_ID, item.id);
+                    i.putExtra(SellItemActivity.EXTRA_ITEM_NAME, item.name);
+                    i.putExtra(SellItemActivity.EXTRA_ITEM_BRAND, item.brand);
+                    i.putExtra(SellItemActivity.EXTRA_ITEM_CATEGORY, item.category);
+                    i.putExtra(SellItemActivity.EXTRA_ITEM_TYPE, item.type);
+                    i.putExtra(SellItemActivity.EXTRA_ITEM_PRICE, item.price);
+                    i.putExtra(SellItemActivity.EXTRA_ITEM_IMAGE, item.imageUrl);
+                    i.putExtra(SellItemActivity.EXTRA_ITEM_RARITY, item.rarity);
+                    i.putExtra(SellItemActivity.EXTRA_ITEM_DESC, item.description);
+                    i.putExtra(SellItemActivity.EXTRA_INV_DOC_ID, doc.getId());
+                    startActivity(i);
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(this, "❌ " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 }

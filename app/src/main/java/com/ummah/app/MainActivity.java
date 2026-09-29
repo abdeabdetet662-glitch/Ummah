@@ -269,6 +269,7 @@ public class MainActivity extends Activity {
         addSectionTitle(getString(R.string.section_governance));
         addSecondaryButton(getString(R.string.btn_parliament), ParliamentActivity.class);
         addPrimaryButton("🛒  السوق العام", MarketActivity.class);
+        addPrimaryButton("🤝  سوق المواطنين", CitizenMarketActivity.class);
         addPrimaryButton("🎒  ممتلكاتي", MyInventoryActivity.class);
         addPrimaryButton("💼  الوظائف", JobsActivity.class);
         addPrimaryButton("🎨  شخصيتي", AvatarActivity.class);

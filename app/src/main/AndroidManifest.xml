@@ -75,5 +75,8 @@
 
             <activity android:name=".GarageActivity" android:exported="false" />
 
+            <activity android:name=".SellItemActivity" android:exported="false" />
+        <activity android:name=".CitizenMarketActivity" android:exported="false" />
+
     </application>
 </manifest>
