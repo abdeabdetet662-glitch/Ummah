@@ -66,5 +66,14 @@
 
             <activity android:name=".MyInventoryActivity" android:exported="false" />
 
+            <activity android:name=".JobsActivity" android:exported="false" />
+        <activity android:name=".MyJobActivity" android:exported="false" />
+
+            <activity android:name=".AvatarActivity" android:exported="false" />
+
+            <activity android:name=".LifeStatsActivity" android:exported="false" />
+
+            <activity android:name=".GarageActivity" android:exported="false" />
+
     </application>
 </manifest>

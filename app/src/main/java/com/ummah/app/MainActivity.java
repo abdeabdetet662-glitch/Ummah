@@ -270,6 +270,10 @@ public class MainActivity extends Activity {
         addSecondaryButton(getString(R.string.btn_parliament), ParliamentActivity.class);
         addPrimaryButton("🛒  السوق العام", MarketActivity.class);
         addPrimaryButton("🎒  ممتلكاتي", MyInventoryActivity.class);
+        addPrimaryButton("💼  الوظائف", JobsActivity.class);
+        addPrimaryButton("🎨  شخصيتي", AvatarActivity.class);
+        addPrimaryButton("❤️  حياتي", LifeStatsActivity.class);
+        addPrimaryButton("🚗  مرآبي", GarageActivity.class);
         addSeedButton();
         electionBadgeContainer = addBadgedSecondaryButton(getString(R.string.btn_election), ElectionActivity.class, 0);
         addSecondaryButton(getString(R.string.btn_constitution), ConstitutionActivity.class);
@@ -555,6 +559,7 @@ public class MainActivity extends Activity {
             com.google.firebase.firestore.FirebaseFirestore db = com.google.firebase.firestore.FirebaseFirestore.getInstance();
             MarketCleanup.cleanupOldItems(db);
             MarketSeed.seed(db);
+            JobSeed.seed(db);
             Toast.makeText(MainActivity.this, "✅ تمت إضافة المنتجات! افتح السوق", Toast.LENGTH_LONG).show();
         });
         root.addView(seedBtn);
