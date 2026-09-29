@@ -3,9 +3,10 @@ package com.ummah.app;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,10 +29,10 @@ public class MarketManager {
         void onError(String msg);
     }
 
+    // بدون orderBy (باش ما يحتاجش index)
     public ListenerRegistration listenByCategory(String category, final ItemsListener l) {
         return db.collection("market_items")
                 .whereEqualTo("category", category)
-                .orderBy("price", Query.Direction.ASCENDING)
                 .addSnapshotListener((snap, e) -> {
                     if (e != null) { l.onError(e.getMessage()); return; }
                     if (snap == null) { l.onItems(new ArrayList<>()); return; }
@@ -43,13 +44,18 @@ public class MarketManager {
                             items.add(item);
                         }
                     }
+                    // الترتيب في Java
+                    Collections.sort(items, new Comparator<MarketItem>() {
+                        @Override public int compare(MarketItem a, MarketItem b) {
+                            return Integer.compare(a.price, b.price);
+                        }
+                    });
                     l.onItems(items);
                 });
     }
 
     public ListenerRegistration listenAll(final ItemsListener l) {
         return db.collection("market_items")
-                .orderBy("price", Query.Direction.ASCENDING)
                 .addSnapshotListener((snap, e) -> {
                     if (e != null) { l.onError(e.getMessage()); return; }
                     if (snap == null) { l.onItems(new ArrayList<>()); return; }
@@ -61,6 +67,11 @@ public class MarketManager {
                             items.add(item);
                         }
                     }
+                    Collections.sort(items, new Comparator<MarketItem>() {
+                        @Override public int compare(MarketItem a, MarketItem b) {
+                            return Integer.compare(a.price, b.price);
+                        }
+                    });
                     l.onItems(items);
                 });
     }
@@ -100,10 +111,10 @@ public class MarketManager {
           .addOnFailureListener(e -> cb.onError(e.getMessage()));
     }
 
+    // بدون orderBy
     public ListenerRegistration listenMyInventory(String userId, final ItemsListener l) {
         return db.collection("users_inventory").document(userId)
                 .collection("items")
-                .orderBy("boughtAt", Query.Direction.DESCENDING)
                 .addSnapshotListener((snap, e) -> {
                     if (e != null) { l.onError(e.getMessage()); return; }
                     if (snap == null) { l.onItems(new ArrayList<>()); return; }
