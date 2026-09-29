@@ -154,8 +154,8 @@ public class AvatarActivity extends Activity {
 
     private void applyColor(String field, String hex) {
         if ("skin".equals(field)) current.skinColor = hex;
-        else if ("shirt".equals(field)) current.shirtColor = hex;
-        else if ("pants".equals(field)) current.pantsColor = hex;
+        else if ("shirt".equals(field)) current.equippedShirtColor = hex;
+        else if ("pants".equals(field)) current.equippedPantsColor = hex;
 
         if (pageLoaded && webView != null) {
             String js = "";
