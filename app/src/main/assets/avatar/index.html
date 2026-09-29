@@ -27,23 +27,14 @@
 <body>
 <div id="loading">
   <div class="spinner"></div>
-  ⏳ جاري تحميل الشخصية
+  ⏳ جاري التحميل
 </div>
 
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-  }
-}
-</script>
+<script src="./libs/three.min.js"></script>
+<script src="./libs/GLTFLoader.js"></script>
+<script src="./libs/OrbitControls.js"></script>
 
-<script type="module">
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-
+<script>
 let scene, camera, renderer, controls;
 let avatarRoot = null;
 let mixer = null;
@@ -66,7 +57,7 @@ function init() {
   renderer.toneMappingExposure = 1.0;
   document.body.appendChild(renderer.domElement);
 
-  // ═══ الإضاءة ═══
+  // الإضاءة
   scene.add(new THREE.AmbientLight(0xffffff, 0.7));
 
   const keyLight = new THREE.DirectionalLight(0xFFD97A, 2.0);
@@ -82,14 +73,11 @@ function init() {
   rimLight.position.set(0, 4, -5);
   scene.add(rimLight);
 
-  // أرضية دائرية
+  // أرضية
   const groundGeom = new THREE.CircleGeometry(2.5, 32);
   const groundMat = new THREE.MeshStandardMaterial({
-    color: 0x0B4F2C,
-    emissive: 0x0B4F2C,
-    emissiveIntensity: 0.2,
-    metalness: 0.4,
-    roughness: 0.8
+    color: 0x0B4F2C, emissive: 0x0B4F2C, emissiveIntensity: 0.2,
+    metalness: 0.4, roughness: 0.8
   });
   const ground = new THREE.Mesh(groundGeom, groundMat);
   ground.rotation.x = -Math.PI / 2;
@@ -97,8 +85,8 @@ function init() {
   ground.receiveShadow = true;
   scene.add(ground);
 
-  // ═══ Controls ═══
-  controls = new OrbitControls(camera, renderer.domElement);
+  // Controls
+  controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.dampingFactor = 0.08;
   controls.minDistance = 1.5;
@@ -110,50 +98,40 @@ function init() {
   controls.minPolarAngle = Math.PI / 4;
 
   clock = new THREE.Clock();
-
   loadAvatar();
 }
 
 function loadAvatar() {
-  const loader = new GLTFLoader();
-
-  // نحمّلو من assets (محلي)
+  const loader = new THREE.GLTFLoader();
   const modelUrl = './models/soldier.glb';
 
   loader.load(
     modelUrl,
-    (gltf) => {
+    function(gltf) {
       avatarRoot = gltf.scene;
 
-      avatarRoot.traverse((child) => {
+      avatarRoot.traverse(function(child) {
         if (child.isMesh) {
           child.castShadow = true;
           child.receiveShadow = true;
-          if (child.material) {
-            child.material.envMapIntensity = 1.0;
-          }
         }
       });
 
-      // ضبط الحجم لـ 1.8 متر
       const box = new THREE.Box3().setFromObject(avatarRoot);
       const size = box.getSize(new THREE.Vector3());
       const targetHeight = 1.8;
       const scale = targetHeight / size.y;
       avatarRoot.scale.setScalar(scale);
 
-      // نضعو على الأرض
       const newBox = new THREE.Box3().setFromObject(avatarRoot);
       avatarRoot.position.y = -newBox.min.y;
 
       scene.add(avatarRoot);
 
-      // ═══ الكاميرا تشوف الشخصية كاملة ═══
       const finalBox = new THREE.Box3().setFromObject(avatarRoot);
       const center = finalBox.getCenter(new THREE.Vector3());
       const height = finalBox.max.y - finalBox.min.y;
 
-      // نضعو الكاميرا على مسافة كافية
       const dist = height * 2.2;
       camera.position.set(0, center.y + height * 0.15, dist);
       camera.lookAt(center.x, center.y, center.z);
@@ -161,83 +139,70 @@ function loadAvatar() {
       controls.target.set(center.x, center.y, center.z);
       controls.update();
 
-      // Animation (إذا فيه)
       if (gltf.animations && gltf.animations.length > 0) {
         mixer = new THREE.AnimationMixer(avatarRoot);
-        const idle = gltf.animations.find(a => a.name.toLowerCase().includes('idle'))
-                  || gltf.animations[0];
+        let idle = null;
+        for (let i = 0; i < gltf.animations.length; i++) {
+          if (gltf.animations[i].name.toLowerCase().indexOf('idle') >= 0) {
+            idle = gltf.animations[i];
+            break;
+          }
+        }
+        if (!idle) idle = gltf.animations[0];
         if (idle) mixer.clipAction(idle).play();
       }
 
       document.getElementById('loading').style.display = 'none';
-
-      // نطبقو الألوان المحفوظة
-      if (window.savedColors) {
-        applyColors(window.savedColors);
-      }
-
-      // نخبرو Java أن التحميل خلص
-      if (window.Android) {
-        window.Android.onAvatarLoaded();
-      }
     },
-    (progress) => {
-      // نسبة صحيحة (0-100)
-      const pct = progress.total > 0
-        ? Math.min(100, Math.round((progress.loaded / progress.total) * 100))
-        : null;
-
-      const loadingEl = document.getElementById('loading');
-      if (pct !== null) {
-        loadingEl.innerHTML = '<div class="spinner"></div>⏳ ' + pct + '%';
-      } else {
-        const kb = Math.round(progress.loaded / 1024);
-        loadingEl.innerHTML = '<div class="spinner"></div>⏳ ' + kb + ' KB';
+    function(progress) {
+      let txt = '⏳ جاري التحميل';
+      if (progress.total > 0) {
+        const pct = Math.min(100, Math.round((progress.loaded / progress.total) * 100));
+        txt = '⏳ ' + pct + '%';
+      } else if (progress.loaded > 0) {
+        txt = '⏳ ' + Math.round(progress.loaded / 1024) + ' KB';
       }
+      document.getElementById('loading').innerHTML = '<div class="spinner"></div>' + txt;
     },
-    (error) => {
-      console.error('Error loading model:', error);
-      document.getElementById('loading').innerHTML =
-        '❌ فشل التحميل<br><small style="color:#888;font-size:12px">' + error + '</small>';
+    function(error) {
+      console.error(error);
+      document.getElementById('loading').innerHTML = '❌ فشل التحميل';
     }
   );
 }
 
-// ═══ تغيير لون القميص ═══
 window.setShirtColor = function(hex) {
   if (!avatarRoot) return;
-  avatarRoot.traverse((child) => {
+  avatarRoot.traverse(function(child) {
     if (child.isMesh && child.material) {
-      const n = (child.name || '').toLowerCase() + ' ' + (child.material.name || '').toLowerCase();
-      if (n.includes('shirt') || n.includes('torso') || n.includes('chest') ||
-          n.includes('uniform') || n.includes('body') || n.includes('jacket')) {
+      const n = ((child.name || '') + ' ' + (child.material.name || '')).toLowerCase();
+      if (n.indexOf('shirt') >= 0 || n.indexOf('torso') >= 0 || n.indexOf('chest') >= 0 ||
+          n.indexOf('uniform') >= 0 || n.indexOf('body') >= 0 || n.indexOf('jacket') >= 0) {
         child.material.color.set(hex);
       }
     }
   });
 };
 
-// ═══ تغيير لون البنطال ═══
 window.setPantsColor = function(hex) {
   if (!avatarRoot) return;
-  avatarRoot.traverse((child) => {
+  avatarRoot.traverse(function(child) {
     if (child.isMesh && child.material) {
-      const n = (child.name || '').toLowerCase() + ' ' + (child.material.name || '').toLowerCase();
-      if (n.includes('pant') || n.includes('leg') || n.includes('trouser')) {
+      const n = ((child.name || '') + ' ' + (child.material.name || '')).toLowerCase();
+      if (n.indexOf('pant') >= 0 || n.indexOf('leg') >= 0 || n.indexOf('trouser') >= 0) {
         child.material.color.set(hex);
       }
     }
   });
 };
 
-// ═══ تغيير لون البشرة ═══
 window.setSkinColor = function(hex) {
   if (!avatarRoot) return;
-  avatarRoot.traverse((child) => {
+  avatarRoot.traverse(function(child) {
     if (child.isMesh && child.material) {
-      const n = (child.name || '').toLowerCase() + ' ' + (child.material.name || '').toLowerCase();
-      if (n.includes('head') || n.includes('face') || n.includes('skin') ||
-          n.includes('hand') || n.includes('arm')) {
+      const n = ((child.name || '') + ' ' + (child.material.name || '')).toLowerCase();
+      if (n.indexOf('head') >= 0 || n.indexOf('face') >= 0 || n.indexOf('skin') >= 0 ||
+          n.indexOf('hand') >= 0 || n.indexOf('arm') >= 0) {
         child.material.color.set(hex);
       }
     }
@@ -250,7 +215,6 @@ window.applyColors = function(colors) {
   if (colors.skin) window.setSkinColor(colors.skin);
 };
 
-// ═══ Animations ═══
 function animate() {
   requestAnimationFrame(animate);
   const delta = clock.getDelta();
@@ -259,7 +223,7 @@ function animate() {
   renderer.render(scene, camera);
 }
 
-window.addEventListener('resize', () => {
+window.addEventListener('resize', function() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
