@@ -40,9 +40,6 @@ let avatarRoot = null;
 let mixer = null;
 let clock;
 
-// نحفظو المواد الأصلية
-let allMats = [];
-
 init();
 animate();
 
@@ -56,10 +53,9 @@ function init() {
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.2;
+  renderer.toneMappingExposure = 1.15;
   document.body.appendChild(renderer.domElement);
 
-  // إضاءة
   scene.add(new THREE.AmbientLight(0xffffff, 0.9));
   const keyLight = new THREE.DirectionalLight(0xffffff, 2.5);
   keyLight.position.set(3, 6, 4);
@@ -72,7 +68,6 @@ function init() {
   rimLight.position.set(0, 4, -5);
   scene.add(rimLight);
 
-  // أرضية
   const groundGeom = new THREE.CircleGeometry(2.5, 32);
   const groundMat = new THREE.MeshStandardMaterial({
     color: 0x0B4F2C, emissive: 0x0B4F2C, emissiveIntensity: 0.3,
@@ -84,7 +79,6 @@ function init() {
   ground.receiveShadow = true;
   scene.add(ground);
 
-  // Controls
   controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.dampingFactor = 0.08;
@@ -122,37 +116,20 @@ function loadAvatar() {
 function onModelLoaded(gltf) {
   avatarRoot = gltf.scene;
 
-  // نجمعو المواد
   avatarRoot.traverse(function(child) {
     if (child.isMesh) {
       child.castShadow = true;
       child.receiveShadow = true;
       child.frustumCulled = false;
-
-      if (child.material) {
-        // نصنعو نسخة معدلة من كل material
-        if (Array.isArray(child.material)) {
-          child.material = child.material.map(m => m.clone());
-          child.material.forEach(m => {
-            m.userData.name = (m.name || '').toLowerCase();
-            allMats.push(m);
-          });
-        } else {
-          child.material = child.material.clone();
-          child.material.userData.name = (child.material.name || '').toLowerCase();
-          allMats.push(child.material);
-        }
-      }
+      // نخليو المواد على حالها (الألوان الأصلية)
     }
   });
 
-  // Animation
   if (gltf.animations && gltf.animations.length > 0) {
     mixer = new THREE.AnimationMixer(avatarRoot);
     mixer.clipAction(gltf.animations[0]).play();
   }
 
-  // ضبط الحجم
   const box = new THREE.Box3().setFromObject(avatarRoot);
   const size = box.getSize(new THREE.Vector3());
   const targetHeight = 1.75;
@@ -164,7 +141,6 @@ function onModelLoaded(gltf) {
 
   scene.add(avatarRoot);
 
-  // ضبط الكاميرا
   const finalBox = new THREE.Box3().setFromObject(avatarRoot);
   const center = finalBox.getCenter(new THREE.Vector3());
   const height = finalBox.max.y - finalBox.min.y;
@@ -176,35 +152,13 @@ function onModelLoaded(gltf) {
   controls.update();
 
   document.getElementById('loading').style.display = 'none';
-
-  if (window.savedAvatar) applyFullAvatar(window.savedAvatar);
 }
 
-// ═══ تغيير الألوان — نستهدف المواد حسب موقعها ═══
-// CesiumMan عادة عندو مادة واحدة أو مواد حسب الـ mesh
-
-window.setShirtColor = function(hex) {
-  if (!avatarRoot) return;
-  avatarRoot.traverse(function(child) {
-    if (child.isMesh && child.material) {
-      const mats = Array.isArray(child.material) ? child.material : [child.material];
-      mats.forEach(m => {
-        // نغيرو فقط المواد اللي فيها "CesiumMan" أو "Torso"
-        if (m.color) m.color.set(hex);
-      });
-    }
-  });
-};
-
-window.setPantsColor = function(hex) {
-  // CesiumMan ما عندوش بنطال منفصل — نفس الشي
-  // نستعملو نصف الجسم الأسفل (لكن صعب نفرق)
-};
-
+// ═══ الألوان معطلة مؤقتاً (باش يبان CesiumMan بألوانو الأصلية) ═══
+window.setShirtColor = function(hex) {};
+window.setPantsColor = function(hex) {};
 window.setSkinColor = function(hex) {};
-
 window.setShoesColor = function(hex) {};
-
 window.setHatColor = function(hex) {};
 window.setGlassesColor = function(hex) {};
 window.setHatVisible = function(v) {};
@@ -213,7 +167,6 @@ window.setPhoneVisible = function(v) {};
 
 window.applyFullAvatar = function(data) {
   window.savedAvatar = data;
-  if (data.shirt) window.setShirtColor(data.shirt);
 };
 
 window.applyColors = window.applyFullAvatar;
