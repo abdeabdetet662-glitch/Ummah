@@ -6,6 +6,9 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
+import android.webkit.WebChromeClient;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -18,9 +21,10 @@ public class AvatarActivity extends Activity {
 
     private IdentityManager im;
     private AvatarManager am;
-    private AvatarGLSurfaceView glView;
+    private WebView webView;
     private Avatar current;
     private ListenerRegistration reg;
+    private boolean pageLoaded = false;
 
     @Override
     protected void onCreate(Bundle b) {
@@ -42,44 +46,57 @@ public class AvatarActivity extends Activity {
         root.addView(title);
 
         TextView sub = new TextView(this);
-        sub.setText("اسحب لتدوير الشخصية • قرّب بإصبعين");
+        sub.setText("اسحب لتدوير • قرّب بإصبعين • بدّل الألوان");
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(12);
         sub.setGravity(Gravity.CENTER);
         sub.setPadding(0, 0, 0, 20);
         root.addView(sub);
 
-        // GLSurfaceView
-        glView = new AvatarGLSurfaceView(this);
-        LinearLayout.LayoutParams glLp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, 900);
-        glView.setLayoutParams(glLp);
-        root.addView(glView);
+        // WebView
+        webView = new WebView(this);
+        webView.setBackgroundColor(Color.TRANSPARENT);
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.getSettings().setDomStorageEnabled(true);
+        webView.getSettings().setAllowFileAccess(true);
+        webView.getSettings().setAllowContentAccess(true);
+        webView.getSettings().setMediaPlaybackRequiresUserGesture(false);
+        webView.setWebChromeClient(new WebChromeClient());
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView v, String url) {
+                pageLoaded = true;
+                // نطبقو الألوان المحفوظة
+                webView.postDelayed(() -> applySaved(), 800);
+            }
+        });
 
-        // ألوان البشرة
+        LinearLayout.LayoutParams wvLp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, 950);
+        webView.setLayoutParams(wvLp);
+        webView.loadUrl("file:///android_asset/avatar/index.html");
+        root.addView(webView);
+
+        // أقسام الألوان
         addColorSection(root, "🎨  لون البشرة", new String[]{
                 "#F5D0A9", "#E8B98A", "#C68B59", "#8D5524"
         }, "skin");
 
-        // ألوان القميص
         addColorSection(root, "👕  لون القميص", new String[]{
                 "#1565C0", "#C62828", "#2E7D32", "#6A1B9A", "#F9A825", "#FFFFFF"
         }, "shirt");
 
-        // ألوان البنطال
         addColorSection(root, "👖  لون البنطال", new String[]{
                 "#212121", "#0D47A1", "#4E342E", "#616161", "#1B5E20"
         }, "pants");
 
-        // ألوان الشعر
-        addColorSection(root, "💇  لون الشعر", new String[]{
-                "#1A1A1A", "#4E342E", "#F9A825", "#C62828", "#E0E0E0"
-        }, "hair");
-
         // أزرار
         Button rotateBtn = UiHelper.actionButton(this, "🔄  تدوير تلقائي", "#0D47A1");
         rotateBtn.setOnClickListener(v -> {
-            if (glView != null) glView.renderer.autoRotate = !glView.renderer.autoRotate;
+            if (pageLoaded) {
+                webView.evaluateJavascript(
+                        "controls.autoRotate = !controls.autoRotate;", null);
+            }
         });
         root.addView(rotateBtn);
 
@@ -91,7 +108,8 @@ public class AvatarActivity extends Activity {
         startListener();
     }
 
-    private void addColorSection(LinearLayout root, String title, final String[] colors, final String field) {
+    private void addColorSection(LinearLayout root, String title,
+                                  final String[] colors, final String field) {
         LinearLayout card = UiHelper.card(this);
 
         TextView t = new TextView(this);
@@ -111,7 +129,8 @@ public class AvatarActivity extends Activity {
             final String color = hex;
 
             View swatch = new View(this);
-            android.graphics.drawable.GradientDrawable g = new android.graphics.drawable.GradientDrawable();
+            android.graphics.drawable.GradientDrawable g =
+                    new android.graphics.drawable.GradientDrawable();
             g.setColor(Color.parseColor(hex));
             g.setCornerRadius(50);
             g.setStroke(3, Color.parseColor("#D4AF37"));
@@ -130,25 +149,16 @@ public class AvatarActivity extends Activity {
     }
 
     private void applyColor(String field, String hex) {
-        int c = Color.parseColor(hex);
-        float r = Color.red(c) / 255f;
-        float g = Color.green(c) / 255f;
-        float bl = Color.blue(c) / 255f;
+        if ("skin".equals(field)) current.skinColor = hex;
+        else if ("shirt".equals(field)) current.shirtColor = hex;
+        else if ("pants".equals(field)) current.pantsColor = hex;
 
-        float[] rgba = {r, g, bl};
-
-        if ("skin".equals(field)) {
-            current.skinColor = hex;
-            if (glView != null) glView.renderer.skinColor = rgba;
-        } else if ("shirt".equals(field)) {
-            current.shirtColor = hex;
-            if (glView != null) glView.renderer.shirtColor = rgba;
-        } else if ("pants".equals(field)) {
-            current.pantsColor = hex;
-            if (glView != null) glView.renderer.pantsColor = rgba;
-        } else if ("hair".equals(field)) {
-            current.hairColor = hex;
-            if (glView != null) glView.renderer.hairColor = rgba;
+        if (pageLoaded && webView != null) {
+            String js = "";
+            if ("skin".equals(field)) js = "setSkinColor('" + hex + "')";
+            else if ("shirt".equals(field)) js = "setShirtColor('" + hex + "')";
+            else if ("pants".equals(field)) js = "setPantsColor('" + hex + "')";
+            webView.evaluateJavascript(js, null);
         }
     }
 
@@ -166,32 +176,27 @@ public class AvatarActivity extends Activity {
     }
 
     private void applySaved() {
+        if (!pageLoaded || webView == null) return;
+
+        StringBuilder js = new StringBuilder();
+        js.append("applyColors({");
+        boolean first = true;
         if (current.skinColor != null && current.skinColor.startsWith("#")) {
-            applyColorToGL("skin", current.skinColor);
+            js.append("skin:'").append(current.skinColor).append("'");
+            first = false;
         }
         if (current.shirtColor != null && current.shirtColor.startsWith("#")) {
-            applyColorToGL("shirt", current.shirtColor);
+            if (!first) js.append(",");
+            js.append("shirt:'").append(current.shirtColor).append("'");
+            first = false;
         }
         if (current.pantsColor != null && current.pantsColor.startsWith("#")) {
-            applyColorToGL("pants", current.pantsColor);
+            if (!first) js.append(",");
+            js.append("pants:'").append(current.pantsColor).append("'");
         }
-        if (current.hairColor != null && current.hairColor.startsWith("#")) {
-            applyColorToGL("hair", current.hairColor);
-        }
-    }
+        js.append("});");
 
-    private void applyColorToGL(String field, String hex) {
-        if (glView == null || glView.renderer == null) return;
-        int c = Color.parseColor(hex);
-        float[] rgba = {
-                Color.red(c) / 255f,
-                Color.green(c) / 255f,
-                Color.blue(c) / 255f
-        };
-        if ("skin".equals(field)) glView.renderer.skinColor = rgba;
-        else if ("shirt".equals(field)) glView.renderer.shirtColor = rgba;
-        else if ("pants".equals(field)) glView.renderer.pantsColor = rgba;
-        else if ("hair".equals(field)) glView.renderer.hairColor = rgba;
+        webView.evaluateJavascript(js.toString(), null);
     }
 
     private void save() {
@@ -208,20 +213,9 @@ public class AvatarActivity extends Activity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        if (glView != null) glView.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (glView != null) glView.onPause();
-    }
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
         if (reg != null) reg.remove();
+        if (webView != null) webView.destroy();
     }
 }
