@@ -107,7 +107,7 @@ function init() {
 
 function loadAvatar() {
   const loader = new THREE.GLTFLoader();
-  const modelUrl = './models/xbot.glb';
+  const modelUrl = './models/soldier.glb';
 
   loader.load(
     modelUrl,
@@ -120,13 +120,8 @@ function loadAvatar() {
       document.getElementById('loading').innerHTML = '<div class="spinner"></div>' + txt;
     },
     function(error) {
-      console.warn('Xbot فشل، نجربو Soldier...');
-      loader.load('./models/soldier.glb',
-        function(gltf) { onModelLoaded(gltf); },
-        null,
-        function(err) {
-          document.getElementById('loading').innerHTML = '❌ فشل التحميل';
-        });
+      console.error(error);
+      document.getElementById('loading').innerHTML = '❌ فشل التحميل';
     }
   );
 }
@@ -138,8 +133,9 @@ function onModelLoaded(gltf) {
     if (child.isMesh) {
       child.castShadow = true;
       child.receiveShadow = true;
+      // نطبقو لون الجيش الرمادي افتراضي
       if (child.material && child.material.color) {
-        child.material.color.set('#E8B98A');
+        child.material.color.set('#4A5568');
       }
     }
   });
