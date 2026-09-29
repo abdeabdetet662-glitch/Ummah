@@ -269,6 +269,7 @@ public class MainActivity extends Activity {
         addSectionTitle(getString(R.string.section_governance));
         addSecondaryButton(getString(R.string.btn_parliament), ParliamentActivity.class);
         addPrimaryButton("🛒  السوق العام", MarketActivity.class);
+        addSeedButton();
         electionBadgeContainer = addBadgedSecondaryButton(getString(R.string.btn_election), ElectionActivity.class, 0);
         addSecondaryButton(getString(R.string.btn_constitution), ConstitutionActivity.class);
         addSecondaryButton(getString(R.string.btn_court), CourtActivity.class);
@@ -533,5 +534,26 @@ public class MainActivity extends Activity {
                         content, 1);
             });
         });
+    }
+
+
+    private void addSeedButton() {
+        Button seedBtn = new Button(this);
+        seedBtn.setText("🌱 تعبئة السوق (تجريبي)");
+        seedBtn.setTextSize(12);
+        seedBtn.setTextColor(Color.parseColor("#FFC107"));
+        seedBtn.setAllCaps(false);
+        seedBtn.setBackgroundResource(R.drawable.bg_btn_outline);
+        seedBtn.setPadding(40, 20, 40, 20);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp.setMargins(0, 6, 0, 6);
+        seedBtn.setLayoutParams(lp);
+        seedBtn.setOnClickListener(v -> {
+            MarketSeed.seed(com.google.firebase.firestore.FirebaseFirestore.getInstance());
+            Toast.makeText(MainActivity.this, "✅ تمت إضافة المنتجات! افتح السوق", Toast.LENGTH_LONG).show();
+        });
+        root.addView(seedBtn);
     }
 }
