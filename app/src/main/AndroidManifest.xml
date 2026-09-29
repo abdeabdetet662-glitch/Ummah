@@ -62,5 +62,7 @@
             </intent-filter>
         </service>
 
+            <activity android:name=".MarketActivity" android:exported="false" />
+
     </application>
 </manifest>
