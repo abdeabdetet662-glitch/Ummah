@@ -18,11 +18,9 @@ public class AvatarActivity extends Activity {
 
     private IdentityManager im;
     private AvatarManager am;
-    private LinearLayout previewBox;
+    private AvatarGLSurfaceView glView;
     private Avatar current;
     private ListenerRegistration reg;
-    private TextView previewEmoji;
-    private TextView previewName;
 
     @Override
     protected void onCreate(Bundle b) {
@@ -40,68 +38,118 @@ public class AvatarActivity extends Activity {
         root.setPadding(30, 50, 30, 60);
         scroll.addView(root);
 
-        TextView title = UiHelper.goldTitle(this, "🎨 شخصيتي", 28);
+        TextView title = UiHelper.goldTitle(this, "🎨 شخصيتي 3D", 28);
         root.addView(title);
 
         TextView sub = new TextView(this);
-        sub.setText("بدّل ملابسك ولون شعرك ومظهرك");
+        sub.setText("اسحب لتدوير الشخصية • قرّب بإصبعين");
         sub.setTextColor(Color.parseColor("#9E9E9E"));
-        sub.setTextSize(13);
+        sub.setTextSize(12);
         sub.setGravity(Gravity.CENTER);
-        sub.setPadding(0, 0, 0, 24);
+        sub.setPadding(0, 0, 0, 20);
         root.addView(sub);
 
-        // Preview
-        previewBox = UiHelper.goldCard(this);
-        previewBox.setGravity(Gravity.CENTER);
+        // GLSurfaceView
+        glView = new AvatarGLSurfaceView(this);
+        LinearLayout.LayoutParams glLp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, 900);
+        glView.setLayoutParams(glLp);
+        root.addView(glView);
 
-        previewEmoji = new TextView(this);
-        previewEmoji.setText("🧑");
-        previewEmoji.setTextSize(140);
-        previewEmoji.setGravity(Gravity.CENTER);
-        previewBox.addView(previewEmoji);
+        // ألوان البشرة
+        addColorSection(root, "🎨  لون البشرة", new String[]{
+                "#F5D0A9", "#E8B98A", "#C68B59", "#8D5524"
+        }, "skin");
 
-        previewName = new TextView(this);
-        previewName.setText("");
-        previewName.setTextColor(Color.parseColor("#D4AF37"));
-        previewName.setTextSize(14);
-        previewName.setTypeface(null, Typeface.BOLD);
-        previewName.setGravity(Gravity.CENTER);
-        previewName.setPadding(0, 12, 0, 0);
-        previewBox.addView(previewName);
+        // ألوان القميص
+        addColorSection(root, "👕  لون القميص", new String[]{
+                "#1565C0", "#C62828", "#2E7D32", "#6A1B9A", "#F9A825", "#FFFFFF"
+        }, "shirt");
 
-        root.addView(previewBox);
+        // ألوان البنطال
+        addColorSection(root, "👖  لون البنطال", new String[]{
+                "#212121", "#0D47A1", "#4E342E", "#616161", "#1B5E20"
+        }, "pants");
 
-        // Sections
-        addSection(root, "🎨 لون البشرة", new String[]{"فاتح", "متوسط", "داكن", "بني"},
-                new String[]{"light", "medium", "dark", "brown"}, "skin");
+        // ألوان الشعر
+        addColorSection(root, "💇  لون الشعر", new String[]{
+                "#1A1A1A", "#4E342E", "#F9A825", "#C62828", "#E0E0E0"
+        }, "hair");
 
-        addSection(root, "💇 تسريحة الشعر", new String[]{"قصير", "طويل", "أصلع", "مجعد"},
-                new String[]{"short", "long", "bald", "curly"}, "hairStyle");
+        // أزرار
+        Button rotateBtn = UiHelper.actionButton(this, "🔄  تدوير تلقائي", "#0D47A1");
+        rotateBtn.setOnClickListener(v -> {
+            if (glView != null) glView.renderer.autoRotate = !glView.renderer.autoRotate;
+        });
+        root.addView(rotateBtn);
 
-        addSection(root, "🎨 لون الشعر", new String[]{"أسود", "بني", "أشقر", "أحمر"},
-                new String[]{"black", "brown", "blond", "red"}, "hairColor");
-
-        addSection(root, "👕 القميص", new String[]{"تي شيرت", "قميص رسمي", "فستان", "جاكيت"},
-                new String[]{"👕", "👔", "👗", "🧥"}, "shirtEmoji");
-
-        addSection(root, "👖 البنطال", new String[]{"جينز", "شورت"},
-                new String[]{"👖", "🩳"}, "pantsEmoji");
-
-        addSection(root, "👟 الحذاء", new String[]{"رياضي", "كلاسيك", "بوت"},
-                new String[]{"👟", "👞", "🥾"}, "shoesEmoji");
-
-        addSection(root, "🎩 إكسسوار", new String[]{"بدون", "نظارات", "قبعة", "طاقية"},
-                new String[]{"", "🕶️", "🎩", "🧢"}, "accessoryEmoji");
-
-        // زر حفظ
         Button saveBtn = UiHelper.primaryButton(this, "💾  حفظ شخصيتي");
         saveBtn.setOnClickListener(v -> save());
         root.addView(saveBtn);
 
         setContentView(scroll);
-
         startListener();
+    }
+
+    private void addColorSection(LinearLayout root, String title, final String[] colors, final String field) {
+        LinearLayout card = UiHelper.card(this);
+
+        TextView t = new TextView(this);
+        t.setText(title);
+        t.setTextColor(Color.parseColor("#D4AF37"));
+        t.setTextSize(14);
+        t.setTypeface(null, Typeface.BOLD);
+        t.setGravity(Gravity.CENTER);
+        t.setPadding(0, 0, 0, 14);
+        card.addView(t);
+
+        LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER);
+
+        for (String hex : colors) {
+            final String color = hex;
+
+            View swatch = new View(this);
+            android.graphics.drawable.GradientDrawable g = new android.graphics.drawable.GradientDrawable();
+            g.setColor(Color.parseColor(hex));
+            g.setCornerRadius(50);
+            g.setStroke(3, Color.parseColor("#D4AF37"));
+            swatch.setBackground(g);
+
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(110, 110);
+            lp.setMargins(8, 0, 8, 0);
+            swatch.setLayoutParams(lp);
+
+            swatch.setOnClickListener(v -> applyColor(field, color));
+            row.addView(swatch);
+        }
+
+        card.addView(row);
+        root.addView(card);
+    }
+
+    private void applyColor(String field, String hex) {
+        int c = Color.parseColor(hex);
+        float r = Color.red(c) / 255f;
+        float g = Color.green(c) / 255f;
+        float bl = Color.blue(c) / 255f;
+
+        float[] rgba = {r, g, bl};
+
+        if ("skin".equals(field)) {
+            current.skinColor = hex;
+            if (glView != null) glView.renderer.skinColor = rgba;
+        } else if ("shirt".equals(field)) {
+            current.shirtColor = hex;
+            if (glView != null) glView.renderer.shirtColor = rgba;
+        } else if ("pants".equals(field)) {
+            current.pantsColor = hex;
+            if (glView != null) glView.renderer.pantsColor = rgba;
+        } else if ("hair".equals(field)) {
+            current.hairColor = hex;
+            if (glView != null) glView.renderer.hairColor = rgba;
+        }
     }
 
     private void startListener() {
@@ -111,139 +159,39 @@ public class AvatarActivity extends Activity {
         reg = am.listenAvatar(c.nationalId, new AvatarManager.AvatarListener() {
             @Override public void onAvatar(Avatar avatar) {
                 current = avatar;
-                runOnUiThread(() -> updatePreview());
+                runOnUiThread(() -> applySaved());
             }
             @Override public void onError(String msg) {}
         });
     }
 
-    private void addSection(LinearLayout root, String title, final String[] labels,
-                             final String[] values, final String field) {
-        LinearLayout card = UiHelper.card(this);
-
-        TextView t = new TextView(this);
-        t.setText(title);
-        t.setTextColor(Color.parseColor("#D4AF37"));
-        t.setTextSize(14);
-        t.setTypeface(null, Typeface.BOLD);
-        t.setGravity(Gravity.CENTER);
-        t.setPadding(0, 0, 0, 12);
-        card.addView(t);
-
-        LinearLayout row = new LinearLayout(this);
-        row.setOrientation(LinearLayout.HORIZONTAL);
-        row.setGravity(Gravity.CENTER);
-
-        for (int i = 0; i < labels.length; i++) {
-            final String value = values[i];
-            final String label = labels[i];
-
-            Button optBtn = new Button(this);
-            optBtn.setText(label);
-            optBtn.setTextSize(11);
-            optBtn.setAllCaps(false);
-            optBtn.setPadding(20, 20, 20, 20);
-            optBtn.setBackgroundResource(R.drawable.bg_btn_outline);
-            optBtn.setTextColor(Color.parseColor("#D4AF37"));
-
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                    0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
-            lp.setMargins(4, 0, 4, 0);
-            optBtn.setLayoutParams(lp);
-
-            optBtn.setOnClickListener(v -> {
-                applyField(field, value);
-                updatePreview();
-            });
-
-            row.addView(optBtn);
+    private void applySaved() {
+        if (current.skinColor != null && current.skinColor.startsWith("#")) {
+            applyColorToGL("skin", current.skinColor);
         }
-
-        card.addView(row);
-        root.addView(card);
-    }
-
-    private void applyField(String field, String value) {
-        switch (field) {
-            case "skin": current.skinColor = value; break;
-            case "hairStyle": current.hairStyle = value; break;
-            case "hairColor": current.hairColor = value; break;
-            case "shirtEmoji": current.shirtEmoji = value; break;
-            case "pantsEmoji": current.pantsEmoji = value; break;
-            case "shoesEmoji": current.shoesEmoji = value; break;
-            case "accessoryEmoji": current.accessoryEmoji = value; break;
+        if (current.shirtColor != null && current.shirtColor.startsWith("#")) {
+            applyColorToGL("shirt", current.shirtColor);
+        }
+        if (current.pantsColor != null && current.pantsColor.startsWith("#")) {
+            applyColorToGL("pants", current.pantsColor);
+        }
+        if (current.hairColor != null && current.hairColor.startsWith("#")) {
+            applyColorToGL("hair", current.hairColor);
         }
     }
 
-    private void updatePreview() {
-        if (previewEmoji == null) return;
-
-        // نبنيو الشخصية من الإيموجي
-        StringBuilder sb = new StringBuilder();
-        if (current.accessoryEmoji != null && !current.accessoryEmoji.isEmpty()) {
-            sb.append(current.accessoryEmoji);
-        } else {
-            sb.append("🧑");
-        }
-
-        previewEmoji.setText(sb.toString());
-
-        // اسم الشخصية
-        String skin = arabicSkin(current.skinColor);
-        String hair = arabicHair(current.hairStyle, current.hairColor);
-        String shirt = arabicShirt(current.shirtEmoji);
-        String pants = arabicPants(current.pantsEmoji);
-        String shoes = arabicShoes(current.shoesEmoji);
-
-        previewName.setText(skin + " • " + hair + "\n" + shirt + " + " + pants + " + " + shoes);
-    }
-
-    private String arabicSkin(String s) {
-        if (s == null) return "";
-        switch (s) {
-            case "light": return "بشرة فاتحة";
-            case "medium": return "بشرة متوسطة";
-            case "dark": return "بشرة داكنة";
-            case "brown": return "بشرة بنية";
-        }
-        return "";
-    }
-
-    private String arabicHair(String style, String color) {
-        String st = "";
-        if ("short".equals(style)) st = "شعر قصير";
-        else if ("long".equals(style)) st = "شعر طويل";
-        else if ("bald".equals(style)) st = "أصلع";
-        else if ("curly".equals(style)) st = "شعر مجعد";
-
-        String c = "";
-        if ("black".equals(color)) c = "أسود";
-        else if ("brown".equals(color)) c = "بني";
-        else if ("blond".equals(color)) c = "أشقر";
-        else if ("red".equals(color)) c = "أحمر";
-
-        return st + " " + c;
-    }
-
-    private String arabicShirt(String s) {
-        if ("👕".equals(s)) return "تي شيرت";
-        if ("👔".equals(s)) return "قميص";
-        if ("👗".equals(s)) return "فستان";
-        if ("🧥".equals(s)) return "جاكيت";
-        return "";
-    }
-
-    private String arabicPants(String s) {
-        if ("👖".equals(s)) return "بنطال";
-        if ("🩳".equals(s)) return "شورت";
-        return "";
-    }
-
-    private String arabicShoes(String s) {
-        if ("👟".equals(s)) return "حذاء رياضي";
-        if ("👞".equals(s)) return "حذاء كلاسيك";
-        if ("🥾".equals(s)) return "بوت";
-        return "";
+    private void applyColorToGL(String field, String hex) {
+        if (glView == null || glView.renderer == null) return;
+        int c = Color.parseColor(hex);
+        float[] rgba = {
+                Color.red(c) / 255f,
+                Color.green(c) / 255f,
+                Color.blue(c) / 255f
+        };
+        if ("skin".equals(field)) glView.renderer.skinColor = rgba;
+        else if ("shirt".equals(field)) glView.renderer.shirtColor = rgba;
+        else if ("pants".equals(field)) glView.renderer.pantsColor = rgba;
+        else if ("hair".equals(field)) glView.renderer.hairColor = rgba;
     }
 
     private void save() {
@@ -257,6 +205,18 @@ public class AvatarActivity extends Activity {
                 Toast.makeText(AvatarActivity.this, "❌ " + msg, Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (glView != null) glView.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (glView != null) glView.onPause();
     }
 
     @Override
