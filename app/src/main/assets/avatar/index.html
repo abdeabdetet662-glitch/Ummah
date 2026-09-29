@@ -56,7 +56,7 @@ function init() {
   renderer.toneMappingExposure = 1.15;
   document.body.appendChild(renderer.domElement);
 
-  scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+  scene.add(new THREE.AmbientLight(0xffffff, 1.0));
   const keyLight = new THREE.DirectionalLight(0xffffff, 2.5);
   keyLight.position.set(3, 6, 4);
   keyLight.castShadow = true;
@@ -67,6 +67,9 @@ function init() {
   const rimLight = new THREE.DirectionalLight(0xFFD97A, 2.0);
   rimLight.position.set(0, 4, -5);
   scene.add(rimLight);
+  const bottomLight = new THREE.DirectionalLight(0xffffff, 0.8);
+  bottomLight.position.set(0, -3, 0);
+  scene.add(bottomLight);
 
   const groundGeom = new THREE.CircleGeometry(2.5, 32);
   const groundMat = new THREE.MeshStandardMaterial({
@@ -97,7 +100,7 @@ function init() {
 function loadAvatar() {
   const loader = new THREE.GLTFLoader();
   loader.load(
-    './models/human.glb',
+    './models/michelle.glb',
     function(gltf) { onModelLoaded(gltf); },
     function(progress) {
       let txt = '⏳ جاري التحميل';
@@ -121,7 +124,6 @@ function onModelLoaded(gltf) {
       child.castShadow = true;
       child.receiveShadow = true;
       child.frustumCulled = false;
-      // نخليو المواد على حالها (الألوان الأصلية)
     }
   });
 
@@ -154,7 +156,6 @@ function onModelLoaded(gltf) {
   document.getElementById('loading').style.display = 'none';
 }
 
-// ═══ الألوان معطلة مؤقتاً (باش يبان CesiumMan بألوانو الأصلية) ═══
 window.setShirtColor = function(hex) {};
 window.setPantsColor = function(hex) {};
 window.setSkinColor = function(hex) {};
@@ -165,10 +166,7 @@ window.setHatVisible = function(v) {};
 window.setGlassesVisible = function(v) {};
 window.setPhoneVisible = function(v) {};
 
-window.applyFullAvatar = function(data) {
-  window.savedAvatar = data;
-};
-
+window.applyFullAvatar = function(data) { window.savedAvatar = data; };
 window.applyColors = window.applyFullAvatar;
 
 function animate() {
