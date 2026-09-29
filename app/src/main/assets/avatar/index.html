@@ -27,7 +27,7 @@
 <body>
 <div id="loading">
   <div class="spinner"></div>
-  ⏳ جاري التحميل
+  ⏳ جاري تحميل الشخصية
 </div>
 
 <script src="./libs/three.min.js"></script>
@@ -48,16 +48,15 @@ let glassesMesh = null;
 let phoneMesh = null;
 let shoesMeshes = [];
 
-let hatVisible = false;
-let glassesVisible = false;
-let phoneVisible = false;
+// مواد الملابس
+let shirtMat, pantsMat, shoesMat, hatMat, glassesMat, phoneMat;
 
 init();
 animate();
 
 function init() {
   scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 100);
+  camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 100);
 
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -65,31 +64,43 @@ function init() {
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.1;
   document.body.appendChild(renderer.domElement);
 
+  // الإضاءة
   scene.add(new THREE.AmbientLight(0xffffff, 0.75));
   const keyLight = new THREE.DirectionalLight(0xFFD97A, 2.2);
   keyLight.position.set(3, 6, 4);
   keyLight.castShadow = true;
   scene.add(keyLight);
-  const fillLight = new THREE.DirectionalLight(0x4A90E2, 0.8);
+  const fillLight = new THREE.DirectionalLight(0x4A90E2, 0.7);
   fillLight.position.set(-4, 3, 2);
   scene.add(fillLight);
   const rimLight = new THREE.DirectionalLight(0xD4AF37, 1.2);
   rimLight.position.set(0, 4, -5);
   scene.add(rimLight);
 
+  // أرضية
   const groundGeom = new THREE.CircleGeometry(2.5, 32);
-  const groundMat = new THREE.MeshStandardMaterial({
-    color: 0x0B4F2C, emissive: 0x0B4F2C, emissiveIntensity: 0.2,
+  const groundMat2 = new THREE.MeshStandardMaterial({
+    color: 0x0B4F2C, emissive: 0x0B4F2C, emissiveIntensity: 0.25,
     metalness: 0.4, roughness: 0.8
   });
-  const ground = new THREE.Mesh(groundGeom, groundMat);
+  const ground = new THREE.Mesh(groundGeom, groundMat2);
   ground.rotation.x = -Math.PI / 2;
   ground.position.y = -0.01;
   ground.receiveShadow = true;
   scene.add(ground);
 
+  // مواد الملابس
+  shirtMat = new THREE.MeshStandardMaterial({ color: 0x1565C0, roughness: 0.75 });
+  pantsMat = new THREE.MeshStandardMaterial({ color: 0x212121, roughness: 0.8 });
+  shoesMat = new THREE.MeshStandardMaterial({ color: 0x1A1A1A, roughness: 0.6 });
+  hatMat = new THREE.MeshStandardMaterial({ color: 0xC62828, roughness: 0.7 });
+  glassesMat = new THREE.MeshStandardMaterial({ color: 0x1A1A1A, roughness: 0.3 });
+  phoneMat = new THREE.MeshStandardMaterial({ color: 0x212121, roughness: 0.3, metalness: 0.6 });
+
+  // Controls
   controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.dampingFactor = 0.08;
@@ -102,12 +113,13 @@ function init() {
   controls.minPolarAngle = Math.PI / 4;
 
   clock = new THREE.Clock();
+
   loadAvatar();
 }
 
 function loadAvatar() {
   const loader = new THREE.GLTFLoader();
-  const modelUrl = './models/soldier.glb';
+  const modelUrl = './models/human.glb';
 
   loader.load(
     modelUrl,
@@ -133,13 +145,11 @@ function onModelLoaded(gltf) {
     if (child.isMesh) {
       child.castShadow = true;
       child.receiveShadow = true;
-      // نطبقو لون الجيش الرمادي افتراضي
-      if (child.material && child.material.color) {
-        child.material.color.set('#4A5568');
-      }
+      child.frustumCulled = false;
     }
   });
 
+  // ضبط الحجم لـ 1.8m
   const box = new THREE.Box3().setFromObject(avatarRoot);
   const size = box.getSize(new THREE.Vector3());
   const targetHeight = 1.8;
@@ -151,34 +161,29 @@ function onModelLoaded(gltf) {
 
   scene.add(avatarRoot);
 
+  // إضافة الملابس 3D
   addClothesToAvatar();
 
+  // ضبط الكاميرا
   const finalBox = new THREE.Box3().setFromObject(avatarRoot);
   const center = finalBox.getCenter(new THREE.Vector3());
   const height = finalBox.max.y - finalBox.min.y;
-  const dist = height * 2.2;
+  const dist = height * 2.0;
 
-  camera.position.set(0, center.y + height * 0.15, dist);
+  camera.position.set(0, center.y + height * 0.1, dist);
   camera.lookAt(center.x, center.y, center.z);
   controls.target.set(center.x, center.y, center.z);
   controls.update();
 
+  // Animation
   if (gltf.animations && gltf.animations.length > 0) {
     mixer = new THREE.AnimationMixer(avatarRoot);
-    let idle = null;
-    for (let i = 0; i < gltf.animations.length; i++) {
-      if (gltf.animations[i].name.toLowerCase().indexOf('idle') >= 0) {
-        idle = gltf.animations[i];
-        break;
-      }
-    }
-    if (!idle) idle = gltf.animations[0];
-    if (idle) mixer.clipAction(idle).play();
+    mixer.clipAction(gltf.animations[0]).play();
   }
 
   document.getElementById('loading').style.display = 'none';
 
-  // نطبقو اللي محفوظ
+  // نطبقو الألوان المحفوظة
   if (window.savedAvatar) {
     applyFullAvatar(window.savedAvatar);
   }
@@ -187,103 +192,106 @@ function onModelLoaded(gltf) {
 function addClothesToAvatar() {
   if (!avatarRoot) return;
 
-  // القميص
-  const shirtGeom = new THREE.CylinderGeometry(0.34, 0.32, 0.70, 24);
-  const shirtMat = new THREE.MeshStandardMaterial({ color: 0x1565C0, roughness: 0.7 });
+  // القميص (فوق الجسم)
+  const shirtGeom = new THREE.CylinderGeometry(0.30, 0.28, 0.70, 24);
   shirtMesh = new THREE.Mesh(shirtGeom, shirtMat);
-  shirtMesh.position.y = 1.00;
+  shirtMesh.position.y = 1.05;
   shirtMesh.castShadow = true;
   avatarRoot.add(shirtMesh);
 
-  // البنطال
-  const pantsGeom = new THREE.CylinderGeometry(0.32, 0.30, 0.60, 24);
-  const pantsMat = new THREE.MeshStandardMaterial({ color: 0x212121, roughness: 0.8 });
+  // البنطال (فوق الحوض + الأرجل)
+  const pantsGeom = new THREE.CylinderGeometry(0.30, 0.28, 0.55, 24);
   pantsMesh = new THREE.Mesh(pantsGeom, pantsMat);
-  pantsMesh.position.y = 0.60;
+  pantsMesh.position.y = 0.62;
   pantsMesh.castShadow = true;
   avatarRoot.add(pantsMesh);
 
-  // القبعة
-  const hatGeom = new THREE.ConeGeometry(0.24, 0.22, 24);
-  const hatMat = new THREE.MeshStandardMaterial({ color: 0xC62828, roughness: 0.7 });
-  hatMesh = new THREE.Mesh(hatGeom, hatMat);
-  hatMesh.position.y = 1.98;
-  hatMesh.castShadow = true;
-  hatMesh.visible = false;
-  avatarRoot.add(hatMesh);
+  // أكمام القميص
+  const sleeveGeom = new THREE.CylinderGeometry(0.09, 0.08, 0.30, 16);
+  const sleeveL = new THREE.Mesh(sleeveGeom, shirtMat);
+  sleeveL.position.set(-0.32, 1.15, 0);
+  sleeveL.rotation.z = 0.1;
+  sleeveL.castShadow = true;
+  avatarRoot.add(sleeveL);
 
-  // النظارات
-  const glassesGeom = new THREE.BoxGeometry(0.34, 0.06, 0.06);
-  const glassesMat = new THREE.MeshStandardMaterial({ color: 0x1A1A1A, roughness: 0.3 });
-  glassesMesh = new THREE.Mesh(glassesGeom, glassesMat);
-  glassesMesh.position.set(0, 1.72, 0.22);
-  glassesMesh.castShadow = true;
-  glassesMesh.visible = false;
-  avatarRoot.add(glassesMesh);
+  const sleeveR = new THREE.Mesh(sleeveGeom, shirtMat);
+  sleeveR.position.set(0.32, 1.15, 0);
+  sleeveR.rotation.z = -0.1;
+  sleeveR.castShadow = true;
+  avatarRoot.add(sleeveR);
 
-  // الهاتف (في اليد اليمنى)
-  const phoneGeom = new THREE.BoxGeometry(0.10, 0.18, 0.02);
-  const phoneMat = new THREE.MeshStandardMaterial({ color: 0x212121, roughness: 0.3, metalness: 0.5 });
-  phoneMesh = new THREE.Mesh(phoneGeom, phoneMat);
-  phoneMesh.position.set(0.42, 0.95, 0.15);
-  phoneMesh.castShadow = true;
-  phoneMesh.visible = false;
-  avatarRoot.add(phoneMesh);
+  shirtMesh.userData.sleeves = [sleeveL, sleeveR];
 
   // الأحذية
-  const shoeGeom = new THREE.BoxGeometry(0.16, 0.10, 0.28);
-  const shoeMat = new THREE.MeshStandardMaterial({ color: 0x1A1A1A, roughness: 0.6 });
-
-  const shoeL = new THREE.Mesh(shoeGeom, shoeMat);
-  shoeL.position.set(-0.14, 0.05, 0.05);
+  const shoeGeom = new THREE.BoxGeometry(0.12, 0.06, 0.22);
+  const shoeL = new THREE.Mesh(shoeGeom, shoesMat);
+  shoeL.position.set(-0.11, 0.03, 0.03);
   shoeL.castShadow = true;
   avatarRoot.add(shoeL);
 
-  const shoeR = new THREE.Mesh(shoeGeom, shoeMat);
-  shoeR.position.set(0.14, 0.05, 0.05);
+  const shoeR = new THREE.Mesh(shoeGeom, shoesMat);
+  shoeR.position.set(0.11, 0.03, 0.03);
   shoeR.castShadow = true;
   avatarRoot.add(shoeR);
 
   shoesMeshes = [shoeL, shoeR];
 
-  // أكمام القميص
-  const sleeveGeom = new THREE.CylinderGeometry(0.11, 0.10, 0.40, 16);
-  const sleeveMat = new THREE.MeshStandardMaterial({ color: 0x1565C0, roughness: 0.7 });
+  // القبعة (مخفية)
+  hatMesh = new THREE.Group();
+  const hatBaseGeom = new THREE.CylinderGeometry(0.15, 0.15, 0.02, 24);
+  const hatBase = new THREE.Mesh(hatBaseGeom, hatMat);
+  hatMesh.add(hatBase);
+  const hatTopGeom = new THREE.CylinderGeometry(0.09, 0.10, 0.11, 24);
+  const hatTop = new THREE.Mesh(hatTopGeom, hatMat);
+  hatTop.position.y = 0.06;
+  hatMesh.add(hatTop);
+  hatMesh.position.y = 1.82;
+  hatMesh.visible = false;
+  avatarRoot.add(hatMesh);
 
-  const sleeveL = new THREE.Mesh(sleeveGeom, sleeveMat);
-  sleeveL.position.set(-0.35, 1.05, 0);
-  sleeveL.castShadow = true;
-  avatarRoot.add(sleeveL);
+  // النظارات (مخفية)
+  glassesMesh = new THREE.Group();
+  const frameGeom = new THREE.BoxGeometry(0.18, 0.02, 0.02);
+  const frame = new THREE.Mesh(frameGeom, glassesMat);
+  glassesMesh.add(frame);
 
-  const sleeveR = new THREE.Mesh(sleeveGeom, sleeveMat);
-  sleeveR.position.set(0.35, 1.05, 0);
-  sleeveR.castShadow = true;
-  avatarRoot.add(sleeveR);
+  const lensGeom = new THREE.CircleGeometry(0.035, 16);
+  const lensL = new THREE.Mesh(lensGeom, glassesMat);
+  lensL.position.set(-0.055, 0, 0.01);
+  glassesMesh.add(lensL);
 
-  shirtMesh.userData.sleeves = [sleeveL, sleeveR];
+  const lensR = new THREE.Mesh(lensGeom, glassesMat);
+  lensR.position.set(0.055, 0, 0.01);
+  glassesMesh.add(lensR);
+
+  glassesMesh.position.set(0, 1.68, 0.13);
+  glassesMesh.visible = false;
+  avatarRoot.add(glassesMesh);
+
+  // الهاتف في اليد (مخفي)
+  const phoneGeom = new THREE.BoxGeometry(0.06, 0.10, 0.01);
+  phoneMesh = new THREE.Mesh(phoneGeom, phoneMat);
+  phoneMesh.position.set(0.32, 0.85, 0.10);
+  phoneMesh.castShadow = true;
+  phoneMesh.visible = false;
+  avatarRoot.add(phoneMesh);
 }
 
-// ═══ تغيير لون القميص ═══
+// تطبيق الألوان
 window.setShirtColor = function(hex) {
-  if (!shirtMesh) return;
-  shirtMesh.material.color.set(hex);
-  if (shirtMesh.userData.sleeves) {
-    shirtMesh.userData.sleeves.forEach(function(s) {
-      s.material.color.set(hex);
-    });
-  }
+  shirtMat.color.set(hex);
 };
 
-// ═══ تغيير لون البنطال ═══
 window.setPantsColor = function(hex) {
-  if (pantsMesh) pantsMesh.material.color.set(hex);
+  pantsMat.color.set(hex);
 };
 
-// ═══ تغيير لون البشرة ═══
 window.setSkinColor = function(hex) {
   if (!avatarRoot) return;
+  // نغيرو لون مواد النموذج الأصلي فقط
   avatarRoot.traverse(function(child) {
-    if (child.isMesh && child.material && child !== shirtMesh && child !== pantsMesh
+    if (child.isMesh && child.material
+        && child !== shirtMesh && child !== pantsMesh
         && child !== hatMesh && child !== glassesMesh && child !== phoneMesh
         && shoesMeshes.indexOf(child) < 0
         && (!shirtMesh.userData.sleeves || shirtMesh.userData.sleeves.indexOf(child) < 0)) {
@@ -292,27 +300,22 @@ window.setSkinColor = function(hex) {
   });
 };
 
-// ═══ تغيير لون الأحذية ═══
 window.setShoesColor = function(hex) {
-  shoesMeshes.forEach(function(s) { s.material.color.set(hex); });
+  shoesMat.color.set(hex);
 };
 
-// ═══ تغيير لون القبعة ═══
 window.setHatColor = function(hex) {
-  if (hatMesh) hatMesh.material.color.set(hex);
+  hatMat.color.set(hex);
 };
 
-// ═══ تغيير لون النظارات ═══
 window.setGlassesColor = function(hex) {
-  if (glassesMesh) glassesMesh.material.color.set(hex);
+  glassesMat.color.set(hex);
 };
 
-// ═══ إظهار/إخفاء ═══
 window.setHatVisible = function(v) { if (hatMesh) hatMesh.visible = v; };
 window.setGlassesVisible = function(v) { if (glassesMesh) glassesMesh.visible = v; };
 window.setPhoneVisible = function(v) { if (phoneMesh) phoneMesh.visible = v; };
 
-// ═══ تطبيق كل شي من Java ═══
 window.applyFullAvatar = function(data) {
   window.savedAvatar = data;
   if (data.skin) window.setSkinColor(data.skin);
@@ -326,7 +329,6 @@ window.applyFullAvatar = function(data) {
   window.setPhoneVisible(data.phoneVisible === true);
 };
 
-// القديمة (توافق)
 window.applyColors = window.applyFullAvatar;
 
 function animate() {
