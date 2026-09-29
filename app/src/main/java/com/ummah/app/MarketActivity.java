@@ -1,6 +1,7 @@
 package com.ummah.app;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -19,17 +20,26 @@ import java.util.List;
 
 public class MarketActivity extends Activity {
 
+    private static final String PREFS = "market_prefs";
+    private static final String KEY_CAT = "current_category";
+
     private IdentityManager im;
     private MarketManager mm;
     private LinearLayout itemsContainer;
+    private LinearLayout tabsContainer;
     private ListenerRegistration reg;
     private String currentCategory = "vehicle";
+    private SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
         im = new IdentityManager(this);
         mm = new MarketManager();
+        prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
+
+        // نقراو الفئة المحفوظة
+        currentCategory = prefs.getString(KEY_CAT, "vehicle");
 
         ScrollView scroll = new ScrollView(this);
         scroll.setBackgroundResource(R.drawable.bg_screen);
@@ -69,17 +79,13 @@ public class MarketActivity extends Activity {
         root.addView(sub);
 
         // Tabs
-        LinearLayout tabs = new LinearLayout(this);
-        tabs.setOrientation(LinearLayout.HORIZONTAL);
-        tabs.setGravity(Gravity.CENTER);
-        tabs.setPadding(0, 0, 0, 24);
+        tabsContainer = new LinearLayout(this);
+        tabsContainer.setOrientation(LinearLayout.HORIZONTAL);
+        tabsContainer.setGravity(Gravity.CENTER);
+        tabsContainer.setPadding(0, 0, 0, 24);
+        root.addView(tabsContainer);
 
-        addTab(tabs, "🚗", "مركبات", "vehicle", true);
-        addTab(tabs, "🏠", "عقارات", "property", false);
-        addTab(tabs, "📱", "إلكترونيات", "electronics", false);
-        addTab(tabs, "👕", "ملابس", "clothing", false);
-
-        root.addView(tabs);
+        buildTabs();
 
         // Container للمنتجات
         itemsContainer = new LinearLayout(this);
@@ -91,12 +97,23 @@ public class MarketActivity extends Activity {
         loadItems(currentCategory);
     }
 
-    private void addTab(LinearLayout parent, String emoji, String label, final String category, boolean active) {
+    private void buildTabs() {
+        tabsContainer.removeAllViews();
+        addTab("🚗", "مركبات", "vehicle");
+        addTab("🏠", "عقارات", "property");
+        addTab("📱", "إلكترونيات", "electronics");
+        addTab("👕", "ملابس", "clothing");
+    }
+
+    private void addTab(String emoji, String label, final String category) {
+        boolean active = category.equals(currentCategory);
+
         LinearLayout tab = new LinearLayout(this);
         tab.setOrientation(LinearLayout.VERTICAL);
         tab.setGravity(Gravity.CENTER);
         tab.setPadding(20, 14, 20, 14);
         tab.setBackgroundResource(active ? R.drawable.bg_btn_gold_hero : R.drawable.bg_btn_outline);
+        tab.setElevation(active ? 10f : 0f);
 
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
@@ -118,11 +135,14 @@ public class MarketActivity extends Activity {
         tab.addView(t);
 
         tab.setOnClickListener(v -> {
+            if (category.equals(currentCategory)) return;
             currentCategory = category;
-            recreate();
+            prefs.edit().putString(KEY_CAT, category).apply();
+            buildTabs();
+            loadItems(category);
         });
 
-        parent.addView(tab);
+        tabsContainer.addView(tab);
     }
 
     private void loadItems(String category) {
@@ -171,20 +191,13 @@ public class MarketActivity extends Activity {
             emptyBox.addView(icon);
 
             TextView empty = new TextView(this);
-            empty.setText("لا توجد منتجات بعد");
+            empty.setText("لا توجد منتجات في هذي الفئة");
             empty.setTextColor(Color.parseColor("#D4AF37"));
             empty.setTextSize(16);
             empty.setTypeface(null, Typeface.BOLD);
             empty.setGravity(Gravity.CENTER);
             empty.setPadding(0, 20, 0, 0);
             emptyBox.addView(empty);
-
-            TextView hint = new TextView(this);
-            hint.setText("المنتجات ستظهر قريباً");
-            hint.setTextColor(Color.parseColor("#9E9E9E"));
-            hint.setTextSize(13);
-            hint.setGravity(Gravity.CENTER);
-            emptyBox.addView(hint);
 
             itemsContainer.addView(emptyBox);
             return;
@@ -231,7 +244,7 @@ public class MarketActivity extends Activity {
         name.setPadding(0, 20, 0, 6);
         card.addView(name);
 
-        // العلامة التجارية
+        // العلامة + الندرة
         TextView brand = new TextView(this);
         brand.setText(item.brand + "  •  " + getRarityLabel(item.rarity));
         brand.setTextColor(Color.parseColor("#9E9E9E"));
@@ -246,7 +259,7 @@ public class MarketActivity extends Activity {
         desc.setPadding(0, 10, 0, 16);
         card.addView(desc);
 
-        // السعر
+        // السعر + زر شراء
         LinearLayout bottomRow = new LinearLayout(this);
         bottomRow.setOrientation(LinearLayout.HORIZONTAL);
         bottomRow.setGravity(Gravity.CENTER_VERTICAL);

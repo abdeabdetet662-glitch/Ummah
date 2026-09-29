@@ -551,7 +551,9 @@ public class MainActivity extends Activity {
         lp.setMargins(0, 6, 0, 6);
         seedBtn.setLayoutParams(lp);
         seedBtn.setOnClickListener(v -> {
-            MarketSeed.seed(com.google.firebase.firestore.FirebaseFirestore.getInstance());
+            com.google.firebase.firestore.FirebaseFirestore db = com.google.firebase.firestore.FirebaseFirestore.getInstance();
+            MarketCleanup.cleanupOldItems(db);
+            MarketSeed.seed(db);
             Toast.makeText(MainActivity.this, "✅ تمت إضافة المنتجات! افتح السوق", Toast.LENGTH_LONG).show();
         });
         root.addView(seedBtn);
