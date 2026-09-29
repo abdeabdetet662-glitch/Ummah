@@ -182,25 +182,46 @@ public class AvatarActivity extends Activity {
     private void applySaved() {
         if (!pageLoaded || webView == null) return;
 
+        // نطبّقو كل شي: البشرة + الملابس الملبوسة
         StringBuilder js = new StringBuilder();
-        js.append("applyColors({");
-        boolean first = true;
+        js.append("applyFullAvatar({");
+
         if (current.skinColor != null && current.skinColor.startsWith("#")) {
-            js.append("skin:'").append(current.skinColor).append("'");
-            first = false;
+            js.append("skin:'").append(current.skinColor).append("',");
         }
-        if (current.shirtColor != null && current.shirtColor.startsWith("#")) {
-            if (!first) js.append(",");
-            js.append("shirt:'").append(current.shirtColor).append("'");
-            first = false;
+        if (current.equippedShirtColor != null && current.equippedShirtColor.startsWith("#")) {
+            js.append("shirt:'").append(current.equippedShirtColor).append("',");
+            js.append("shirtName:'").append(esc(current.equippedShirtName)).append("',");
         }
-        if (current.pantsColor != null && current.pantsColor.startsWith("#")) {
-            if (!first) js.append(",");
-            js.append("pants:'").append(current.pantsColor).append("'");
+        if (current.equippedPantsColor != null && current.equippedPantsColor.startsWith("#")) {
+            js.append("pants:'").append(current.equippedPantsColor).append("',");
+            js.append("pantsName:'").append(esc(current.equippedPantsName)).append("',");
         }
+        if (current.equippedShoesColor != null && current.equippedShoesColor.startsWith("#")) {
+            js.append("shoes:'").append(current.equippedShoesColor).append("',");
+        }
+        if (current.equippedHatColor != null && current.equippedHatColor.startsWith("#")
+                && current.equippedHatId != null && !current.equippedHatId.isEmpty()) {
+            js.append("hat:'").append(current.equippedHatColor).append("',");
+            js.append("hatVisible:true,");
+        }
+        if (current.equippedGlassesColor != null && current.equippedGlassesColor.startsWith("#")
+                && current.equippedGlassesId != null && !current.equippedGlassesId.isEmpty()) {
+            js.append("glasses:'").append(current.equippedGlassesColor).append("',");
+            js.append("glassesVisible:true,");
+        }
+        if (current.equippedPhoneId != null && !current.equippedPhoneId.isEmpty()) {
+            js.append("phoneVisible:true,");
+        }
+
         js.append("});");
 
         webView.evaluateJavascript(js.toString(), null);
+    }
+
+    private String esc(String s) {
+        if (s == null) return "";
+        return s.replace("'", "\\'");
     }
 
     private void save() {

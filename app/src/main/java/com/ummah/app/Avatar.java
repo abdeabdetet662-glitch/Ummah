@@ -2,29 +2,36 @@ package com.ummah.app;
 
 public class Avatar {
     public String userId;
-    public String skinColor;    // "light" | "medium" | "dark" | "brown"
-    public String hairStyle;    // "short" | "long" | "bald" | "curly"
-    public String hairColor;    // "black" | "brown" | "blond" | "red"
-    public String shirtEmoji;   // "👕" | "👔" | "👗" | "🧥"
-    public String shirtColor;
-    public String pantsEmoji;   // "👖" | "🩳"
-    public String pantsColor;
-    public String shoesEmoji;   // "👟" | "👞" | "🥾"
-    public String accessoryEmoji; // "🕶️" | "🎩" | "" | "🧢"
+
+    // الجسم
+    public String skinColor = "#E8B98A";
+
+    // الملابس الملبوسة (IDs من inventory)
+    public String equippedShirtId = "";
+    public String equippedShirtColor = "#1565C0";
+    public String equippedShirtName = "";
+
+    public String equippedPantsId = "";
+    public String equippedPantsColor = "#212121";
+    public String equippedPantsName = "";
+
+    public String equippedShoesId = "";
+    public String equippedShoesColor = "#1A1A1A";
+    public String equippedShoesName = "";
+
+    public String equippedHatId = "";
+    public String equippedHatColor = "#C62828";
+    public String equippedHatName = "";
+
+    public String equippedGlassesId = "";
+    public String equippedGlassesColor = "#1A1A1A";
+    public String equippedGlassesName = "";
+
+    public String equippedPhoneId = "";
+    public String equippedPhoneColor = "#212121";
+    public String equippedPhoneName = "";
+
     public long updatedAt;
 
-    public Avatar() {
-        this.skinColor = "light";
-        this.hairStyle = "short";
-        this.hairColor = "black";
-        this.shirtEmoji = "👕";
-        this.shirtColor = "#1565C0";
-        this.pantsEmoji = "👖";
-        this.pantsColor = "#212121";
-        this.shoesEmoji = "👟";
-        this.shoesColor_placeholder();
-        this.accessoryEmoji = "";
-    }
-
-    private void shoesColor_placeholder() {}
+    public Avatar() {}
 }

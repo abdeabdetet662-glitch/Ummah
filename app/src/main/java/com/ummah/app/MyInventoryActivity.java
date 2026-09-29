@@ -14,6 +14,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ public class MyInventoryActivity extends Activity {
 
     private IdentityManager im;
     private MarketManager mm;
+    private FirebaseFirestore db;
     private LinearLayout itemsContainer;
     private LinearLayout tabsContainer;
     private ListenerRegistration reg;
@@ -38,6 +40,7 @@ public class MyInventoryActivity extends Activity {
         super.onCreate(b);
         im = new IdentityManager(this);
         mm = new MarketManager();
+        db = FirebaseFirestore.getInstance();
         prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
         currentCategory = prefs.getString(KEY_CAT, "all");
 
@@ -265,6 +268,22 @@ public class MyInventoryActivity extends Activity {
 
         card.addView(info);
 
+        // زر ارتداء (للملابس والهواتف)
+        String wearType = getWearType(item);
+        if (wearType != null && !wearType.isEmpty()) {
+            Button wearBtn = new Button(this);
+            wearBtn.setText("👕 البس");
+            wearBtn.setTextSize(12);
+            wearBtn.setTextColor(Color.parseColor("#0A0A0A"));
+            wearBtn.setTypeface(null, Typeface.BOLD);
+            wearBtn.setBackgroundResource(R.drawable.bg_btn_gold_hero);
+            LinearLayout.LayoutParams wearLp = new LinearLayout.LayoutParams(180, 180);
+            wearLp.setMargins(0, 0, 8, 0);
+            wearBtn.setLayoutParams(wearLp);
+            wearBtn.setOnClickListener(v -> wearItem(item, wearType));
+            card.addView(wearBtn);
+        }
+
         // زر بيع
         Button sellBtn = new Button(this);
         sellBtn.setText("بِع");
@@ -310,5 +329,52 @@ public class MyInventoryActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         if (reg != null) reg.remove();
+    }
+
+
+    private String getWearType(MarketItem item) {
+        if (item.category == null) return null;
+        if (!"clothing".equals(item.category) && !"electronics".equals(item.category)) {
+            return null;
+        }
+        if ("electronics".equals(item.category) && !"phone".equals(item.type)) {
+            return null;
+        }
+        // نحاولو نستخرجو النوع من الاسم
+        String name = item.name != null ? item.name : "";
+        if (name.contains("قميص")) return "shirt";
+        if (name.contains("بنطال")) return "pants";
+        if (name.contains("حذاء") || name.contains("بوت")) return "shoes";
+        if (name.contains("قبعة")) return "hat";
+        if (name.contains("نظارات")) return "glasses";
+        if ("phone".equals(item.type)) return "phone";
+        return null;
+    }
+
+    private void wearItem(MarketItem item, String slot) {
+        Citizen c = im.getCitizen();
+        if (c == null) return;
+
+        // نجيبو اللون من الـ inventory
+        db.collection("users_inventory").document(c.nationalId)
+                .collection("items").document(item.id)
+                .get()
+                .addOnSuccessListener(doc -> {
+                    String color = doc.getString("color");
+                    if (color == null) color = "#1565C0";
+
+                    AvatarManager am = new AvatarManager();
+                    final String finalColor = color;
+                    am.equipItem(c.nationalId, slot, item.id, item.name, color,
+                            new AvatarManager.OnDone() {
+                        @Override public void onSuccess() {
+                            Toast.makeText(MyInventoryActivity.this,
+                                    "✅ تم ارتداء " + item.name, Toast.LENGTH_LONG).show();
+                        }
+                        @Override public void onError(String msg) {
+                            Toast.makeText(MyInventoryActivity.this, "❌ " + msg, Toast.LENGTH_LONG).show();
+                        }
+                    });
+                });
     }
 }

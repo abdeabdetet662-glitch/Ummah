@@ -4,14 +4,16 @@ public class MarketItem {
     public String id;
     public String name;
     public String brand;
-    public String category; // "vehicle" | "property" | "electronics" | "clothing"
-    public String type;     // "car" | "motorcycle" | "villa" | ...
+    public String category;
+    public String type;
     public int price;
     public String imageUrl;
     public String description;
-    public String rarity;   // "common" | "rare" | "epic" | "legendary"
+    public String rarity;
     public int stock;
     public long createdAt;
+    public String wearType;  // shirt/pants/shoes/hat/glasses/phone
+    public String color;     // #hex
 
     public MarketItem() {}
 

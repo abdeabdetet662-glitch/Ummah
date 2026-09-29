@@ -100,6 +100,16 @@ public class MarketManager {
             inventory.put("imageUrl", item.imageUrl);
             inventory.put("boughtAt", System.currentTimeMillis());
 
+            // metadata للملابس
+            com.google.firebase.firestore.DocumentSnapshot itemDoc =
+                    transaction.get(db.collection("market_items").document(item.id));
+            if (itemDoc.exists()) {
+                String wearType = itemDoc.getString("wearType");
+                String color = itemDoc.getString("color");
+                if (wearType != null) inventory.put("wearType", wearType);
+                if (color != null) inventory.put("color", color);
+            }
+
             com.google.firebase.firestore.DocumentReference invRef =
                     db.collection("users_inventory").document(buyerId)
                       .collection("items").document();
