@@ -192,89 +192,109 @@ function onModelLoaded(gltf) {
 function addClothesToAvatar() {
   if (!avatarRoot) return;
 
-  // القميص (فوق الجسم)
-  const shirtGeom = new THREE.CylinderGeometry(0.30, 0.28, 0.70, 24);
+  // نجيبو الحدود العالمية للشخصية بعد الـ scale
+  const box = new THREE.Box3().setFromObject(avatarRoot);
+  const minY = box.min.y;
+  const maxY = box.max.y;
+  const centerX = (box.min.x + box.max.x) / 2;
+  const centerZ = (box.min.z + box.max.z) / 2;
+  const totalH = maxY - minY;
+
+  // المواقع النسبية
+  const shoulderY = minY + totalH * 0.78;
+  const chestY = minY + totalH * 0.63;
+  const waistY = minY + totalH * 0.50;
+  const hipY = minY + totalH * 0.42;
+  const footY = minY + 0.03;
+
+  // نصف قطر الجسم (تقريبي — 18% من الطول)
+  const bodyR = totalH * 0.11;
+
+  // ═══ القميص (من الخصر للكتفين) ═══
+  const shirtH = shoulderY - waistY;
+  const shirtGeom = new THREE.CylinderGeometry(bodyR * 1.05, bodyR, shirtH, 24);
   shirtMesh = new THREE.Mesh(shirtGeom, shirtMat);
-  shirtMesh.position.y = 1.05;
+  shirtMesh.position.set(centerX, (shoulderY + waistY) / 2, centerZ);
   shirtMesh.castShadow = true;
-  avatarRoot.add(shirtMesh);
+  scene.add(shirtMesh);
 
-  // البنطال (فوق الحوض + الأرجل)
-  const pantsGeom = new THREE.CylinderGeometry(0.30, 0.28, 0.55, 24);
+  // ═══ البنطال (من الخصر للركبة) ═══
+  const pantsH = waistY - (minY + totalH * 0.15);
+  const pantsGeom = new THREE.CylinderGeometry(bodyR, bodyR * 0.9, pantsH, 24);
   pantsMesh = new THREE.Mesh(pantsGeom, pantsMat);
-  pantsMesh.position.y = 0.62;
+  pantsMesh.position.set(centerX, waistY - pantsH / 2, centerZ);
   pantsMesh.castShadow = true;
-  avatarRoot.add(pantsMesh);
+  scene.add(pantsMesh);
 
-  // أكمام القميص
-  const sleeveGeom = new THREE.CylinderGeometry(0.09, 0.08, 0.30, 16);
+  // ═══ الأكمام ═══
+  const sleeveGeom = new THREE.CylinderGeometry(bodyR * 0.35, bodyR * 0.30, totalH * 0.20, 16);
   const sleeveL = new THREE.Mesh(sleeveGeom, shirtMat);
-  sleeveL.position.set(-0.32, 1.15, 0);
-  sleeveL.rotation.z = 0.1;
+  sleeveL.position.set(centerX - bodyR * 1.2, chestY, centerZ);
+  sleeveL.rotation.z = 0.15;
   sleeveL.castShadow = true;
-  avatarRoot.add(sleeveL);
+  scene.add(sleeveL);
 
   const sleeveR = new THREE.Mesh(sleeveGeom, shirtMat);
-  sleeveR.position.set(0.32, 1.15, 0);
-  sleeveR.rotation.z = -0.1;
+  sleeveR.position.set(centerX + bodyR * 1.2, chestY, centerZ);
+  sleeveR.rotation.z = -0.15;
   sleeveR.castShadow = true;
-  avatarRoot.add(sleeveR);
+  scene.add(sleeveR);
 
   shirtMesh.userData.sleeves = [sleeveL, sleeveR];
 
-  // الأحذية
-  const shoeGeom = new THREE.BoxGeometry(0.12, 0.06, 0.22);
+  // ═══ الأحذية ═══
+  const shoeGeom = new THREE.BoxGeometry(bodyR * 0.55, totalH * 0.035, totalH * 0.14);
   const shoeL = new THREE.Mesh(shoeGeom, shoesMat);
-  shoeL.position.set(-0.11, 0.03, 0.03);
+  shoeL.position.set(centerX - bodyR * 0.5, footY, centerZ + totalH * 0.02);
   shoeL.castShadow = true;
-  avatarRoot.add(shoeL);
+  scene.add(shoeL);
 
   const shoeR = new THREE.Mesh(shoeGeom, shoesMat);
-  shoeR.position.set(0.11, 0.03, 0.03);
+  shoeR.position.set(centerX + bodyR * 0.5, footY, centerZ + totalH * 0.02);
   shoeR.castShadow = true;
-  avatarRoot.add(shoeR);
+  scene.add(shoeR);
 
   shoesMeshes = [shoeL, shoeR];
 
-  // القبعة (مخفية)
+  // ═══ القبعة (مخفية) ═══
   hatMesh = new THREE.Group();
-  const hatBaseGeom = new THREE.CylinderGeometry(0.15, 0.15, 0.02, 24);
+  const hatBaseGeom = new THREE.CylinderGeometry(bodyR * 0.55, bodyR * 0.55, totalH * 0.015, 24);
   const hatBase = new THREE.Mesh(hatBaseGeom, hatMat);
   hatMesh.add(hatBase);
-  const hatTopGeom = new THREE.CylinderGeometry(0.09, 0.10, 0.11, 24);
+  const hatTopGeom = new THREE.CylinderGeometry(bodyR * 0.35, bodyR * 0.4, totalH * 0.06, 24);
   const hatTop = new THREE.Mesh(hatTopGeom, hatMat);
-  hatTop.position.y = 0.06;
+  hatTop.position.y = totalH * 0.03;
   hatMesh.add(hatTop);
-  hatMesh.position.y = 1.82;
+  hatMesh.position.set(centerX, maxY + totalH * 0.005, centerZ);
   hatMesh.visible = false;
-  avatarRoot.add(hatMesh);
+  scene.add(hatMesh);
 
-  // النظارات (مخفية)
+  // ═══ النظارات (مخفية) ═══
   glassesMesh = new THREE.Group();
-  const frameGeom = new THREE.BoxGeometry(0.18, 0.02, 0.02);
+  const frameGeom = new THREE.BoxGeometry(bodyR * 0.7, totalH * 0.012, totalH * 0.012);
   const frame = new THREE.Mesh(frameGeom, glassesMat);
   glassesMesh.add(frame);
 
-  const lensGeom = new THREE.CircleGeometry(0.035, 16);
+  const lensGeom = new THREE.CircleGeometry(bodyR * 0.13, 16);
   const lensL = new THREE.Mesh(lensGeom, glassesMat);
-  lensL.position.set(-0.055, 0, 0.01);
+  lensL.position.x = -bodyR * 0.2;
   glassesMesh.add(lensL);
-
   const lensR = new THREE.Mesh(lensGeom, glassesMat);
-  lensR.position.set(0.055, 0, 0.01);
+  lensR.position.x = bodyR * 0.2;
   glassesMesh.add(lensR);
 
-  glassesMesh.position.set(0, 1.68, 0.13);
+  const headY = minY + totalH * 0.92;
+  glassesMesh.position.set(centerX, headY, centerZ + bodyR * 0.85);
   glassesMesh.visible = false;
-  avatarRoot.add(glassesMesh);
+  scene.add(glassesMesh);
 
-  // الهاتف في اليد (مخفي)
-  const phoneGeom = new THREE.BoxGeometry(0.06, 0.10, 0.01);
+  // ═══ الهاتف (مخفي) ═══
+  const phoneGeom = new THREE.BoxGeometry(bodyR * 0.22, totalH * 0.05, totalH * 0.008);
   phoneMesh = new THREE.Mesh(phoneGeom, phoneMat);
-  phoneMesh.position.set(0.32, 0.85, 0.10);
+  phoneMesh.position.set(centerX + bodyR * 1.2, chestY - totalH * 0.15, centerZ + bodyR * 0.3);
   phoneMesh.castShadow = true;
   phoneMesh.visible = false;
-  avatarRoot.add(phoneMesh);
+  scene.add(phoneMesh);
 }
 
 // تطبيق الألوان
@@ -288,14 +308,10 @@ window.setPantsColor = function(hex) {
 
 window.setSkinColor = function(hex) {
   if (!avatarRoot) return;
-  // نغيرو لون مواد النموذج الأصلي فقط
+  // نغيرو لون النموذج الأصلي فقط (avatarRoot ما فيهش ملابس بعد الفصل)
   avatarRoot.traverse(function(child) {
-    if (child.isMesh && child.material
-        && child !== shirtMesh && child !== pantsMesh
-        && child !== hatMesh && child !== glassesMesh && child !== phoneMesh
-        && shoesMeshes.indexOf(child) < 0
-        && (!shirtMesh.userData.sleeves || shirtMesh.userData.sleeves.indexOf(child) < 0)) {
-      if (child.material.color) child.material.color.set(hex);
+    if (child.isMesh && child.material && child.material.color) {
+      child.material.color.set(hex);
     }
   });
 };
