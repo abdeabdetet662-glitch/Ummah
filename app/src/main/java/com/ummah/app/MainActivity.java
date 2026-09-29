@@ -269,6 +269,7 @@ public class MainActivity extends Activity {
         addSectionTitle(getString(R.string.section_governance));
         addSecondaryButton(getString(R.string.btn_parliament), ParliamentActivity.class);
         addPrimaryButton("🛒  السوق العام", MarketActivity.class);
+        addPrimaryButton("🎒  ممتلكاتي", MyInventoryActivity.class);
         addSeedButton();
         electionBadgeContainer = addBadgedSecondaryButton(getString(R.string.btn_election), ElectionActivity.class, 0);
         addSecondaryButton(getString(R.string.btn_constitution), ConstitutionActivity.class);

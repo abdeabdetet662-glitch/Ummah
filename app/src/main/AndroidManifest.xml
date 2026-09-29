@@ -64,5 +64,7 @@
 
             <activity android:name=".MarketActivity" android:exported="false" />
 
+            <activity android:name=".MyInventoryActivity" android:exported="false" />
+
     </application>
 </manifest>

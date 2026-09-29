@@ -134,4 +134,34 @@ public class MarketManager {
                     l.onItems(items);
                 });
     }
+
+
+    public void sellItem(final String sellerId, final String inventoryDocId,
+                          final int originalPrice, final OnDone cb) {
+        db.runTransaction(transaction -> {
+            com.google.firebase.firestore.DocumentReference userRef =
+                    db.collection("citizens").document(sellerId);
+            com.google.firebase.firestore.DocumentReference invRef =
+                    db.collection("users_inventory").document(sellerId)
+                      .collection("items").document(inventoryDocId);
+
+            DocumentSnapshot user = transaction.get(userRef);
+            DocumentSnapshot inv = transaction.get(invRef);
+
+            if (!user.exists()) throw new RuntimeException("المستخدم غير موجود");
+            if (!inv.exists()) throw new RuntimeException("المنتج غير موجود");
+
+            Long balance = user.getLong("balance");
+            int bal = balance != null ? balance.intValue() : 0;
+
+            // نرجعو 70% من السعر
+            int refund = (int) (originalPrice * 0.7);
+
+            transaction.update(userRef, "balance", bal + refund);
+            transaction.delete(invRef);
+
+            return refund;
+        }).addOnSuccessListener(r -> cb.onSuccess())
+          .addOnFailureListener(e -> cb.onError(e.getMessage()));
+    }
 }
