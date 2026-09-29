@@ -6,12 +6,13 @@
 <title>Avatar 3D</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: radial-gradient(circle at 50% 30%, #0B4F2C 0%, #0A0A0A 70%); overflow: hidden; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: radial-gradient(circle at 50% 30%, #0B4F2C 0%, #0A0A0A 70%); }
   canvas { display: block; }
   #loading {
     position: absolute; top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    color: #D4AF37; font-family: sans-serif; font-size: 18px; text-align: center;
+    color: #D4AF37; font-family: sans-serif; font-size: 18px;
+    text-align: center; z-index: 10;
   }
   .spinner {
     border: 4px solid rgba(212, 175, 55, 0.2);
@@ -26,7 +27,7 @@
 <body>
 <div id="loading">
   <div class="spinner"></div>
-  ⏳ جاري تحميل الشخصية...
+  ⏳ جاري تحميل الشخصية
 </div>
 
 <script type="importmap">
@@ -45,64 +46,54 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 let scene, camera, renderer, controls;
 let avatarRoot = null;
-let shirtMaterials = [];
-let pantsMaterials = [];
-let skinMaterials = [];
+let mixer = null;
+let clock;
 
 init();
 animate();
 
 function init() {
-  // Scene
   scene = new THREE.Scene();
 
-  // Camera
-  camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
-  camera.position.set(0, 1.2, 2.5);
+  camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 100);
 
-  // Renderer
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.2;
+  renderer.toneMappingExposure = 1.0;
   document.body.appendChild(renderer.domElement);
 
   // ═══ الإضاءة ═══
-  // Ambient
-  scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+  scene.add(new THREE.AmbientLight(0xffffff, 0.7));
 
-  // Key light (ذهبي)
-  const keyLight = new THREE.DirectionalLight(0xFFD97A, 2.5);
-  keyLight.position.set(2, 4, 3);
+  const keyLight = new THREE.DirectionalLight(0xFFD97A, 2.0);
+  keyLight.position.set(3, 6, 4);
   keyLight.castShadow = true;
-  keyLight.shadow.mapSize.width = 1024;
-  keyLight.shadow.mapSize.height = 1024;
   scene.add(keyLight);
 
-  // Fill light (أزرق)
-  const fillLight = new THREE.DirectionalLight(0x4A90E2, 0.8);
-  fillLight.position.set(-3, 2, 2);
+  const fillLight = new THREE.DirectionalLight(0x4A90E2, 0.7);
+  fillLight.position.set(-4, 3, 2);
   scene.add(fillLight);
 
-  // Rim light (ذهبي من الخلف)
-  const rimLight = new THREE.DirectionalLight(0xD4AF37, 1.5);
-  rimLight.position.set(0, 3, -3);
+  const rimLight = new THREE.DirectionalLight(0xD4AF37, 1.0);
+  rimLight.position.set(0, 4, -5);
   scene.add(rimLight);
 
-  // أرضية بتوهج
-  const groundGeom = new THREE.CircleGeometry(2, 32);
+  // أرضية دائرية
+  const groundGeom = new THREE.CircleGeometry(2.5, 32);
   const groundMat = new THREE.MeshStandardMaterial({
     color: 0x0B4F2C,
     emissive: 0x0B4F2C,
-    emissiveIntensity: 0.3,
-    metalness: 0.5,
-    roughness: 0.7
+    emissiveIntensity: 0.2,
+    metalness: 0.4,
+    roughness: 0.8
   });
   const ground = new THREE.Mesh(groundGeom, groundMat);
   ground.rotation.x = -Math.PI / 2;
+  ground.position.y = -0.01;
   ground.receiveShadow = true;
   scene.add(ground);
 
@@ -110,43 +101,41 @@ function init() {
   controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.dampingFactor = 0.08;
-  controls.minDistance = 1.2;
-  controls.maxDistance = 5;
-  controls.target.set(0, 1, 0);
+  controls.minDistance = 1.5;
+  controls.maxDistance = 6;
   controls.autoRotate = true;
-  controls.autoRotateSpeed = 1.2;
+  controls.autoRotateSpeed = 1.5;
   controls.enablePan = false;
-  controls.maxPolarAngle = Math.PI / 1.8;
+  controls.maxPolarAngle = Math.PI / 1.9;
+  controls.minPolarAngle = Math.PI / 4;
 
-  // ═══ تحميل النموذج ═══
+  clock = new THREE.Clock();
+
   loadAvatar();
 }
 
 function loadAvatar() {
   const loader = new GLTFLoader();
 
-  // نموذج Soldier مجاني من Three.js examples
-  const modelUrl = 'https://threejs.org/examples/models/gltf/Soldier.glb';
+  // نحمّلو من assets (محلي)
+  const modelUrl = './models/soldier.glb';
 
   loader.load(
     modelUrl,
     (gltf) => {
       avatarRoot = gltf.scene;
 
-      // تحسين المواد
       avatarRoot.traverse((child) => {
         if (child.isMesh) {
           child.castShadow = true;
           child.receiveShadow = true;
           if (child.material) {
-            child.material.envMapIntensity = 1.2;
-            // نصنفو المواد
-            classifyMaterial(child);
+            child.material.envMapIntensity = 1.0;
           }
         }
       });
 
-      // ضبط الحجم
+      // ضبط الحجم لـ 1.8 متر
       const box = new THREE.Box3().setFromObject(avatarRoot);
       const size = box.getSize(new THREE.Vector3());
       const targetHeight = 1.8;
@@ -159,97 +148,102 @@ function loadAvatar() {
 
       scene.add(avatarRoot);
 
-      // نطبق الألوان المحفوظة من Java (إذا كاينين)
+      // ═══ الكاميرا تشوف الشخصية كاملة ═══
+      const finalBox = new THREE.Box3().setFromObject(avatarRoot);
+      const center = finalBox.getCenter(new THREE.Vector3());
+      const height = finalBox.max.y - finalBox.min.y;
+
+      // نضعو الكاميرا على مسافة كافية
+      const dist = height * 2.2;
+      camera.position.set(0, center.y + height * 0.15, dist);
+      camera.lookAt(center.x, center.y, center.z);
+
+      controls.target.set(center.x, center.y, center.z);
+      controls.update();
+
+      // Animation (إذا فيه)
+      if (gltf.animations && gltf.animations.length > 0) {
+        mixer = new THREE.AnimationMixer(avatarRoot);
+        const idle = gltf.animations.find(a => a.name.toLowerCase().includes('idle'))
+                  || gltf.animations[0];
+        if (idle) mixer.clipAction(idle).play();
+      }
+
+      document.getElementById('loading').style.display = 'none';
+
+      // نطبقو الألوان المحفوظة
       if (window.savedColors) {
         applyColors(window.savedColors);
       }
 
-      document.getElementById('loading').style.display = 'none';
+      // نخبرو Java أن التحميل خلص
+      if (window.Android) {
+        window.Android.onAvatarLoaded();
+      }
     },
     (progress) => {
-      if (progress.total > 0) {
-        const pct = Math.round((progress.loaded / progress.total) * 100);
-        document.querySelector('#loading').innerHTML =
-          '<div class="spinner"></div>⏳ ' + pct + '%';
+      // نسبة صحيحة (0-100)
+      const pct = progress.total > 0
+        ? Math.min(100, Math.round((progress.loaded / progress.total) * 100))
+        : null;
+
+      const loadingEl = document.getElementById('loading');
+      if (pct !== null) {
+        loadingEl.innerHTML = '<div class="spinner"></div>⏳ ' + pct + '%';
+      } else {
+        const kb = Math.round(progress.loaded / 1024);
+        loadingEl.innerHTML = '<div class="spinner"></div>⏳ ' + kb + ' KB';
       }
     },
     (error) => {
       console.error('Error loading model:', error);
       document.getElementById('loading').innerHTML =
-        '❌ فشل تحميل الشخصية<br><small style="color:#888">' + error + '</small>';
+        '❌ فشل التحميل<br><small style="color:#888;font-size:12px">' + error + '</small>';
     }
   );
 }
 
-function classifyMaterial(mesh) {
-  const name = (mesh.name || '').toLowerCase();
-  const matName = (mesh.material.name || '').toLowerCase();
-  const full = name + ' ' + matName;
-
-  // نحاولو نصنفو حسب الاسم
-  if (full.includes('shirt') || full.includes('body') || full.includes('torso') ||
-      full.includes('chest') || full.includes('uniform')) {
-    shirtMaterials.push(mesh.material);
-  } else if (full.includes('pant') || full.includes('leg') || full.includes('trouser')) {
-    pantsMaterials.push(mesh.material);
-  } else if (full.includes('head') || full.includes('face') || full.includes('skin') ||
-             full.includes('hand') || full.includes('arm')) {
-    skinMaterials.push(mesh.material);
-  }
-}
-
-// ═══ دالة تغيير لون القميص ═══
+// ═══ تغيير لون القميص ═══
 window.setShirtColor = function(hex) {
-  if (avatarRoot) {
-    // نغيرو لون كل mesh يبدو كلباس
-    avatarRoot.traverse((child) => {
-      if (child.isMesh && child.material) {
-        const name = (child.name || '').toLowerCase();
-        const matName = (child.material.name || '').toLowerCase();
-        const full = name + ' ' + matName;
-        if (full.includes('shirt') || full.includes('body') || full.includes('torso') ||
-            full.includes('chest') || full.includes('uniform')) {
-          child.material.color.set(hex);
-        }
+  if (!avatarRoot) return;
+  avatarRoot.traverse((child) => {
+    if (child.isMesh && child.material) {
+      const n = (child.name || '').toLowerCase() + ' ' + (child.material.name || '').toLowerCase();
+      if (n.includes('shirt') || n.includes('torso') || n.includes('chest') ||
+          n.includes('uniform') || n.includes('body') || n.includes('jacket')) {
+        child.material.color.set(hex);
       }
-    });
-  }
+    }
+  });
 };
 
-// ═══ دالة تغيير لون البنطال ═══
+// ═══ تغيير لون البنطال ═══
 window.setPantsColor = function(hex) {
-  if (avatarRoot) {
-    avatarRoot.traverse((child) => {
-      if (child.isMesh && child.material) {
-        const name = (child.name || '').toLowerCase();
-        const matName = (child.material.name || '').toLowerCase();
-        const full = name + ' ' + matName;
-        if (full.includes('pant') || full.includes('leg') || full.includes('trouser')) {
-          child.material.color.set(hex);
-        }
+  if (!avatarRoot) return;
+  avatarRoot.traverse((child) => {
+    if (child.isMesh && child.material) {
+      const n = (child.name || '').toLowerCase() + ' ' + (child.material.name || '').toLowerCase();
+      if (n.includes('pant') || n.includes('leg') || n.includes('trouser')) {
+        child.material.color.set(hex);
       }
-    });
-  }
+    }
+  });
 };
 
-// ═══ دالة تغيير لون البشرة ═══
+// ═══ تغيير لون البشرة ═══
 window.setSkinColor = function(hex) {
-  if (avatarRoot) {
-    avatarRoot.traverse((child) => {
-      if (child.isMesh && child.material) {
-        const name = (child.name || '').toLowerCase();
-        const matName = (child.material.name || '').toLowerCase();
-        const full = name + ' ' + matName;
-        if (full.includes('head') || full.includes('face') || full.includes('skin') ||
-            full.includes('hand') || full.includes('arm')) {
-          child.material.color.set(hex);
-        }
+  if (!avatarRoot) return;
+  avatarRoot.traverse((child) => {
+    if (child.isMesh && child.material) {
+      const n = (child.name || '').toLowerCase() + ' ' + (child.material.name || '').toLowerCase();
+      if (n.includes('head') || n.includes('face') || n.includes('skin') ||
+          n.includes('hand') || n.includes('arm')) {
+        child.material.color.set(hex);
       }
-    });
-  }
+    }
+  });
 };
 
-// ═══ دالة تطبيق ألوان متعددة ═══
 window.applyColors = function(colors) {
   if (colors.shirt) window.setShirtColor(colors.shirt);
   if (colors.pants) window.setPantsColor(colors.pants);
@@ -257,21 +251,14 @@ window.applyColors = function(colors) {
 };
 
 // ═══ Animations ═══
-let clock = new THREE.Clock();
 function animate() {
   requestAnimationFrame(animate);
-
-  // حركة خفيفة للشخصية
-  if (avatarRoot) {
-    const t = clock.getElapsedTime();
-    avatarRoot.position.y = Math.sin(t * 1.5) * 0.02 + avatarRoot.position.y * 0 + 0;
-  }
-
+  const delta = clock.getDelta();
+  if (mixer) mixer.update(delta);
   controls.update();
   renderer.render(scene, camera);
 }
 
-// ═══ Resize ═══
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
