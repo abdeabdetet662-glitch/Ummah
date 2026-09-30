@@ -28,7 +28,7 @@ public class HomeTabBuilder {
         addHeroCard(citizen, countryName);
 
         // ═══ Mini Stats (3) ═══
-        LinearLayout[] stats = addMiniStats();
+        TextView[] stats = addMiniStats();
         TextView balanceView = stats[0];
         TextView countView = stats[1];
         TextView onlineView = stats[2];
@@ -209,7 +209,7 @@ public class HomeTabBuilder {
     // ═══════════════════════════════════════
     //  Mini Stats (3 in a row)
     // ═══════════════════════════════════════
-    private LinearLayout[] addMiniStats() {
+    private TextView[] addMiniStats() {
         LinearLayout row = new LinearLayout(act);
         row.setOrientation(LinearLayout.HORIZONTAL);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
