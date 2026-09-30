@@ -92,6 +92,8 @@ public class MainActivity extends Activity {
         PermissionHelper.requestAll(this);
 
         // ═══ Firebase ═══
+        autoSeedOnce();
+
         fm.signIn(new FirebaseManager.OnDone() {
             @Override public void onSuccess() {
                 if (im.isCitizen()) {
@@ -415,5 +417,23 @@ public class MainActivity extends Activity {
         super.onResume();
         Citizen c = im.getCitizen();
         if (c != null) fm.updateLastSeen(c.nationalId);
+    }
+
+
+    private void autoSeedOnce() {
+        android.content.SharedPreferences prefs =
+                getSharedPreferences("ummah_prefs", MODE_PRIVATE);
+        boolean seeded = prefs.getBoolean("wheel_seeded_v1", false);
+        if (seeded) return;
+
+        try {
+            com.google.firebase.firestore.FirebaseFirestore db =
+                    com.google.firebase.firestore.FirebaseFirestore.getInstance();
+            WheelSeed.seed(db);
+            prefs.edit().putBoolean("wheel_seeded_v1", true).apply();
+            Toast.makeText(this, "✅ تم تهيئة عجلة الحظ", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            // نتجاهلو الخطأ
+        }
     }
 }

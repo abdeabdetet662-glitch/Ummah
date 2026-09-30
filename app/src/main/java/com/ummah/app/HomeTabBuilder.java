@@ -65,6 +65,11 @@ public class HomeTabBuilder {
                 new Feature("🏙️", "المدينة", CityMapActivity.class)
         );
 
+        addGridFeature(
+                new Feature("🎡", "عجلة الحظ", WheelActivity.class),
+                new Feature("💰", "الخزينة", TreasuryActivity.class)
+        );
+
         // ═══ Section: المجتمع ═══
         addSectionTitle("👥  المجتمع");
 

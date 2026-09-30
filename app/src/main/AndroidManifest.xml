@@ -96,5 +96,7 @@
 
             <activity android:name=".PresidentAnnouncementsListActivity" android:exported="false" />
 
+            <activity android:name=".WheelActivity" android:exported="false" />
+
     </application>
 </manifest>
