@@ -92,10 +92,9 @@ public class MainActivity extends Activity {
         PermissionHelper.requestAll(this);
 
         // ═══ Firebase ═══
-        autoSeedOnce();
-
         fm.signIn(new FirebaseManager.OnDone() {
             @Override public void onSuccess() {
+                autoSeedOnce();
                 if (im.isCitizen()) {
                     currentCitizen = im.getCitizen();
                     syncAndShow(currentCitizen);
@@ -419,21 +418,29 @@ public class MainActivity extends Activity {
         if (c != null) fm.updateLastSeen(c.nationalId);
     }
 
+    
 
     private void autoSeedOnce() {
-        android.content.SharedPreferences prefs =
-                getSharedPreferences("ummah_prefs", MODE_PRIVATE);
-        boolean seeded = prefs.getBoolean("wheel_seeded_v1", false);
-        if (seeded) return;
-
         try {
             com.google.firebase.firestore.FirebaseFirestore db =
                     com.google.firebase.firestore.FirebaseFirestore.getInstance();
-            WheelSeed.seed(db);
-            prefs.edit().putBoolean("wheel_seeded_v1", true).apply();
-            Toast.makeText(this, "✅ تم تهيئة عجلة الحظ", Toast.LENGTH_SHORT).show();
+
+            // نتحققو من Firestore مباشرة (ماشي من الـ flag)
+            db.collection("wheel_segments").limit(1).get()
+                .addOnSuccessListener(q -> {
+                    if (q.isEmpty()) {
+                        // ما فيهش بيانات → نعبيو
+                        WheelSeed.seed(db);
+                        android.util.Log.d("UMMAH", "✅ Wheel seed done");
+                    } else {
+                        android.util.Log.d("UMMAH", "✅ Wheel segments already exist");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    android.util.Log.e("UMMAH", "❌ Wheel check failed: " + e.getMessage());
+                });
         } catch (Exception e) {
-            // نتجاهلو الخطأ
+            android.util.Log.e("UMMAH", "❌ autoSeedOnce error", e);
         }
     }
 }
