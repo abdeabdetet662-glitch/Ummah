@@ -865,4 +865,23 @@ public class FirebaseManager {
 
     public void setMyPhotoUrl(String url) { this.myPhotoUrl = url; }
     public String getMyPhotoUrl() { return myPhotoUrl != null ? myPhotoUrl : ""; }
+
+
+    // ═══════════════════════════════════════
+    //  President Status
+    // ═══════════════════════════════════════
+    public interface PresidentListener {
+        void onStatus(boolean isPresident);
+        void onError(String msg);
+    }
+
+    public ListenerRegistration listenPresidentStatus(String nationalId, final PresidentListener l) {
+        return db.collection("citizens").document(nationalId)
+            .addSnapshotListener((doc, e) -> {
+                if (e != null) { l.onError(e.getMessage()); return; }
+                if (doc == null || !doc.exists()) { l.onStatus(false); return; }
+                Boolean isP = doc.getBoolean("isPresident");
+                l.onStatus(isP != null && isP);
+            });
+    }
 }
