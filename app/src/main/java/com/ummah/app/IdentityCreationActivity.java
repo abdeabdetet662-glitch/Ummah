@@ -122,7 +122,7 @@ public class IdentityCreationActivity extends Activity {
         tvStep.setTextColor(GOLD);
         tvStep.setGravity(Gravity.CENTER);
         tvStep.setPadding(40, 20, 40, 20);
-        tvStep.setText("1️⃣ اختر بلدك");
+        tvStep.setText("١ • اختر بلدك");
         root.addView(tvStep);
 
         // ═══ Content (يتغير) ═══
@@ -141,14 +141,14 @@ public class IdentityCreationActivity extends Activity {
         // ═══ Bottom Buttons ═══
         LinearLayout btnBox = new LinearLayout(this);
         btnBox.setOrientation(LinearLayout.HORIZONTAL);
-        btnBox.setPadding(40, 20, 40, 60);
+        btnBox.setPadding(30, 15, 30, 30);
 
         btnBack = new Button(this);
         btnBack.setText("← رجوع");
         btnBack.setTextSize(15);
         btnBack.setTextColor(GOLD);
         btnBack.setBackgroundColor(Color.TRANSPARENT);
-        LinearLayout.LayoutParams backLp = new LinearLayout.LayoutParams(0, 130, 1f);
+        LinearLayout.LayoutParams backLp = new LinearLayout.LayoutParams(0, 110, 1f);
         btnBack.setLayoutParams(backLp);
         btnBack.setVisibility(View.GONE);
         btnBack.setOnClickListener(v -> onBack());
@@ -160,7 +160,7 @@ public class IdentityCreationActivity extends Activity {
         btnNext.setTypeface(null, Typeface.BOLD);
         btnNext.setTextColor(Color.BLACK);
         btnNext.setBackgroundResource(R.drawable.bg_btn_gold_hero);
-        LinearLayout.LayoutParams nextLp = new LinearLayout.LayoutParams(0, 130, 2f);
+        LinearLayout.LayoutParams nextLp = new LinearLayout.LayoutParams(0, 110, 2f);
         btnNext.setLayoutParams(nextLp);
         btnNext.setOnClickListener(v -> onNext());
         btnBox.addView(btnNext);
@@ -191,22 +191,22 @@ public class IdentityCreationActivity extends Activity {
 
         switch (step) {
             case 1:
-                tvStep.setText("1️⃣ اختر بلدك");
+                tvStep.setText("١ • اختر بلدك");
                 btnNext.setText("التالي ←");
                 buildCountryStep();
                 break;
             case 2:
-                tvStep.setText("2️⃣ اختر اسمك");
+                tvStep.setText("٢ • اختر اسمك");
                 btnNext.setText("التالي ←");
                 buildNameStep();
                 break;
             case 3:
-                tvStep.setText("3️⃣ كلماتك السرية");
+                tvStep.setText("٣ • كلماتك السرية");
                 btnNext.setText("تأكيد ✓");
                 buildSeedStep();
                 break;
             case 4:
-                tvStep.setText("4️⃣ مبروك! 🎉");
+                tvStep.setText("٤ • مبروك!");
                 btnNext.setText("🎁 ابدأ رحلتك");
                 buildCelebrationStep();
                 break;
@@ -522,7 +522,29 @@ public class IdentityCreationActivity extends Activity {
     // ══════════════════════════════════════════
 
     private void finishAndStart() {
-        // حفظ محلياً
+        // ═══ 1. نسجل المواطن في IdentityManager (باش MainActivity تلقاه) ═══
+        try {
+            IdentityManager im = new IdentityManager(this);
+            String joinDate = new java.text.SimpleDateFormat("yyyy-MM-dd",
+                    java.util.Locale.US).format(new java.util.Date());
+            im.restoreCitizen(nationalId, userName, joinDate, seedPhrase, selectedCountry);
+        } catch (Exception e) {
+            // فشل؟ نحفظ يدوياً في نفس SharedPreferences
+            try {
+                getSharedPreferences("ummah_prefs", MODE_PRIVATE).edit()
+                        .putString("national_id", nationalId)
+                        .putString("citizen_name", userName)
+                        .putString("join_date", new java.text.SimpleDateFormat("yyyy-MM-dd",
+                                java.util.Locale.US).format(new java.util.Date()))
+                        .putString("seed_phrase", seedPhrase)
+                        .putString("country", selectedCountry)
+                        .apply();
+            } catch (Exception e2) {
+                // صمت
+            }
+        }
+
+        // ═══ 2. حفظ إضافي في SharedPreferences العامة ═══
         getSharedPreferences("ummah", MODE_PRIVATE).edit()
                 .putString("pending_country", selectedCountry)
                 .putString("pending_name", userName)

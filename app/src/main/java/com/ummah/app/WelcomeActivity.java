@@ -130,7 +130,7 @@ public class WelcomeActivity extends Activity {
         // ═══ الأزرار ═══
         LinearLayout btnBox = new LinearLayout(this);
         btnBox.setOrientation(LinearLayout.VERTICAL);
-        btnBox.setPadding(40, 20, 40, 60);
+        btnBox.setPadding(30, 15, 30, 40);
 
         btnNext = new Button(this);
         btnNext.setText("التالي ←");
@@ -139,7 +139,7 @@ public class WelcomeActivity extends Activity {
         btnNext.setTextColor(Color.BLACK);
         btnNext.setBackgroundResource(R.drawable.bg_btn_gold_hero);
         LinearLayout.LayoutParams nextLp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, 140);
+                LinearLayout.LayoutParams.MATCH_PARENT, 120);
         btnNext.setLayoutParams(nextLp);
         btnNext.setOnClickListener(v -> onNextClicked());
         btnBox.addView(btnNext);
