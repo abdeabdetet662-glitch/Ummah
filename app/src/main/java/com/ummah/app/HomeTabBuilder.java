@@ -21,6 +21,8 @@ public class HomeTabBuilder {
     private final LinearLayout root;
     private ListenerRegistration presidentReg;
     private LinearLayout presidentTagContainer;
+    private boolean isUserPresident = false;
+    private LinearLayout presidentDashboardBtn = null;
 
     public HomeTabBuilder(Activity act, LinearLayout root) {
         this.act = act;
@@ -115,19 +117,88 @@ public class HomeTabBuilder {
         startPresidentListener(citizen.nationalId);
     }
 
-    private void startPresidentListener(String nationalId) {
+    private void startPresidentListener(final String nationalId) {
         if (presidentReg != null) presidentReg.remove();
         presidentReg = FirebaseManager.get().listenPresidentStatus(nationalId,
                 new FirebaseManager.PresidentListener() {
             @Override public void onStatus(final boolean isPresident) {
                 act.runOnUiThread(() -> {
+                    isUserPresident = isPresident;
                     if (presidentTagContainer != null) {
                         presidentTagContainer.setVisibility(isPresident ? View.VISIBLE : View.GONE);
                     }
+                    updatePresidentDashboardButton();
                 });
             }
             @Override public void onError(String msg) {}
         });
+    }
+
+    private void updatePresidentDashboardButton() {
+        if (isUserPresident) {
+            if (presidentDashboardBtn == null) {
+                addSectionTitle("\uD83D\uDC51  صلاحيات الرئيس");
+
+                presidentDashboardBtn = new LinearLayout(act);
+                presidentDashboardBtn.setOrientation(LinearLayout.HORIZONTAL);
+                presidentDashboardBtn.setGravity(Gravity.CENTER_VERTICAL);
+                presidentDashboardBtn.setBackgroundResource(R.drawable.bg_president_card);
+                presidentDashboardBtn.setPadding(28, 28, 28, 28);
+                presidentDashboardBtn.setClickable(true);
+
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                lp.setMargins(0, 8, 0, 8);
+                presidentDashboardBtn.setLayoutParams(lp);
+
+                TextView crown = new TextView(act);
+                crown.setText("\uD83D\uDC51");
+                crown.setTextSize(36);
+                crown.setPadding(0, 0, 20, 0);
+                presidentDashboardBtn.addView(crown);
+
+                LinearLayout info = new LinearLayout(act);
+                info.setOrientation(LinearLayout.VERTICAL);
+                info.setLayoutParams(new LinearLayout.LayoutParams(
+                        0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+
+                TextView t1 = new TextView(act);
+                t1.setText("لوحة الرئيس");
+                t1.setTextColor(Color.parseColor("#FFD700"));
+                t1.setTextSize(18);
+                t1.setTypeface(null, Typeface.BOLD);
+                info.addView(t1);
+
+                TextView t2 = new TextView(act);
+                t2.setText("إعلانات \u2022 هدايا \u2022 تعيينات \u2022 مراسيم");
+                t2.setTextColor(Color.parseColor("#FFFFFF"));
+                t2.setTextSize(11);
+                t2.setPadding(0, 6, 0, 0);
+                info.addView(t2);
+
+                presidentDashboardBtn.addView(info);
+
+                TextView arrow = new TextView(act);
+                arrow.setText("\u203A");
+                arrow.setTextColor(Color.parseColor("#FFD700"));
+                arrow.setTextSize(32);
+                presidentDashboardBtn.addView(arrow);
+
+                presidentDashboardBtn.setOnClickListener(v -> {
+                    AnimHelper.pressEffect(v);
+                    AnimHelper.mediumHaptic(act);
+                    act.startActivity(new Intent(act, PresidentDashboardActivity.class));
+                });
+
+                root.addView(presidentDashboardBtn);
+                AnimHelper.fadeInUp(presidentDashboardBtn, 0);
+            }
+        } else {
+            if (presidentDashboardBtn != null) {
+                root.removeView(presidentDashboardBtn);
+                presidentDashboardBtn = null;
+            }
+        }
     }
 
     // ═══════════════════════════════════════
