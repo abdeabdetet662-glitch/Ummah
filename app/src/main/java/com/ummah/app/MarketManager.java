@@ -78,9 +78,13 @@ public class MarketManager {
 
     public void buyItem(final String buyerId, final MarketItem item, final OnDone cb) {
         db.runTransaction(transaction -> {
-            com.google.firebase.firestore.DocumentReference userRef =
-                    db.collection("citizens").document(buyerId);
+            // ═══ 1. كل القراءات أولاً ═══
+            DocumentReference userRef = db.collection("citizens").document(buyerId);
+            DocumentReference itemRef = db.collection("market_items").document(item.id);
+
             DocumentSnapshot user = transaction.get(userRef);
+            DocumentSnapshot itemDoc = transaction.get(itemRef);
+
             if (!user.exists()) throw new RuntimeException("المستخدم غير موجود");
 
             Long balance = user.getLong("balance");
@@ -88,8 +92,7 @@ public class MarketManager {
 
             if (bal < item.price) throw new RuntimeException("الرصيد غير كافٍ");
 
-            transaction.update(userRef, "balance", bal - item.price);
-
+            // نجهزو بيانات المخزون
             Map<String, Object> inventory = new HashMap<>();
             inventory.put("itemId", item.id);
             inventory.put("name", item.name);
@@ -100,9 +103,7 @@ public class MarketManager {
             inventory.put("imageUrl", item.imageUrl);
             inventory.put("boughtAt", System.currentTimeMillis());
 
-            // metadata للملابس
-            com.google.firebase.firestore.DocumentSnapshot itemDoc =
-                    transaction.get(db.collection("market_items").document(item.id));
+            // metadata للملابس (من الـ itemDoc)
             if (itemDoc.exists()) {
                 String wearType = itemDoc.getString("wearType");
                 String color = itemDoc.getString("color");
@@ -110,10 +111,11 @@ public class MarketManager {
                 if (color != null) inventory.put("color", color);
             }
 
-            com.google.firebase.firestore.DocumentReference invRef =
-                    db.collection("users_inventory").document(buyerId)
-                      .collection("items").document();
+            DocumentReference invRef = db.collection("users_inventory").document(buyerId)
+                    .collection("items").document();
 
+            // ═══ 2. كل الكتابات بعدها ═══
+            transaction.update(userRef, "balance", bal - item.price);
             transaction.set(invRef, inventory);
 
             return null;
