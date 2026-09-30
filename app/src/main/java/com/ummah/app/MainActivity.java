@@ -35,6 +35,9 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
+        // Immersive Mode — إخفاء أشرطة النظام
+        try { ImmersiveHelper.enable(this); } catch (Exception ignored) {}
+
         im = new IdentityManager(this);
         wm = new WalletManager(this);
         fm = FirebaseManager.get();
