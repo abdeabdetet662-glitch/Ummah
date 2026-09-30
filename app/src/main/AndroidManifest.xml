@@ -98,5 +98,20 @@
 
             <activity android:name=".WheelActivity" android:exported="false" />
 
+    
+        <!-- Welcome Activity - شاشة الترحيب -->
+        <activity
+            android:name=".WelcomeActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.NoTitleBar" />
+
+        <!-- Identity Creation - إنشاء الهوية -->
+        <activity
+            android:name=".IdentityCreationActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.NoTitleBar" />
+
     </application>
 </manifest>

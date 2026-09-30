@@ -122,7 +122,16 @@ public class SplashActivity extends Activity {
         all.start();
 
         new Handler().postDelayed(() -> {
-            startActivity(new Intent(SplashActivity.this, MainActivity.class));
+            boolean seenWelcome = getSharedPreferences("ummah", MODE_PRIVATE)
+                    .getBoolean("seen_welcome", false);
+
+            Intent next;
+            if (!seenWelcome) {
+                next = new Intent(SplashActivity.this, WelcomeActivity.class);
+            } else {
+                next = new Intent(SplashActivity.this, MainActivity.class);
+            }
+            startActivity(next);
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             finish();
         }, 2500);
