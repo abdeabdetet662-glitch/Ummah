@@ -35,6 +35,9 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
+        // Feature Flags — تهيئة نظام التحكم في الميزات
+        try { FeatureFlags.init(this); } catch (Exception ignored) {}
+
         im = new IdentityManager(this);
         wm = new WalletManager(this);
         fm = FirebaseManager.get();
