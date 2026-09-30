@@ -34,6 +34,12 @@ public class PrivateChatActivity extends Activity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
+        // Feature Check
+        if (!FeatureFlags.checkOrToast(this, "private_chat")) {
+            finish();
+            return;
+        }
+
         fm = FirebaseManager.get();
         im = new IdentityManager(this);
         me = im.getCitizen();

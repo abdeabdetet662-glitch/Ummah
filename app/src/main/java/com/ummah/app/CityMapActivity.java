@@ -34,6 +34,12 @@ public class CityMapActivity extends Activity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
+        // Feature Check
+        if (!FeatureFlags.checkOrToast(this, "city")) {
+            finish();
+            return;
+        }
+
         im = new IdentityManager(this);
         cm = new CityManager();
 

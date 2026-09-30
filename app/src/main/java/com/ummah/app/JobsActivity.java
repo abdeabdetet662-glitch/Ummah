@@ -27,6 +27,12 @@ public class JobsActivity extends Activity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
+        // Feature Check
+        if (!FeatureFlags.checkOrToast(this, "jobs")) {
+            finish();
+            return;
+        }
+
         im = new IdentityManager(this);
         jm = new JobManager();
 

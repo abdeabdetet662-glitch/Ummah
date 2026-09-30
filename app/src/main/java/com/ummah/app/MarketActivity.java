@@ -34,6 +34,12 @@ public class MarketActivity extends Activity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
+        // Feature Check
+        if (!FeatureFlags.checkOrToast(this, "market")) {
+            finish();
+            return;
+        }
+
         im = new IdentityManager(this);
         mm = new MarketManager();
         prefs = getSharedPreferences(PREFS, MODE_PRIVATE);

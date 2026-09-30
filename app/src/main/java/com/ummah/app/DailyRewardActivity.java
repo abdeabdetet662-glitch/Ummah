@@ -21,6 +21,12 @@ public class DailyRewardActivity extends Activity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
+        // Feature Check
+        if (!FeatureFlags.checkOrToast(this, "daily_reward")) {
+            finish();
+            return;
+        }
+
         fm = FirebaseManager.get();
         im = new IdentityManager(this);
         wm = new WalletManager(this);

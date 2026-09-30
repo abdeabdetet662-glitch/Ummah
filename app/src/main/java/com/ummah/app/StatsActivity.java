@@ -16,6 +16,12 @@ public class StatsActivity extends Activity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
+        // Feature Check
+        if (!FeatureFlags.checkOrToast(this, "stats")) {
+            finish();
+            return;
+        }
+
         fm = FirebaseManager.get();
 
         ScrollView scroll = new ScrollView(this);

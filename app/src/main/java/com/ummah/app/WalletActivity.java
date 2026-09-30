@@ -26,6 +26,12 @@ public class WalletActivity extends Activity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
+        // Feature Check
+        if (!FeatureFlags.checkOrToast(this, "transfers")) {
+            finish();
+            return;
+        }
+
         // FullscreenHelper.enable(this);  // DISABLED - crash
         im = new IdentityManager(this);
         fm = FirebaseManager.get();

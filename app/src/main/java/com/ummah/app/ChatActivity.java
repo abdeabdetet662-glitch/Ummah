@@ -39,6 +39,12 @@ public class ChatActivity extends Activity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
+        // Feature Check
+        if (!FeatureFlags.checkOrToast(this, "chat")) {
+            finish();
+            return;
+        }
+
         // FullscreenHelper.enable(this);  // DISABLED - crash
         getWindow().setSoftInputMode(
                 android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);

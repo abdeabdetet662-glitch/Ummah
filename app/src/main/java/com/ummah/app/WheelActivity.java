@@ -39,6 +39,12 @@ public class WheelActivity extends Activity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
+        // Feature Check
+        if (!FeatureFlags.checkOrToast(this, "wheel")) {
+            finish();
+            return;
+        }
+
         im = new IdentityManager(this);
         wm = new WheelManager();
 

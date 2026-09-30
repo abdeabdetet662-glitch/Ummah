@@ -28,6 +28,12 @@ public class CitizenMarketActivity extends Activity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
+        // Feature Check
+        if (!FeatureFlags.checkOrToast(this, "citizen_market")) {
+            finish();
+            return;
+        }
+
         im = new IdentityManager(this);
         clm = new CitizenListingManager();
 

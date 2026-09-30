@@ -35,6 +35,12 @@ public class TransferActivity extends Activity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
+        // Feature Check
+        if (!FeatureFlags.checkOrToast(this, "transfers")) {
+            finish();
+            return;
+        }
+
         fm = FirebaseManager.get();
         im = new IdentityManager(this);
 

@@ -26,6 +26,12 @@ public class TreasuryActivity extends Activity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
+        // Feature Check
+        if (!FeatureFlags.checkOrToast(this, "treasury")) {
+            finish();
+            return;
+        }
+
         fm = FirebaseManager.get();
         im = new IdentityManager(this);
         wm = new WalletManager(this);

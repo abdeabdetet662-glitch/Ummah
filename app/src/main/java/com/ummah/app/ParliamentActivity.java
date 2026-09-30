@@ -28,6 +28,12 @@ public class ParliamentActivity extends Activity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
+        // Feature Check
+        if (!FeatureFlags.checkOrToast(this, "parliament")) {
+            finish();
+            return;
+        }
+
         fm = FirebaseManager.get();
         wm = new WalletManager(this);
         im = new IdentityManager(this);

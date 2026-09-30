@@ -23,6 +23,12 @@ public class PresidentDashboardActivity extends Activity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
+        // Feature Check
+        if (!FeatureFlags.checkOrToast(this, "president")) {
+            finish();
+            return;
+        }
+
         im = new IdentityManager(this);
         pm = new PresidentManager();
 

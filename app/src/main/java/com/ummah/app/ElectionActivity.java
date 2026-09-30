@@ -35,6 +35,12 @@ public class ElectionActivity extends Activity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
+        // Feature Check
+        if (!FeatureFlags.checkOrToast(this, "elections")) {
+            finish();
+            return;
+        }
+
         db = FirebaseFirestore.getInstance();
         im = new IdentityManager(this);
 
