@@ -12,7 +12,7 @@
             <stroke android:width="2dp" android:color="#FFD700"/>
         </shape>
     </item>
-    <item android:top="0dp" android:bottom="60%">
+    <item android:top="2dp" android:bottom="100dp">
         <shape android:shape="rectangle">
             <corners android:radius="24dp"/>
             <gradient
