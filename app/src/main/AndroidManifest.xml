@@ -78,5 +78,23 @@
 
             <activity android:name=".CityMapActivity" android:exported="false" />
 
+            <activity android:name=".PresidentDashboardActivity" android:exported="false" />
+
+            <activity android:name=".PresidentAnnounceActivity" android:exported="false" />
+
+            <activity android:name=".PresidentGiftActivity" android:exported="false" />
+
+            <activity android:name=".PresidentPardonActivity" android:exported="false" />
+
+            <activity android:name=".PresidentMinistersActivity" android:exported="false" />
+
+            <activity android:name=".PresidentTreasuryActivity" android:exported="false" />
+
+            <activity android:name=".PresidentTitlesActivity" android:exported="false" />
+
+            <activity android:name=".PresidentDecreesActivity" android:exported="false" />
+
+            <activity android:name=".PresidentAnnouncementsListActivity" android:exported="false" />
+
     </application>
 </manifest>
