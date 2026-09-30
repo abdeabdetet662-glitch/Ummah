@@ -9,6 +9,8 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.firebase.firestore.ListenerRegistration;
+
 public class HomeTabBuilder {
 
     public interface OnHomeReady {
@@ -17,6 +19,8 @@ public class HomeTabBuilder {
 
     private final Activity act;
     private final LinearLayout root;
+    private ListenerRegistration presidentReg;
+    private LinearLayout presidentTagContainer;
 
     public HomeTabBuilder(Activity act, LinearLayout root) {
         this.act = act;
@@ -106,6 +110,24 @@ public class HomeTabBuilder {
 
         // نرجعو الـ TextViews
         if (cb != null) cb.onReady(balanceView, countView, onlineView);
+
+        // نراقبو حالة الرئيس
+        startPresidentListener(citizen.nationalId);
+    }
+
+    private void startPresidentListener(String nationalId) {
+        if (presidentReg != null) presidentReg.remove();
+        presidentReg = FirebaseManager.get().listenPresidentStatus(nationalId,
+                new FirebaseManager.PresidentListener() {
+            @Override public void onStatus(final boolean isPresident) {
+                act.runOnUiThread(() -> {
+                    if (presidentTagContainer != null) {
+                        presidentTagContainer.setVisibility(isPresident ? View.VISIBLE : View.GONE);
+                    }
+                });
+            }
+            @Override public void onError(String msg) {}
+        });
     }
 
     // ═══════════════════════════════════════
@@ -170,6 +192,17 @@ public class HomeTabBuilder {
         line.setLayoutParams(lineLp);
         line.setBackgroundColor(Color.parseColor("#2A3D32"));
         card.addView(line);
+
+        // ═══ President Tag (يظهر فقط للرؤساء) ═══
+        presidentTagContainer = new LinearLayout(act);
+        presidentTagContainer.setOrientation(LinearLayout.HORIZONTAL);
+        presidentTagContainer.setGravity(Gravity.CENTER);
+        presidentTagContainer.setVisibility(View.GONE);
+        presidentTagContainer.setPadding(0, 16, 0, 0);
+
+        LinearLayout tag = PresidentBadgeHelper.createPresidentTag(act);
+        presidentTagContainer.addView(tag);
+        card.addView(presidentTagContainer);
 
         // Country + Join Date
         LinearLayout infoRow = new LinearLayout(act);

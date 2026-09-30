@@ -12,6 +12,8 @@ public class Citizen {
     public boolean online;
     public boolean blocked;
     public boolean muted;
+    public boolean isPresident;
+    public long presidentSince;
     public long mutedUntil;
 
     public Citizen(String nationalId, String name, String joinDate, String seedPhrase, String country) {
