@@ -271,8 +271,8 @@ public class MainActivity extends Activity {
         addPrimaryButton("🛒  السوق العام", MarketActivity.class);
         addPrimaryButton("🤝  سوق المواطنين", CitizenMarketActivity.class);
         addPrimaryButton("🎒  ممتلكاتي", MyInventoryActivity.class);
+        addPrimaryButton("🏙️  مدينة أُمّة", CityMapActivity.class);
         addPrimaryButton("💼  الوظائف", JobsActivity.class);
-        addPrimaryButton("🎨  شخصيتي", AvatarActivity.class);
         addPrimaryButton("❤️  حياتي", LifeStatsActivity.class);
         addPrimaryButton("🚗  مرآبي", GarageActivity.class);
         addSeedButton();
@@ -561,6 +561,7 @@ public class MainActivity extends Activity {
             MarketCleanup.cleanupOldItems(db);
             MarketSeed.seed(db);
             JobSeed.seed(db);
+            CitySeed.seed(db);
             Toast.makeText(MainActivity.this, "✅ تمت إضافة المنتجات! افتح السوق", Toast.LENGTH_LONG).show();
         });
         root.addView(seedBtn);

@@ -69,14 +69,14 @@
             <activity android:name=".JobsActivity" android:exported="false" />
         <activity android:name=".MyJobActivity" android:exported="false" />
 
-            <activity android:name=".AvatarActivity" android:exported="false" />
-
             <activity android:name=".LifeStatsActivity" android:exported="false" />
 
             <activity android:name=".GarageActivity" android:exported="false" />
 
             <activity android:name=".SellItemActivity" android:exported="false" />
         <activity android:name=".CitizenMarketActivity" android:exported="false" />
+
+            <activity android:name=".CityMapActivity" android:exported="false" />
 
     </application>
 </manifest>

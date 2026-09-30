@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>مدينة أُمّة</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #050505; }
+  canvas { display: block; }
+  #loading {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    color: #D4AF37; font-family: sans-serif; font-size: 16px;
+    text-align: center; z-index: 10;
+  }
+  .spinner {
+    border: 4px solid rgba(212, 175, 55, 0.2);
+    border-top: 4px solid #D4AF37;
+    border-radius: 50%; width: 50px; height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+  }
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div id="loading">
+  <div class="spinner"></div>
+  ⏳ جاري تحميل المدينة
+</div>
+
+<script src="../avatar/libs/three.min.js"></script>
+<script src="../avatar/libs/OrbitControls.js"></script>
+
+<script>
+let scene, camera, renderer, controls;
+let clock;
+
+const DISTRICTS = {
+  "center":     { name: "الوسط التجاري", color: 0xD4AF37, x0: 0,  z0: 0 },
+  "luxury":     { name: "الحي الراقي",    color: 0x9C27B0, x0: 6,  z0: 0 },
+  "garden":     { name: "الحدائق",        color: 0x4CAF50, x0: 12, z0: 0 },
+  "mid":        { name: "الحي المتوسط",   color: 0x2196F3, x0: 0,  z0: 6 },
+  "suburb":     { name: "الضواحي",        color: 0x757575, x0: 6,  z0: 6 },
+  "industrial": { name: "المنطقة الصناعية", color: 0xFF5722, x0: 12, z0: 6 }
+};
+
+let allPlots = [];
+let plotMeshes = {};
+let raycaster, mouse;
+
+init();
+animate();
+
+function init() {
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x050505);
+  scene.fog = new THREE.Fog(0x050505, 25, 60);
+
+  camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 200);
+  camera.position.set(18, 25, 18);
+
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  document.body.appendChild(renderer.domElement);
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.75));
+
+  const sun = new THREE.DirectionalLight(0xFFD97A, 1.8);
+  sun.position.set(20, 40, 20);
+  sun.castShadow = true;
+  sun.shadow.mapSize.set(2048, 2048);
+  sun.shadow.camera.left = -30;
+  sun.shadow.camera.right = 30;
+  sun.shadow.camera.top = 30;
+  sun.shadow.camera.bottom = -30;
+  scene.add(sun);
+
+  const fill = new THREE.DirectionalLight(0x4A90E2, 0.5);
+  fill.position.set(-20, 10, -10);
+  scene.add(fill);
+
+  const groundGeom = new THREE.PlaneGeometry(60, 60);
+  const groundMat = new THREE.MeshStandardMaterial({ color: 0x1A3D2A, roughness: 0.9 });
+  const ground = new THREE.Mesh(groundGeom, groundMat);
+  ground.rotation.x = -Math.PI / 2;
+  ground.position.y = -0.05;
+  ground.receiveShadow = true;
+  scene.add(ground);
+
+  controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.08;
+  controls.minDistance = 10;
+  controls.maxDistance = 50;
+  controls.maxPolarAngle = Math.PI / 2.3;
+  controls.minPolarAngle = Math.PI / 6;
+  controls.target.set(9, 0, 6);
+  controls.update();
+
+  raycaster = new THREE.Raycaster();
+  mouse = new THREE.Vector2();
+
+  renderer.domElement.addEventListener('click', onCanvasClick);
+
+  window.setCityData = function(jsonStr) {
+    try {
+      const data = JSON.parse(jsonStr);
+      renderCity(data);
+    } catch(e) {
+      console.error('JSON error:', e);
+    }
+  };
+
+  clock = new THREE.Clock();
+
+  if (window.AndroidBridge) {
+    window.AndroidBridge.onReady();
+  }
+}
+
+function renderCity(plots) {
+  document.getElementById('loading').style.display = 'none';
+  allPlots = plots;
+
+  Object.values(plotMeshes).forEach(m => scene.remove(m));
+  plotMeshes = {};
+
+  Object.keys(DISTRICTS).forEach(did => {
+    drawDistrictZone(DISTRICTS[did]);
+  });
+
+  plots.forEach(plot => {
+    drawPlot(plot);
+  });
+}
+
+function drawDistrictZone(d) {
+  const zoneGeom = new THREE.PlaneGeometry(6, 6);
+  const zoneMat = new THREE.MeshStandardMaterial({
+    color: d.color, transparent: true, opacity: 0.08, side: THREE.DoubleSide
+  });
+  const zone = new THREE.Mesh(zoneGeom, zoneMat);
+  zone.rotation.x = -Math.PI / 2;
+  zone.position.set(d.x0 + 3, 0.01, d.z0 + 3);
+  scene.add(zone);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 80;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = 'rgba(0,0,0,0.6)';
+  ctx.fillRect(0, 0, 512, 80);
+  ctx.font = 'bold 40px sans-serif';
+  ctx.fillStyle = '#' + d.color.toString(16).padStart(6, '0');
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(d.name, 256, 40);
+  const texture = new THREE.CanvasTexture(canvas);
+
+  const labelMat = new THREE.MeshBasicMaterial({ map: texture, transparent: true });
+  const label = new THREE.Mesh(new THREE.PlaneGeometry(5, 0.8), labelMat);
+  label.rotation.x = -Math.PI / 2;
+  label.position.set(d.x0 + 3, 0.05, d.z0 + 5.5);
+  scene.add(label);
+}
+
+function drawPlot(plot) {
+  const geom = new THREE.BoxGeometry(0.85, 0.1, 0.85);
+  const color = (plot.ownerId && plot.ownerId.length > 0) ? 0x00AA55 : 0x555555;
+  const mat = new THREE.MeshStandardMaterial({ color: color, roughness: 0.6 });
+  const mesh = new THREE.Mesh(geom, mat);
+  mesh.position.set(plot.x + 0.5, 0.05, plot.z + 0.5);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  mesh.userData = plot;
+  scene.add(mesh);
+  plotMeshes[plot.id] = mesh;
+
+  if (plot.buildingType && plot.buildingType.length > 0) {
+    addBuilding(mesh, plot);
+  }
+}
+
+function addBuilding(parent, plot) {
+  const level = plot.buildingLevel || 1;
+  const h = 0.3 + level * 0.15;
+  let color, w, d;
+  switch(plot.buildingType) {
+    case "house": color = 0x8D6E63; w = 0.5; d = 0.5; break;
+    case "villa": color = 0xE1BEE7; w = 0.6; d = 0.6; break;
+    case "palace": color = 0xFFD700; w = 0.7; d = 0.7; break;
+    case "shop": color = 0x2196F3; w = 0.55; d = 0.55; break;
+    case "factory": color = 0xFF5722; w = 0.65; d = 0.65; break;
+    default: color = 0x999999; w = 0.5; d = 0.5;
+  }
+  const geom = new THREE.BoxGeometry(w, h, d);
+  const mat = new THREE.MeshStandardMaterial({ color: color, roughness: 0.5 });
+  const mesh = new THREE.Mesh(geom, mat);
+  mesh.position.y = h / 2 + 0.1;
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  parent.add(mesh);
+}
+
+function onCanvasClick(event) {
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const meshes = Object.values(plotMeshes);
+  const hits = raycaster.intersectObjects(meshes);
+  if (hits.length > 0) {
+    const plot = hits[0].object.userData;
+    if (window.AndroidBridge) {
+      window.AndroidBridge.onPlotClick(JSON.stringify(plot));
+    }
+  }
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  controls.update();
+  renderer.render(scene, camera);
+}
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
+</body>
+</html>
