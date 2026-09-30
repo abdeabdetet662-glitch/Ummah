@@ -47,9 +47,6 @@ public class WelcomeActivity extends Activity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
-        // Immersive Mode — إخفاء أشرطة النظام
-        try { ImmersiveHelper.enable(this); } catch (Exception ignored) {}
-
 
         // ═══ Root ═══
         LinearLayout root = new LinearLayout(this);

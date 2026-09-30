@@ -20,9 +20,6 @@ public class SplashActivity extends Activity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
-        // Immersive Mode — إخفاء أشرطة النظام
-        try { ImmersiveHelper.enable(this); } catch (Exception ignored) {}
-
         // FullscreenHelper.enable(this);  // DISABLED - crash
 
         LinearLayout root = new LinearLayout(this);

@@ -81,9 +81,6 @@ public class IdentityCreationActivity extends Activity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
-        // Immersive Mode — إخفاء أشرطة النظام
-        try { ImmersiveHelper.enable(this); } catch (Exception ignored) {}
-
 
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
