@@ -53,6 +53,17 @@ public class MainActivity extends Activity {
         topBar.setPadding(40, 40, 40, 20);
         topBar.setBackgroundColor(Color.parseColor("#0A0A0A"));
 
+        // زر القائمة الجانبية ☰
+        TextView menuBtn = new TextView(this);
+        menuBtn.setText("☰");
+        menuBtn.setTextSize(32);
+        menuBtn.setTextColor(Color.parseColor("#D4AF37"));
+        menuBtn.setPadding(0, 0, 20, 0);
+        menuBtn.setClickable(true);
+        menuBtn.setFocusable(true);
+        menuBtn.setOnClickListener(v -> openNavDrawer());
+        topBar.addView(menuBtn);
+
         TextView flag = new TextView(this);
         flag.setText("🌍");
         flag.setTextSize(28);
@@ -445,5 +456,93 @@ public class MainActivity extends Activity {
         } catch (Exception e) {
             android.util.Log.e("UMMAH", "❌ autoSeedOnce error", e);
         }
+    }
+
+    // ═══════════════════════════════════════
+    //  القائمة الجانبية (Nav Drawer)
+    // ═══════════════════════════════════════
+    private void openNavDrawer() {
+        NavDrawerHelper.show(this, currentCitizen, new NavDrawerHelper.OnDrawerClick() {
+            @Override
+            public void onItem(int itemId, String title) {
+                handleDrawerClick(itemId, title);
+            }
+        });
+    }
+
+    private void handleDrawerClick(int itemId, String title) {
+        switch (itemId) {
+            case NavDrawerHelper.ITEM_HOME:
+                handleTabClick(BottomNavHelper.TAB_HOME);
+                break;
+            case NavDrawerHelper.ITEM_CITY:
+                try { startActivity(new Intent(this, CityMapActivity.class)); } catch (Exception ignored) {}
+                break;
+            case NavDrawerHelper.ITEM_PARLIAMENT:
+                try { startActivity(new Intent(this, ParliamentActivity.class)); } catch (Exception ignored) {}
+                break;
+            case NavDrawerHelper.ITEM_ELECTIONS:
+                try { startActivity(new Intent(this, ElectionActivity.class)); } catch (Exception ignored) {}
+                break;
+            case NavDrawerHelper.ITEM_MARKET:
+                try { startActivity(new Intent(this, MarketActivity.class)); } catch (Exception ignored) {}
+                break;
+            case NavDrawerHelper.ITEM_JOBS:
+                try { startActivity(new Intent(this, JobsActivity.class)); } catch (Exception ignored) {}
+                break;
+            case NavDrawerHelper.ITEM_GIFTS:
+                try { startActivity(new Intent(this, GiftsActivity.class)); } catch (Exception ignored) {}
+                break;
+            case NavDrawerHelper.ITEM_LEADERBOARD:
+                try { startActivity(new Intent(this, LeaderboardActivity.class)); } catch (Exception ignored) {}
+                break;
+            case NavDrawerHelper.ITEM_NEWS:
+                try { startActivity(new Intent(this, NewsActivity.class)); } catch (Exception ignored) {}
+                break;
+            case NavDrawerHelper.ITEM_STATS:
+                try { startActivity(new Intent(this, StatsActivity.class)); } catch (Exception ignored) {}
+                break;
+            case NavDrawerHelper.ITEM_PROFILE:
+                try { startActivity(new Intent(this, ProfileActivity.class)); } catch (Exception ignored) {}
+                break;
+            case NavDrawerHelper.ITEM_SETTINGS:
+                try { startActivity(new Intent(this, SettingsActivity.class)); } catch (Exception e) {
+                    Toast.makeText(this, "الإعدادات — قريباً", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case NavDrawerHelper.ITEM_ABOUT:
+                try {
+                    Intent i = new Intent(Intent.ACTION_VIEW,
+                            android.net.Uri.parse("https://abdeabdetet662-glitch.github.io/ummah-website/about.html"));
+                    startActivity(i);
+                } catch (Exception ignored) {}
+                break;
+            case NavDrawerHelper.ITEM_WEBSITE:
+                try {
+                    Intent i = new Intent(Intent.ACTION_VIEW,
+                            android.net.Uri.parse("https://abdeabdetet662-glitch.github.io/ummah-website/"));
+                    startActivity(i);
+                } catch (Exception ignored) {}
+                break;
+            case NavDrawerHelper.ITEM_LOGOUT:
+                showLogoutDialog();
+                break;
+        }
+    }
+
+    private void showLogoutDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("🚪 تسجيل الخروج")
+                .setMessage("واش راك متأكد؟ رايح تحتاج كلماتك السرية للدخول مرة ثانية.")
+                .setPositiveButton("تسجيل الخروج", (d, w) -> {
+                    getSharedPreferences("ummah_prefs", MODE_PRIVATE).edit().clear().apply();
+                    getSharedPreferences("ummah", MODE_PRIVATE).edit().clear().apply();
+                    Intent intent = new Intent(this, WelcomeActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
+                })
+                .setNegativeButton("إلغاء", null)
+                .show();
     }
 }
