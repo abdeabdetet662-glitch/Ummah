@@ -66,6 +66,11 @@ public class CityMapActivity extends Activity {
         root.addView(header);
 
         // WebView
+        // ═══ WebView Debugging (للتشخيص) ═══
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+            WebView.setWebContentsDebuggingEnabled(true);
+        }
+        
         webView = new WebView(this);
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setDomStorageEnabled(true);

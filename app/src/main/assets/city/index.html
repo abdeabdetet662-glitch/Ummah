@@ -7,7 +7,7 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { width: 100%; height: 100%; overflow: hidden; background: #87CEEB; }
-  canvas { display: block; }
+  canvas { display: block; touch-action: none; pointer-events: auto; }
   #loading {
     position: absolute; top: 50%; left: 50%;
     transform: translate(-50%, -50%);
@@ -152,6 +152,15 @@ function init() {
   raycaster = new THREE.Raycaster();
   mouse = new THREE.Vector2();
   renderer.domElement.addEventListener('click', onCanvasClick);
+  renderer.domElement.addEventListener('touchend', onCanvasClick);
+  renderer.domElement.addEventListener('touchstart', function(e) {
+    // نخزنو الموقع للـ touchend
+    if (e.touches.length > 0) {
+      const t = e.touches[0];
+      mouse.x = (t.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(t.clientY / window.innerHeight) * 2 + 1;
+    }
+  }, { passive: true });
 
   clock = new THREE.Clock();
 
@@ -1842,8 +1851,17 @@ function addLamp(x, z) {
 
 // ═══ نقر ═══
 function onCanvasClick(event) {
-  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  // ═══ نحسبو إحداثيات النقر ═══
+  if (event.changedTouches && event.changedTouches.length > 0) {
+    const t = event.changedTouches[0];
+    mouse.x = (t.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(t.clientY / window.innerHeight) * 2 + 1;
+  } else if (event.clientX !== undefined) {
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  } else {
+    return;
+  }
 
   raycaster.setFromCamera(mouse, camera);
   const meshes = Object.values(plotMeshes);
@@ -1857,15 +1875,36 @@ function onCanvasClick(event) {
   });
 
   const hits = raycaster.intersectObjects(allMesh, false);
+  console.log('🎯 Hits:', hits.length);
+  
   if (hits.length > 0) {
     let obj = hits[0].object;
     // نصعدو حتى نلقاو المجموعة اللي فيها userData
-    while (obj && !obj.userData.id) obj = obj.parent;
-    if (obj && obj.userData.id) {
+    while (obj && (!obj.userData || !obj.userData.id)) obj = obj.parent;
+    
+    if (obj && obj.userData && obj.userData.id) {
       const plot = obj.userData;
-      if (window.AndroidBridge) {
-        window.AndroidBridge.onPlotClick(JSON.stringify(plot));
+      console.log('✅ Plot clicked:', plot.id, 'ownerId:', plot.ownerId, 'buildingType:', plot.buildingType);
+      
+      // ═══ Visual Feedback - نغيّر لون القطعة مؤقتاً ═══
+      if (hits[0].object.material && hits[0].object.material.color) {
+        const origColor = hits[0].object.material.color.getHex();
+        hits[0].object.material.color.setHex(0xFFD700);
+        setTimeout(() => {
+          if (hits[0].object && hits[0].object.material) {
+            hits[0].object.material.color.setHex(origColor);
+          }
+        }, 200);
       }
+      
+      // ═══ نرسلو لـ Java ═══
+      if (window.AndroidBridge && window.AndroidBridge.onPlotClick) {
+        window.AndroidBridge.onPlotClick(JSON.stringify(plot));
+      } else {
+        console.error('❌ AndroidBridge غير موجود!');
+      }
+    } else {
+      console.log('⚠️ ما لقيتش userData.id في الـ mesh');
     }
   }
 }
