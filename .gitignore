@@ -1,20 +1,24 @@
+# Keystore files
+*.keystore
+*.jks
+*.p12
+*.pepk
+
+# Local config
+local.properties
+
+# IDE
+.idea/
 *.iml
 .gradle/
-/local.properties
-/.idea/
-.DS_Store
-/build
-/app/build
-/captures
-.externalNativeBuild
-.cxx
-local.properties
-*.jks
-*.keystore
-*.log
-ummah-release.keystore
-keystore-base64.txt
-app-release.apk
 
-# Backup folder (local only)
-_backup_pre_material/
+# Build
+build/
+*.apk
+*.aab
+
+# Logs
+*.log
+
+# Firebase (يُفضل يكون محلي)
+# google-services.json
