@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">أُمّة</string>
+    <string name="welcome">مرحباً بك في أُمّة</string>
+    <string name="join_button">انضم إلى الأمة</string>
+    <string name="citizenship_card">بطاقة المواطنة</string>
+    <string name="national_id">الرقم الوطني</string>
+    <string name="seed_phrase">الكلمات السرية</string>
+    <string name="seed_warning">احفظ هذه الكلمات في مكان آمن. لا تشاركها مع أحد. هي هويتك الوحيدة.</string>
+    <string name="join_date">تاريخ الانضمام</string>
+    <string name="citizen_name">اسم المواطن</string>
+</resources>
