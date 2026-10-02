@@ -52,6 +52,13 @@ public class NavDrawerHelper {
     public static void show(final Activity activity,
                             final Citizen citizen,
                             final OnDrawerClick listener) {
+        show(activity, citizen, 0, listener);
+    }
+
+    public static void show(final Activity activity,
+                            final Citizen citizen,
+                            final int balance,
+                            final OnDrawerClick listener) {
         try {
             // ═══ Root Container ═══
             final android.widget.FrameLayout overlay = new android.widget.FrameLayout(activity);
@@ -88,7 +95,7 @@ public class NavDrawerHelper {
             // ═══════════════════════════════════════════
             //  Header (بطاقة المواطن)
             // ═══════════════════════════════════════════
-            addHeader(content, activity, citizen);
+            addHeader(content, activity, citizen, balance);
 
             // ═══════════════════════════════════════════
             //  القسم الأول: التنقل
@@ -197,7 +204,7 @@ public class NavDrawerHelper {
     // ═══════════════════════════════════════════
     //  Header
     // ═══════════════════════════════════════════
-    private static void addHeader(LinearLayout parent, Activity activity, Citizen citizen) {
+    private static void addHeader(LinearLayout parent, Activity activity, Citizen citizen, int balance) {
         LinearLayout header = new LinearLayout(activity);
         header.setOrientation(LinearLayout.VERTICAL);
         header.setBackgroundResource(R.drawable.bg_hero_card);
@@ -260,7 +267,7 @@ public class NavDrawerHelper {
         balanceRow.addView(balIcon);
 
         TextView balText = new TextView(activity);
-        balText.setText("100 Đ");
+        balText.setText(balance + " Đ");
         balText.setTextColor(Color.parseColor("#4CAF50"));
         balText.setTextSize(16);
         balText.setTypeface(null, Typeface.BOLD);

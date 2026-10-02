@@ -462,7 +462,7 @@ public class MainActivity extends Activity {
     //  القائمة الجانبية (Nav Drawer)
     // ═══════════════════════════════════════
     private void openNavDrawer() {
-        NavDrawerHelper.show(this, currentCitizen, new NavDrawerHelper.OnDrawerClick() {
+        NavDrawerHelper.show(this, currentCitizen, wm.getBalance(), new NavDrawerHelper.OnDrawerClick() {
             @Override
             public void onItem(int itemId, String title) {
                 handleDrawerClick(itemId, title);
