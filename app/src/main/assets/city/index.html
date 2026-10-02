@@ -334,6 +334,8 @@ function addRealisticBuilding(group, plot) {
     buildHouse(group, level);
   } else if (type === "duplex") {
     buildDuplex(group, level);
+  } else if (type === "garden_house") {
+    buildGardenHouse(group, level);
   } else if (type === "apartment") {
     buildApartment(group, level);
   } else if (type === "villa") {
@@ -675,6 +677,89 @@ function buildDuplex(group, level) {
       win.position.set(x, y, w / 2 + 0.005);
       group.add(win);
     }
+  }
+}
+
+
+// ═══ منزل بحديقة ═══
+function buildGardenHouse(group, level) {
+  const h = 0.4 + level * 0.1;
+  const w = 0.5;
+
+  // الجدران
+  const wallsMat = new THREE.MeshStandardMaterial({ color: 0xFFF8E1, roughness: 0.7 });
+  const walls = new THREE.Mesh(new THREE.BoxGeometry(w, h, w), wallsMat);
+  walls.position.y = h / 2 + 0.05;
+  walls.castShadow = true;
+  walls.receiveShadow = true;
+  group.add(walls);
+
+  // سقف قرميدي
+  const roofMat = new THREE.MeshStandardMaterial({ color: 0xC62828, roughness: 0.7 });
+  const roof = new THREE.Mesh(
+    new THREE.ConeGeometry(w * 0.85, 0.2, 4),
+    roofMat
+  );
+  roof.rotation.y = Math.PI / 4;
+  roof.position.y = h + 0.15;
+  roof.castShadow = true;
+  group.add(roof);
+
+  // باب خشبي
+  const door = new THREE.Mesh(
+    new THREE.BoxGeometry(0.11, 0.17, 0.02),
+    new THREE.MeshStandardMaterial({ color: 0x4E342E })
+  );
+  door.position.set(0, 0.13, w / 2 + 0.01);
+  group.add(door);
+
+  // نوافذ
+  const winMat = new THREE.MeshStandardMaterial({
+    color: 0x4FC3F7, emissive: 0x4FC3F7, emissiveIntensity: 0.3
+  });
+  for (let col = -1; col <= 1; col += 2) {
+    const win = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.07, 0.01), winMat);
+    win.position.set(col * w * 0.25, h * 0.6, w / 2 + 0.005);
+    group.add(win);
+  }
+
+  // ═══ حديقة (سياج + شجر + زهور) ═══
+  // سياج خشبي
+  const fenceMat = new THREE.MeshStandardMaterial({ color: 0x8D6E63, roughness: 0.9 });
+  const fencePoints = [
+    { x: -w * 0.5, z: -w * 0.5, rotY: 0 },
+    { x: w * 0.5, z: -w * 0.5, rotY: 0 },
+    { x: -w * 0.5, z: w * 0.5, rotY: 0 },
+    { x: w * 0.5, z: w * 0.5, rotY: 0 },
+  ];
+  fencePoints.forEach(p => {
+    const fence = new THREE.Mesh(
+      new THREE.BoxGeometry(w * 1.5, 0.06, 0.02),
+      fenceMat
+    );
+    fence.position.set(p.x * 1.5, 0.05, p.z * 1.5);
+    fence.rotation.y = (p.z > 0) ? 0 : Math.PI / 2;
+    group.add(fence);
+  });
+
+  // شجرتين
+  addTree(group, -w * 0.7, 0.05, 0.12);
+  addTree(group, w * 0.7, 0.05, 0.1);
+
+  // زهور صغيرة (3 ألوان)
+  const flowerColors = [0xE91E63, 0xFF9800, 0xFFEB3B];
+  for (let i = 0; i < 5; i++) {
+    const flower = new THREE.Mesh(
+      new THREE.SphereGeometry(0.025, 6, 6),
+      new THREE.MeshStandardMaterial({ 
+        color: flowerColors[i % 3], 
+        emissive: flowerColors[i % 3], 
+        emissiveIntensity: 0.3 
+      })
+    );
+    const fx = -w * 0.7 + (i * 0.15);
+    flower.position.set(fx, 0.08, w * 0.7);
+    group.add(flower);
   }
 }
 

@@ -25,6 +25,7 @@ public class CityMapActivity extends Activity {
 
     private IdentityManager im;
     private CityManager cm;
+    private WalletManager wm;
     private WebView webView;
     private LinearLayout root;
     private ListenerRegistration plotsReg;
@@ -42,6 +43,7 @@ public class CityMapActivity extends Activity {
 
         im = new IdentityManager(this);
         cm = new CityManager();
+        wm = new WalletManager(this);
 
         root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
@@ -222,42 +224,180 @@ public class CityMapActivity extends Activity {
     }
 
     private void showBuildDialog(final String plotId, String districtId) {
-        final String[] buildings = {"house", "villa", "shop", "factory", "palace"};
-        final String[] labels = {"🏠 منزل (5,000 Đ)", "🏡 فيلا (15,000 Đ)",
-                "🏪 متجر (10,000 Đ)", "🏭 مصنع (20,000 Đ)", "🏰 قصر (50,000 Đ)"};
-        final int[] costs = {5000, 15000, 10000, 20000, 50000};
+        // ═══ نشوفو رصيد المستخدم ═══
+        Citizen me = im.getCitizen();
+        if (me == null) return;
 
-        new AlertDialog.Builder(this)
-                .setTitle("بناء مبنى")
-                .setItems(labels, (d, which) -> {
-                    Citizen me = im.getCitizen();
-                    if (me == null) return;
-                    CityPlot plot = findPlot(plotId);
-                    if (plot == null) return;
+        final int myBalance = wm.getBalance();
 
-                    cm.buildOnPlot(me.nationalId, plot, buildings[which], costs[which],
-                            new CityManager.OnDone() {
-                        @Override public void onSuccess() {
-                            Toast.makeText(CityMapActivity.this,
-                                    "✅ تم البناء!", Toast.LENGTH_LONG).show();
-                        }
-                        @Override public void onError(String msg) {
-                            Toast.makeText(CityMapActivity.this,
-                                    "❌ " + msg, Toast.LENGTH_LONG).show();
-                        }
-                    });
-                })
-                .setNegativeButton("إلغاء", null)
-                .show();
+        // ═══ ScrollView مع Dialog ═══
+        android.widget.ScrollView scroll = new android.widget.ScrollView(this);
+        scroll.setBackgroundColor(Color.parseColor("#0A0A0A"));
+
+        LinearLayout rootBox = new LinearLayout(this);
+        rootBox.setOrientation(LinearLayout.VERTICAL);
+        rootBox.setPadding(40, 40, 40, 40);
+        scroll.addView(rootBox);
+
+        // ═══ Header ═══
+        TextView header = new TextView(this);
+        header.setText("💰 رصيدك: " + myBalance + " Đ");
+        header.setTextColor(Color.parseColor("#00FF88"));
+        header.setTextSize(16);
+        header.setTypeface(null, Typeface.BOLD);
+        header.setGravity(Gravity.CENTER);
+        header.setPadding(0, 0, 0, 20);
+        rootBox.addView(header);
+
+        // ═══ نصيحة ═══
+        TextView hint = new TextView(this);
+        hint.setText("اختر نوع المبنى 👇");
+        hint.setTextColor(Color.parseColor("#9E9E9E"));
+        hint.setTextSize(14);
+        hint.setGravity(Gravity.CENTER);
+        hint.setPadding(0, 0, 0, 30);
+        rootBox.addView(hint);
+
+        // ═══ نعرضو المبانى حسب الفئة ═══
+        List<String> categories = BuildingCatalog.getCategories();
+        for (String cat : categories) {
+            List<BuildingCatalog.Building> list = BuildingCatalog.getByCategory(cat);
+            if (list.isEmpty()) continue;
+
+            // عنوان الفئة
+            TextView catTitle = new TextView(this);
+            catTitle.setText("═══ " + BuildingCatalog.getCategoryName(cat) + " ═══");
+            catTitle.setTextColor(Color.parseColor("#D4AF37"));
+            catTitle.setTextSize(15);
+            catTitle.setTypeface(null, Typeface.BOLD);
+            catTitle.setGravity(Gravity.CENTER);
+            catTitle.setPadding(0, 20, 0, 15);
+            rootBox.addView(catTitle);
+
+            // المبانى
+            for (final BuildingCatalog.Building b : list) {
+                LinearLayout card = new LinearLayout(this);
+                card.setOrientation(LinearLayout.HORIZONTAL);
+                card.setGravity(Gravity.CENTER_VERTICAL);
+                card.setBackgroundResource(R.drawable.bg_card);
+                card.setPadding(30, 25, 30, 25);
+
+                LinearLayout.LayoutParams cardLp = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT);
+                cardLp.setMargins(0, 8, 0, 8);
+                card.setLayoutParams(cardLp);
+                card.setElevation(6f);
+
+                // الإيموجي
+                TextView emoji = new TextView(this);
+                emoji.setText(b.emoji);
+                emoji.setTextSize(32);
+                emoji.setPadding(0, 0, 20, 0);
+                card.addView(emoji);
+
+                // المعلومات
+                LinearLayout info = new LinearLayout(this);
+                info.setOrientation(LinearLayout.VERTICAL);
+                LinearLayout.LayoutParams infoLp = new LinearLayout.LayoutParams(
+                        0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+                info.setLayoutParams(infoLp);
+
+                TextView name = new TextView(this);
+                name.setText(b.name);
+                name.setTextColor(Color.WHITE);
+                name.setTextSize(15);
+                name.setTypeface(null, Typeface.BOLD);
+                info.addView(name);
+
+                TextView desc = new TextView(this);
+                desc.setText(b.desc);
+                desc.setTextColor(Color.parseColor("#9E9E9E"));
+                desc.setTextSize(11);
+                desc.setPadding(0, 4, 0, 0);
+                info.addView(desc);
+
+                // السعر
+                TextView price = new TextView(this);
+                price.setText("💰 " + b.price + " Đ");
+                boolean canAfford = myBalance >= b.price;
+                price.setTextColor(canAfford 
+                        ? Color.parseColor("#4CAF50") 
+                        : Color.parseColor("#F44336"));
+                price.setTextSize(12);
+                price.setTypeface(null, Typeface.BOLD);
+                price.setPadding(0, 6, 0, 0);
+                info.addView(price);
+
+                card.addView(info);
+
+                // زر البناء
+                android.widget.Button btn = new android.widget.Button(this);
+                btn.setText(canAfford ? "🏗️" : "🔒");
+                btn.setTextSize(18);
+                btn.setBackgroundResource(canAfford 
+                        ? R.drawable.bg_btn_gold_hero 
+                        : R.drawable.bg_btn_outline);
+                btn.setTextColor(canAfford 
+                        ? Color.BLACK 
+                        : Color.parseColor("#666666"));
+                btn.setEnabled(canAfford);
+                btn.setMinWidth(100);
+                btn.setMinHeight(100);
+
+                btn.setOnClickListener(v -> {
+                    doBuild(me, plotId, b);
+                });
+
+                card.addView(btn);
+                rootBox.addView(card);
+            }
+        }
+
+        // ═══ Dialog ═══
+        final AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("🏗️ بناء في القطعة")
+                .setView(scroll)
+                .setNegativeButton("❌ إغلاق", null)
+                .create();
+
+        dialog.show();
+    }
+
+    private void doBuild(Citizen me, String plotId, final BuildingCatalog.Building b) {
+        CityPlot plot = findPlot(plotId);
+        if (plot == null) {
+            Toast.makeText(this, "❌ القطعة غير موجودة", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        cm.buildOnPlot(me.nationalId, plot, b.id, b.price, new CityManager.OnDone() {
+            @Override public void onSuccess() {
+                Toast.makeText(CityMapActivity.this,
+                        "✅ تم بناء " + b.emoji + " " + b.name + "!",
+                        Toast.LENGTH_LONG).show();
+                // نرسلو للـ WebView يحدّث
+                if (webView != null) {
+                    webView.evaluateJavascript("location.reload();", null);
+                }
+            }
+            @Override public void onError(String msg) {
+                Toast.makeText(CityMapActivity.this,
+                        "❌ " + msg, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void showMyPlotDialog(final String plotId, String districtId,
                                     String buildingType, int level, int basePrice) {
         int upgradeCost = (level + 1) * 5000;
         new AlertDialog.Builder(this)
-                .setTitle("🏢 " + buildingLabel(buildingType) + " (مستوى " + level + ")")
-                .setMessage("هذي القطعة ديالك.\n\nهل تريد ترقيتها للمستوى " + (level + 1) +
-                        "؟\n💰 التكلفة: " + upgradeCost + " Đ")
+                .setTitle(buildingLabel(buildingType) + " (مستوى " + level + ")")
+                .setMessage("🏢 المبنى: " + buildingLabel(buildingType) +
+                        "\n⭐ المستوى الحالي: " + level +
+                        "\n⭐ المستوى القادم: " + (level + 1) +
+                        "\n\n💰 تكلفة الترقية: " + upgradeCost + " Đ" +
+                        "\n📈 المبنى رايح يتحسن!")
                 .setPositiveButton("ترقية", (d, w) -> {
                     Citizen me = im.getCitizen();
                     if (me == null) return;
@@ -276,29 +416,53 @@ public class CityMapActivity extends Activity {
                         }
                     });
                 })
-                .setNeutralButton("بيع للتطبيق (60%)", (d, w) -> {
+                .setNeutralButton("💰 بيع للتطبيق (70%)", (d, w) -> {
                     Citizen me = im.getCitizen();
                     if (me == null) return;
                     CityPlot plot = findPlot(plotId);
                     if (plot == null) return;
 
-                    int refund = (int) (basePrice * 0.6);
+                    // 70% من قيمة المبنى الحالي
+                    int buildingValue = 0;
+                    if (buildingType != null && !buildingType.isEmpty()) {
+                        BuildingCatalog.Building b = BuildingCatalog.getById(buildingType);
+                        if (b != null) {
+                            // القيمة = السعر × المستوى
+                            buildingValue = b.price * Math.max(1, level);
+                        }
+                    }
+
+                    // 70% من (قيمة الأرض + المبنى)
+                    int totalValue = basePrice + buildingValue;
+                    int refund = (int) (totalValue * 0.7);
+
+                    String summary = "🏢 المبنى: " + BuildingCatalog.getLabel(buildingType) +
+                            "\n⭐ المستوى: " + level +
+                            "\n💰 قيمة البناء: " + buildingValue + " Đ" +
+                            "\n🏞️ قيمة الأرض: " + basePrice + " Đ" +
+                            "\n\n📊 الإجمالي: " + totalValue + " Đ" +
+                            "\n💵 ستحصل على (70%): " + refund + " Đ";
+
                     new AlertDialog.Builder(this)
-                            .setTitle("تأكيد البيع")
-                            .setMessage("ستستلم: " + refund + " Đ")
-                            .setPositiveButton("بِع", (dd, ww) ->
+                            .setTitle("💰 تأكيد البيع")
+                            .setMessage(summary)
+                            .setPositiveButton("✅ بيع الآن", (dd, ww) ->
                                     cm.sellPlotBackToSystem(me.nationalId, plot, refund,
                                             new CityManager.OnDone() {
                                         @Override public void onSuccess() {
                                             Toast.makeText(CityMapActivity.this,
-                                                    "✅ تم البيع!", Toast.LENGTH_LONG).show();
+                                                    "✅ تم البيع! استلمت " + refund + " Đ",
+                                                    Toast.LENGTH_LONG).show();
+                                            if (webView != null) {
+                                                webView.evaluateJavascript("location.reload();", null);
+                                            }
                                         }
                                         @Override public void onError(String msg) {
                                             Toast.makeText(CityMapActivity.this,
                                                     "❌ " + msg, Toast.LENGTH_LONG).show();
                                         }
                                     }))
-                            .setNegativeButton("إلغاء", null)
+                            .setNegativeButton("❌ إلغاء", null)
                             .show();
                 })
                 .setNegativeButton("إغلاق", null)
@@ -325,14 +489,9 @@ public class CityMapActivity extends Activity {
     }
 
     private String buildingLabel(String t) {
-        switch (t) {
-            case "house": return "🏠 منزل";
-            case "villa": return "🏡 فيلا";
-            case "palace": return "🏰 قصر";
-            case "shop": return "🏪 متجر";
-            case "factory": return "🏭 مصنع";
-        }
-        return "لا يوجد";
+        if (t == null || t.isEmpty()) return "لا يوجد";
+        String label = BuildingCatalog.getLabel(t);
+        return label != null ? label : "🏢 مبنى";
     }
 
     @Override
