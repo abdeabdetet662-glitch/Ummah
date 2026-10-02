@@ -3,7 +3,22 @@ plugins {
     id 'com.google.gms.google-services'
 }
 
+// ═══ قراءة local.properties ═══
+def localProps = new Properties()
+def localFile = rootProject.file('local.properties')
+if (localFile.exists()) {
+    localProps.load(new FileInputStream(localFile))
+}
+def getLocalProp = { String key, String defaultVal = "" ->
+    return localProps.getProperty(key) ?: defaultVal
+}
+
+
 android {
+    buildFeatures {
+        buildConfig true
+    }
+
     namespace 'com.ummah.app'
     compileSdk 35
 
@@ -17,10 +32,10 @@ android {
 
     signingConfigs {
         release {
-            storeFile file("../ummah-release.keystore")
-            storePassword "ummah2026"
+            storeFile file(getLocalProp("KEYSTORE_FILE", "../ummah-release.keystore"))
+            storePassword getLocalProp("KEYSTORE_PASSWORD", System.getenv("KEYSTORE_PASSWORD") ?: "")
             keyAlias "ummah"
-            keyPassword "ummah2026"
+            keyPassword getLocalProp("KEY_PASSWORD", System.getenv("KEY_PASSWORD") ?: "")
         }
     }
 

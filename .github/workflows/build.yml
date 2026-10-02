@@ -1,4 +1,4 @@
-name: Build Ummah APK
+name: Build Ummah App
 
 on:
   push:
@@ -22,21 +22,47 @@ jobs:
         run: |
           SDK=/usr/local/lib/android/sdk
           yes | $SDK/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null 2>&1 || true
-          yes | $SDK/cmdline-tools/latest/bin/sdkmanager "platforms;android-35" "build-tools;35.0.0" > /dev/null 2>&1 || true
+          yes | $SDK/cmdline-tools/latest/bin/sdkmanager "platforms;android-34" "build-tools;34.0.0" > /dev/null 2>&1 || true
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
+      # ═══ إنشاء Keystore من Secret ═══
       - name: Decode Keystore
         run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > ummah-release.keystore
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > ${{ github.workspace }}/ummah-release.keystore
+          ls -la ${{ github.workspace }}/ummah-release.keystore
 
+      # ═══ إنشاء local.properties من Secrets ═══
+      - name: Create local.properties
+        run: |
+          printf 'KEYSTORE_FILE=ummah-release.keystore\n' > local.properties
+          printf 'KEYSTORE_PASSWORD=%s\n' "${{ secrets.KEYSTORE_PASSWORD }}" >> local.properties
+          printf 'KEY_ALIAS=%s\n' "${{ secrets.KEY_ALIAS }}" >> local.properties
+          printf 'KEY_PASSWORD=%s\n' "${{ secrets.KEY_PASSWORD }}" >> local.properties
+          echo "=== local.properties ==="
+          cat local.properties
+
+      # ═══ بناء Release APK ═══
       - name: Build Release APK
         run: ./gradlew assembleRelease --no-daemon --stacktrace
 
-      - name: Upload APK
+      # ═══ بناء Debug APK ═══
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug --no-daemon
+
+      # ═══ رفع Release APK ═══
+      - name: Upload Release APK
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: Ummah-release-apk
           path: app/build/outputs/apk/release/app-release.apk
+
+      # ═══ رفع Debug APK ═══
+      - name: Upload Debug APK
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Ummah-debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
