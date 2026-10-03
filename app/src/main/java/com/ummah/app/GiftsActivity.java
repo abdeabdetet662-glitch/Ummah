@@ -450,4 +450,10 @@ public class GiftsActivity extends Activity {
         if (recReg != null) recReg.remove();
         if (sentReg != null) sentReg.remove();
     }
+
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.wrap(base));
+    }
+
 }

@@ -232,4 +232,10 @@ public class PresidentDashboardActivity extends Activity {
         super.onDestroy();
         if (treasuryReg != null) treasuryReg.remove();
     }
+
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.wrap(base));
+    }
+
 }

@@ -132,4 +132,10 @@ public class AccountRecoveryActivity extends Activity {
             return seed;
         }
     }
+
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.wrap(base));
+    }
+
 }

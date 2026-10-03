@@ -103,4 +103,10 @@ public class ElectionCelebrationActivity extends Activity {
         super.onDestroy();
         if (confetti != null) confetti.stop();
     }
+
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.wrap(base));
+    }
+
 }

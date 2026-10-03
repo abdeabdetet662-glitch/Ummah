@@ -311,4 +311,10 @@ public class CourtActivity extends Activity {
                "• للمدعى عليه حق الرد خلال 3 أيام.\n\n" +
                "يمكن للطرفين الاتفاق أو الاستئناف.";
     }
+
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.wrap(base));
+    }
+
 }

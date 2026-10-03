@@ -215,4 +215,10 @@ public class SellItemActivity extends Activity {
         }
         return "";
     }
+
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.wrap(base));
+    }
+
 }

@@ -280,4 +280,10 @@ public class MyJobActivity extends Activity {
         if (reg != null) reg.remove();
         if (ticker != null) handler.removeCallbacks(ticker);
     }
+
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.wrap(base));
+    }
+
 }

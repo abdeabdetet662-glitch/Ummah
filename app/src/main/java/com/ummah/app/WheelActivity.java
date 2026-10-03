@@ -385,4 +385,10 @@ public class WheelActivity extends Activity {
         if (balReg != null) balReg.remove();
         if (historyReg != null) historyReg.remove();
     }
+
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.wrap(base));
+    }
+
 }

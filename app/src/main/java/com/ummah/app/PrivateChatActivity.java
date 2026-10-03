@@ -176,4 +176,10 @@ public class PrivateChatActivity extends Activity {
         wrapper.addView(bubble);
         return wrapper;
     }
+
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.wrap(base));
+    }
+
 }

@@ -162,4 +162,10 @@ public class TreasuryActivity extends Activity {
             .setNegativeButton("إلغاء", null)
             .show();
     }
+
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.wrap(base));
+    }
+
 }

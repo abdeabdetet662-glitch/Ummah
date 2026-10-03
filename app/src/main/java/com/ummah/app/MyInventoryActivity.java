@@ -426,4 +426,10 @@ public class MyInventoryActivity extends Activity {
                 .addOnFailureListener(e ->
                         Toast.makeText(this, "❌ " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
+
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.wrap(base));
+    }
+
 }

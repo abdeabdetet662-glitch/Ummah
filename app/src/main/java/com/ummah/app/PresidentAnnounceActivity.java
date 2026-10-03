@@ -110,4 +110,10 @@ public class PresidentAnnounceActivity extends Activity {
 
         setContentView(scroll);
     }
+
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.wrap(base));
+    }
+
 }

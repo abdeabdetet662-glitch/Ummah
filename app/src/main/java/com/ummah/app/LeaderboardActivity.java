@@ -141,4 +141,10 @@ public class LeaderboardActivity extends Activity {
             listContainer.addView(row);
         }
     }
+
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.wrap(base));
+    }
+
 }

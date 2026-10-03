@@ -273,4 +273,10 @@ public class WalletActivity extends Activity {
         super.onResume();
         // FullscreenHelper.enable(this);  // DISABLED - crash
     }
+
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.wrap(base));
+    }
+
 }

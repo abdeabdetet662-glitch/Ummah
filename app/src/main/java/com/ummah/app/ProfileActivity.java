@@ -143,4 +143,10 @@ public class ProfileActivity extends Activity {
         super.onDestroy();
         if (photoReg != null) photoReg.remove();
     }
+
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.wrap(base));
+    }
+
 }

@@ -243,4 +243,10 @@ public class AvatarActivity extends Activity {
         if (reg != null) reg.remove();
         if (webView != null) webView.destroy();
     }
+
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.wrap(base));
+    }
+
 }

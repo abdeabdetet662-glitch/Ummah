@@ -120,4 +120,10 @@ public class DailyRewardActivity extends Activity {
             }
         });
     }
+
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.wrap(base));
+    }
+
 }

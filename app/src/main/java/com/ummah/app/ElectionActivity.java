@@ -347,4 +347,10 @@ public class ElectionActivity extends Activity {
                     .show();
             });
     }
+
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.wrap(base));
+    }
+
 }

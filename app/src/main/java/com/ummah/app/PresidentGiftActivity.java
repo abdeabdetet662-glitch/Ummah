@@ -156,4 +156,10 @@ public class PresidentGiftActivity extends Activity {
         btn.setOnClickListener(v -> input.setText(String.valueOf(val)));
         parent.addView(btn);
     }
+
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.wrap(base));
+    }
+
 }

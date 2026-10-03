@@ -211,4 +211,10 @@ public class JobsActivity extends Activity {
         super.onDestroy();
         if (reg != null) reg.remove();
     }
+
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.wrap(base));
+    }
+
 }
