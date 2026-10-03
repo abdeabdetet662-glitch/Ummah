@@ -45,7 +45,7 @@ public class TreasuryActivity extends Activity {
         scroll.addView(root);
 
         TextView title = new TextView(this);
-        title.setText("🏦 خزينة أُمّة");
+        title.setText(getString(R.string.treasury_title));
         title.setTextColor(Color.parseColor("#D4AF37"));
         title.setTextSize(28);
         title.setTypeface(null, Typeface.BOLD);
@@ -53,7 +53,7 @@ public class TreasuryActivity extends Activity {
         root.addView(title);
 
         TextView sub = new TextView(this);
-        sub.setText("الصندوق العام لكل المواطنين");
+        sub.setText(getString(R.string.treasury_subtitle));
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(13);
         sub.setGravity(Gravity.CENTER);
@@ -69,7 +69,7 @@ public class TreasuryActivity extends Activity {
         root.addView(balanceView);
 
         TextView currency = new TextView(this);
-        currency.setText("Đ دينار أُمّة");
+        currency.setText(getString(R.string.treasury_dinar));
         currency.setTextColor(Color.parseColor("#9E9E9E"));
         currency.setTextSize(14);
         currency.setGravity(Gravity.CENTER);
@@ -77,7 +77,7 @@ public class TreasuryActivity extends Activity {
         root.addView(currency);
 
         Button contributeBtn = new Button(this);
-        contributeBtn.setText("💝  ساهم في الخزينة");
+        contributeBtn.setText(getString(R.string.treasury_donate));
         contributeBtn.setTextSize(16);
         contributeBtn.setOnClickListener(v -> showContributeDialog());
         root.addView(contributeBtn);
@@ -114,7 +114,7 @@ public class TreasuryActivity extends Activity {
 
     private void showContributeDialog() {
         final EditText input = new EditText(this);
-        input.setHint("المبلغ (دينار)");
+        input.setHint(getString(R.string.treasury_amount));
         input.setTextColor(Color.WHITE);
         input.setHintTextColor(Color.GRAY);
         input.setInputType(InputType.TYPE_CLASS_NUMBER);
@@ -124,21 +124,21 @@ public class TreasuryActivity extends Activity {
         c.addView(input);
 
         new AlertDialog.Builder(this)
-            .setTitle("ساهم في الخزينة")
+            .setTitle(getString(R.string.treasury_contribute_title))
             .setMessage("رصيدك الحالي: " + wm.getBalance() + " Đ")
             .setView(c)
-            .setPositiveButton("ساهم", (d, w) -> {
+            .setPositiveButton(getString(R.string.treasury_contribute), (d, w) -> {
                 String s = input.getText().toString().trim();
                 if (s.isEmpty()) return;
                 int parsedAmount;
                 try { parsedAmount = Integer.parseInt(s); }
                 catch (Exception e) { parsedAmount = 0; }
                 if (parsedAmount <= 0) {
-                    Toast.makeText(this, "مبلغ غير صالح", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.treasury_invalid_amount), Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if (!wm.spend(parsedAmount)) {
-                    Toast.makeText(this, "رصيدك غير كافٍ", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, getString(R.string.treasury_insufficient), Toast.LENGTH_LONG).show();
                     return;
                 }
                 final int finalAmount = parsedAmount;
@@ -151,7 +151,7 @@ public class TreasuryActivity extends Activity {
                                 @Override public void onError(String m) {}
                             });
                         }
-                        Toast.makeText(TreasuryActivity.this, "✅ شكراً لمساهمتك", Toast.LENGTH_LONG).show();
+                        Toast.makeText(TreasuryActivity.this, getString(R.string.treasury_thanks), Toast.LENGTH_LONG).show();
                     }
                     @Override public void onError(String msg) {
                         wm.add(finalAmount);

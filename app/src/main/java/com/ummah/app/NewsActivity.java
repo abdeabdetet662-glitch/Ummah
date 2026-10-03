@@ -47,7 +47,7 @@ public class NewsActivity extends Activity {
         scroll.addView(root);
 
         TextView title = new TextView(this);
-        title.setText("📰 أخبار أُمّة");
+        title.setText(getString(R.string.news_title));
         title.setTextColor(Color.parseColor("#D4AF37"));
         title.setTextSize(28);
         title.setTypeface(null, Typeface.BOLD);
@@ -55,7 +55,7 @@ public class NewsActivity extends Activity {
         root.addView(title);
 
         TextView sub = new TextView(this);
-        sub.setText("ما يقوله مواطنو العالم");
+        sub.setText(getString(R.string.news_subtitle));
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(12);
         sub.setGravity(Gravity.CENTER);
@@ -63,7 +63,7 @@ public class NewsActivity extends Activity {
         root.addView(sub);
 
         Button postBtn = new Button(this);
-        postBtn.setText("✍️  انشر خبراً أو رأياً");
+        postBtn.setText(getString(R.string.news_publish));
         postBtn.setTextSize(15);
         postBtn.setOnClickListener(v -> showPostDialog());
         root.addView(postBtn);
@@ -91,7 +91,7 @@ public class NewsActivity extends Activity {
         listContainer.removeAllViews();
         if (list.isEmpty()) {
             TextView empty = new TextView(this);
-            empty.setText("لا توجد أخبار بعد. كن أول من ينشر!");
+            empty.setText(getString(R.string.news_empty));
             empty.setTextColor(Color.parseColor("#616161"));
             empty.setTextSize(14);
             empty.setGravity(Gravity.CENTER);
@@ -149,7 +149,7 @@ public class NewsActivity extends Activity {
                 }
                 if (muted && until > System.currentTimeMillis()) {
                     runOnUiThread(() -> Toast.makeText(NewsActivity.this,
-                            "🔇 أنت مكتوم مؤقتاً", Toast.LENGTH_LONG).show());
+                            getString(R.string.news_muted), Toast.LENGTH_LONG).show());
                     return;
                 }
                 runOnUiThread(() -> showPostDialogReal(me));
@@ -163,7 +163,7 @@ public class NewsActivity extends Activity {
     private void showPostDialogReal(final Citizen me) {
 
         final EditText input = new EditText(this);
-        input.setHint("اكتب ما تريد...");
+        input.setHint(getString(R.string.news_write));
         input.setTextColor(Color.WHITE);
         input.setHintTextColor(Color.GRAY);
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
@@ -174,14 +174,14 @@ public class NewsActivity extends Activity {
         c.addView(input);
 
         new AlertDialog.Builder(this)
-            .setTitle("منشور جديد")
+            .setTitle(getString(R.string.news_new_post))
             .setView(c)
             .setPositiveButton("نشر", (d, w) -> {
                 String text = input.getText().toString().trim();
                 if (text.isEmpty()) return;
                 fm.postNews(me.name, text, new FirebaseManager.OnDone() {
                     @Override public void onSuccess() {
-                        Toast.makeText(NewsActivity.this, "✅ تم النشر", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(NewsActivity.this, getString(R.string.news_published), Toast.LENGTH_SHORT).show();
                     }
                     @Override public void onError(String msg) {
                         Toast.makeText(NewsActivity.this, "خطأ: " + msg, Toast.LENGTH_SHORT).show();

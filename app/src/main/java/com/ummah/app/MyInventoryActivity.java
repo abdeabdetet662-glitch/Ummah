@@ -65,7 +65,7 @@ public class MyInventoryActivity extends Activity {
         header.addView(icon);
 
         TextView title = new TextView(this);
-        title.setText("  ممتلكاتي");
+        title.setText(getString(R.string.inv_title));
         title.setTextColor(Color.parseColor("#D4AF37"));
         title.setTextSize(26);
         title.setTypeface(null, Typeface.BOLD);
@@ -74,7 +74,7 @@ public class MyInventoryActivity extends Activity {
         root.addView(header);
 
         TextView sub = new TextView(this);
-        sub.setText("كل ما اشتريته من السوق");
+        sub.setText(getString(R.string.inv_subtitle));
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(13);
         sub.setGravity(Gravity.CENTER);
@@ -102,7 +102,7 @@ public class MyInventoryActivity extends Activity {
 
     private void buildTabs() {
         tabsContainer.removeAllViews();
-        addTab("الكل", "all");
+        addTab(getString(R.string.inv_all), "all");
         addTab("🚗", "vehicle");
         addTab("🏠", "property");
         addTab("📱", "electronics");
@@ -186,7 +186,7 @@ public class MyInventoryActivity extends Activity {
             emptyBox.addView(icon);
 
             TextView empty = new TextView(this);
-            empty.setText("ما عندك حتى منتج بعد");
+            empty.setText(getString(R.string.inv_empty));
             empty.setTextColor(Color.parseColor("#D4AF37"));
             empty.setTextSize(16);
             empty.setTypeface(null, Typeface.BOLD);
@@ -195,7 +195,7 @@ public class MyInventoryActivity extends Activity {
             emptyBox.addView(empty);
 
             TextView hint = new TextView(this);
-            hint.setText("روح للسوق واشتري!");
+            hint.setText(getString(R.string.inv_go_market));
             hint.setTextColor(Color.parseColor("#9E9E9E"));
             hint.setTextSize(13);
             hint.setGravity(Gravity.CENTER);
@@ -320,7 +320,7 @@ public class MyInventoryActivity extends Activity {
         int refund = (int) (item.price * 0.7);
 
         new android.app.AlertDialog.Builder(this)
-                .setTitle("بيع المنتج")
+                .setTitle(getString(R.string.inv_sell_item))
                 .setMessage("هل تريد بيع:\n\n" + item.name +
                         "\n\nسعر الشراء: " + item.price + " Đ" +
                         "\nستستلم: " + refund + " Đ (70%)")
@@ -328,7 +328,7 @@ public class MyInventoryActivity extends Activity {
                         new MarketManager.OnDone() {
                     @Override public void onSuccess() {
                         Toast.makeText(MyInventoryActivity.this,
-                                "✅ تم البيع! +" + refund + " Đ", Toast.LENGTH_LONG).show();
+                                getString(R.string.inv_sold_plus) + refund + " Đ", Toast.LENGTH_LONG).show();
                     }
                     @Override public void onError(String msg) {
                         Toast.makeText(MyInventoryActivity.this, "❌ " + msg, Toast.LENGTH_LONG).show();
@@ -355,11 +355,11 @@ public class MyInventoryActivity extends Activity {
         }
         // نحاولو نستخرجو النوع من الاسم
         String name = item.name != null ? item.name : "";
-        if (name.contains("قميص")) return "shirt";
-        if (name.contains("بنطال")) return "pants";
-        if (name.contains("حذاء") || name.contains("بوت")) return "shoes";
-        if (name.contains("قبعة")) return "hat";
-        if (name.contains("نظارات")) return "glasses";
+        if (name.contains(getString(R.string.inv_shirt))) return "shirt";
+        if (name.contains(getString(R.string.inv_pants))) return "pants";
+        if (name.contains(getString(R.string.inv_shoes)) || name.contains(getString(R.string.inv_boots))) return "shoes";
+        if (name.contains(getString(R.string.inv_hat))) return "hat";
+        if (name.contains(getString(R.string.inv_glasses))) return "glasses";
         if ("phone".equals(item.type)) return "phone";
         return null;
     }
@@ -401,12 +401,12 @@ public class MyInventoryActivity extends Activity {
                 .get()
                 .addOnSuccessListener(doc -> {
                     if (!doc.exists()) {
-                        Toast.makeText(this, "❌ المنتج غير موجود", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, getString(R.string.inv_not_found), Toast.LENGTH_SHORT).show();
                         return;
                     }
                     Boolean listed = doc.getBoolean("listedForSale");
                     if (listed != null && listed) {
-                        Toast.makeText(this, "⚠️ المنتج معروض للبيع مسبقاً", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, getString(R.string.inv_already_listed), Toast.LENGTH_LONG).show();
                         return;
                     }
 

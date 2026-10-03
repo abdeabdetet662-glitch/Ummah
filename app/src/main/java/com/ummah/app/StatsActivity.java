@@ -32,7 +32,7 @@ public class StatsActivity extends Activity {
         scroll.addView(root);
 
         TextView title = new TextView(this);
-        title.setText("📊 إحصائيات أُمّة");
+        title.setText(getString(R.string.stats_title));
         title.setTextColor(Color.parseColor("#D4AF37"));
         title.setTextSize(28);
         title.setTypeface(null, Typeface.BOLD);
@@ -40,18 +40,18 @@ public class StatsActivity extends Activity {
         root.addView(title);
 
         TextView sub = new TextView(this);
-        sub.setText("دولتك في الوقت الحقيقي");
+        sub.setText(getString(R.string.stats_subtitle));
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(12);
         sub.setGravity(Gravity.CENTER);
         sub.setPadding(0, 8, 0, 40);
         root.addView(sub);
 
-        citizensView = addStatCard(root, "👥", "المواطنون", "الحساب...");
-        transfersView = addStatCard(root, "💸", "التحويلات", "الحساب...");
-        totalView = addStatCard(root, "💰", "إجمالي المُحوّل", "الحساب...");
-        newsView = addStatCard(root, "📰", "الأخبار", "الحساب...");
-        proposalsView = addStatCard(root, "🗳️", "الاقتراحات", "الحساب...");
+        citizensView = addStatCard(root, "👥", getString(R.string.stats_citizens_title), getString(R.string.stats_account));
+        transfersView = addStatCard(root, "💸", getString(R.string.stats_transfers_title), getString(R.string.stats_account));
+        totalView = addStatCard(root, "💰", getString(R.string.stats_total_transferred), getString(R.string.stats_account));
+        newsView = addStatCard(root, "📰", getString(R.string.stats_news_title), getString(R.string.stats_account));
+        proposalsView = addStatCard(root, "🗳️", getString(R.string.stats_proposals_title), getString(R.string.stats_account));
 
         setContentView(scroll);
         load();
@@ -101,11 +101,11 @@ public class StatsActivity extends Activity {
             @Override public void onStats(final int citizens, final int transfers,
                                           final int total, final int news, final int proposals) {
                 runOnUiThread(() -> {
-                    citizensView.setText(citizens + " مواطن");
-                    transfersView.setText(transfers + " تحويل");
+                    citizensView.setText(citizens + getString(R.string.stats_citizens));
+                    transfersView.setText(transfers + getString(R.string.stats_transfers));
                     totalView.setText(total + " Đ");
-                    newsView.setText(news + " خبر");
-                    proposalsView.setText(proposals + " اقتراح");
+                    newsView.setText(news + getString(R.string.stats_news));
+                    proposalsView.setText(proposals + getString(R.string.stats_proposals));
                 });
             }
         });

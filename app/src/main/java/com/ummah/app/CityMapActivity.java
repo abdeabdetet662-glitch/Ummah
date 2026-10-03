@@ -57,7 +57,7 @@ public class CityMapActivity extends Activity {
         header.setBackgroundColor(Color.parseColor("#0A0A0A"));
 
         TextView title = new TextView(this);
-        title.setText("🏙️  مدينة أُمّة");
+        title.setText(getString(R.string.city_title));
         title.setTextColor(Color.parseColor("#D4AF37"));
         title.setTextSize(22);
         title.setTypeface(null, Typeface.BOLD);
@@ -95,7 +95,7 @@ public class CityMapActivity extends Activity {
         footer.setBackgroundColor(Color.parseColor("#0A0A0A"));
 
         TextView hint = new TextView(this);
-        hint.setText("👆 اضغط على قطعة لشرائها أو البناء عليها");
+        hint.setText(getString(R.string.city_hint));
         hint.setTextColor(Color.parseColor("#9E9E9E"));
         hint.setTextSize(12);
         hint.setGravity(Gravity.CENTER);
@@ -188,7 +188,7 @@ public class CityMapActivity extends Activity {
                 }
             } else {
                 new AlertDialog.Builder(this)
-                        .setTitle("قطعة مملوكة")
+                        .setTitle(getString(R.string.city_owned_plot))
                         .setMessage("👤 المالك: " + o.optString("ownerName", "?") +
                                 "\n🏢 المبنى: " + buildingLabel(buildingType) +
                                 "\n⭐ المستوى: " + buildingLevel)
@@ -203,7 +203,7 @@ public class CityMapActivity extends Activity {
     private void showBuyDialog(final String plotId, String districtId, int price) {
         String districtName = districtLabel(districtId);
         new AlertDialog.Builder(this)
-                .setTitle("شراء قطعة أرض")
+                .setTitle(getString(R.string.city_buy_plot))
                 .setMessage("📍 " + districtName +
                         "\n\n💰 السعر: " + price + " Đ" +
                         "\n\nهل تريد شراء هذي القطعة؟")
@@ -216,7 +216,7 @@ public class CityMapActivity extends Activity {
                     cm.buyPlot(me.nationalId, me.name, plot, new CityManager.OnDone() {
                         @Override public void onSuccess() {
                             Toast.makeText(CityMapActivity.this,
-                                    "✅ تم الشراء!", Toast.LENGTH_LONG).show();
+                                    getString(R.string.city_purchased), Toast.LENGTH_LONG).show();
                         }
                         @Override public void onError(String msg) {
                             Toast.makeText(CityMapActivity.this,
@@ -361,7 +361,7 @@ public class CityMapActivity extends Activity {
 
         // ═══ Dialog ═══
         final AlertDialog dialog = new AlertDialog.Builder(this)
-                .setTitle("🏗️ بناء في القطعة")
+                .setTitle(getString(R.string.city_build_title))
                 .setView(scroll)
                 .setNegativeButton("❌ إغلاق", null)
                 .create();
@@ -372,7 +372,7 @@ public class CityMapActivity extends Activity {
     private void doBuild(Citizen me, String plotId, final BuildingCatalog.Building b) {
         CityPlot plot = findPlot(plotId);
         if (plot == null) {
-            Toast.makeText(this, "❌ القطعة غير موجودة", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.city_plot_not_found), Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -403,7 +403,7 @@ public class CityMapActivity extends Activity {
                         "\n⭐ المستوى القادم: " + (level + 1) +
                         "\n\n💰 تكلفة الترقية: " + upgradeCost + " Đ" +
                         "\n📈 المبنى رايح يتحسن!")
-                .setPositiveButton("ترقية", (d, w) -> {
+                .setPositiveButton(getString(R.string.city_upgrade), (d, w) -> {
                     Citizen me = im.getCitizen();
                     if (me == null) return;
                     CityPlot plot = findPlot(plotId);
@@ -413,7 +413,7 @@ public class CityMapActivity extends Activity {
                             new CityManager.OnDone() {
                         @Override public void onSuccess() {
                             Toast.makeText(CityMapActivity.this,
-                                    "✅ تمت الترقية!", Toast.LENGTH_LONG).show();
+                                    getString(R.string.city_upgraded), Toast.LENGTH_LONG).show();
                         }
                         @Override public void onError(String msg) {
                             Toast.makeText(CityMapActivity.this,
@@ -421,7 +421,7 @@ public class CityMapActivity extends Activity {
                         }
                     });
                 })
-                .setNeutralButton("💰 بيع للتطبيق (70%)", (d, w) -> {
+                .setNeutralButton(getString(R.string.city_sell_to_app), (d, w) -> {
                     Citizen me = im.getCitizen();
                     if (me == null) return;
                     CityPlot plot = findPlot(plotId);
@@ -449,9 +449,9 @@ public class CityMapActivity extends Activity {
                             "\n💵 ستحصل على (70%): " + refund + " Đ";
 
                     new AlertDialog.Builder(this)
-                            .setTitle("💰 تأكيد البيع")
+                            .setTitle(getString(R.string.city_confirm_sell))
                             .setMessage(summary)
-                            .setPositiveButton("✅ بيع الآن", (dd, ww) ->
+                            .setPositiveButton(getString(R.string.city_sell_now), (dd, ww) ->
                                     cm.sellPlotBackToSystem(me.nationalId, plot, refund,
                                             new CityManager.OnDone() {
                                         @Override public void onSuccess() {
@@ -483,12 +483,12 @@ public class CityMapActivity extends Activity {
 
     private String districtLabel(String id) {
         switch (id) {
-            case "center": return "🏛️ الوسط التجاري";
-            case "luxury": return "🏙️ الحي الراقي";
-            case "garden": return "🌳 الحدائق";
-            case "mid": return "🏘️ الحي المتوسط";
-            case "suburb": return "🏚️ الضواحي";
-            case "industrial": return "🏭 المنطقة الصناعية";
+            case "center": return getString(R.string.city_center);
+            case "luxury": return getString(R.string.city_luxury);
+            case "garden": return getString(R.string.city_garden);
+            case "mid": return getString(R.string.city_mid);
+            case "suburb": return getString(R.string.city_suburb);
+            case "industrial": return getString(R.string.city_industrial);
         }
         return id;
     }
@@ -496,7 +496,7 @@ public class CityMapActivity extends Activity {
     private String buildingLabel(String t) {
         if (t == null || t.isEmpty()) return "لا يوجد";
         String label = BuildingCatalog.getLabel(t);
-        return label != null ? label : "🏢 مبنى";
+        return label != null ? label : getString(R.string.city_building_generic);
     }
 
     @Override
