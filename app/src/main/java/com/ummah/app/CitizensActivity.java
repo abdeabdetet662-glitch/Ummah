@@ -39,7 +39,7 @@ public class CitizensActivity extends Activity {
         scroll.addView(root);
 
         TextView title = new TextView(this);
-        title.setText("👥 دليل المواطنين");
+        title.setText(getString(R.string.citizens_title));
         title.setTextColor(Color.parseColor("#D4AF37"));
         title.setTextSize(26);
         title.setTypeface(null, Typeface.BOLD);
@@ -47,7 +47,7 @@ public class CitizensActivity extends Activity {
         root.addView(title);
 
         TextView sub = new TextView(this);
-        sub.setText("أغنى 20 مواطناً في الدولة");
+        sub.setText(getString(R.string.citizens_richest));
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(12);
         sub.setGravity(Gravity.CENTER);
@@ -55,7 +55,7 @@ public class CitizensActivity extends Activity {
         root.addView(sub);
 
         Button searchBtn = new Button(this);
-        searchBtn.setText("🔍  ابحث برقم وطني محدد");
+        searchBtn.setText(getString(R.string.citizens_search_id));
         searchBtn.setTextSize(14);
         searchBtn.setOnClickListener(v -> showSearchDialog());
         root.addView(searchBtn);
@@ -86,7 +86,7 @@ public class CitizensActivity extends Activity {
 
         if (list.isEmpty()) {
             TextView empty = new TextView(this);
-            empty.setText("لا يوجد مواطنون بعد.");
+            empty.setText(getString(R.string.citizens_none));
             empty.setTextColor(Color.parseColor("#616161"));
             empty.setTextSize(14);
             empty.setGravity(Gravity.CENTER);
@@ -138,10 +138,10 @@ public class CitizensActivity extends Activity {
         TextView rankView = new TextView(this);
         String rankText;
         if (rank == 1) rankText = "🥇 الأول";
-        else if (rank == 2) rankText = "🥈 الثاني";
-        else if (rank == 3) rankText = "🥉 الثالث";
+        else if (rank == 2) rankText = getString(R.string.citizens_second);
+        else if (rank == 3) rankText = getString(R.string.citizens_third);
         else rankText = "#" + rank;
-        rankView.setText(rankText + (isMe ? "  (أنت)" : ""));
+        rankView.setText(rankText + (isMe ? getString(R.string.citizens_you) : ""));
         rankView.setTextColor(Color.parseColor("#D4AF37"));
         rankView.setTextSize(11);
         rankView.setTypeface(null, Typeface.BOLD);
@@ -178,19 +178,19 @@ public class CitizensActivity extends Activity {
         c.addView(input);
 
         new AlertDialog.Builder(this)
-            .setTitle("ابحث عن مواطن")
+            .setTitle(getString(R.string.citizens_search_hint))
             .setView(c)
-            .setPositiveButton("بحث", (d, w) -> {
+            .setPositiveButton(getString(R.string.citizens_search), (d, w) -> {
                 String id = input.getText().toString().trim();
                 if (id.isEmpty()) return;
                 fm.searchCitizenByExactId(id, new FirebaseManager.CitizenLookup() {
                     @Override public void onFound(FirebaseManager.CitizenItem item) {
                         new AlertDialog.Builder(CitizensActivity.this)
-                            .setTitle("تم العثور")
+                            .setTitle(getString(R.string.citizens_found))
                             .setMessage("الاسم: " + item.name + "\n" +
                                     "الرصيد: " + item.balance + " Đ\n" +
                                     "الانضمام: " + item.joinDate)
-                            .setPositiveButton("إرسال دينار", (d2, w2) -> {
+                            .setPositiveButton(getString(R.string.citizens_send_dinar), (d2, w2) -> {
                                 Intent i = new Intent(CitizensActivity.this, TransferActivity.class);
                                 i.putExtra("prefill_id", item.nationalId);
                                 startActivity(i);
@@ -199,7 +199,7 @@ public class CitizensActivity extends Activity {
                             .show();
                     }
                     @Override public void onNotFound() {
-                        Toast.makeText(CitizensActivity.this, "❌ غير موجود", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(CitizensActivity.this, getString(R.string.citizens_not_found), Toast.LENGTH_SHORT).show();
                     }
                 });
             })

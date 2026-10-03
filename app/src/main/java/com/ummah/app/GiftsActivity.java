@@ -55,7 +55,7 @@ public class GiftsActivity extends Activity {
         scroll.addView(root);
 
         TextView title = new TextView(this);
-        title.setText("🎁 متجر الهدايا");
+        title.setText(getString(R.string.gifts_store));
         title.setTextColor(Color.parseColor("#D4AF37"));
         title.setTextSize(28);
         title.setTypeface(null, Typeface.BOLD);
@@ -63,7 +63,7 @@ public class GiftsActivity extends Activity {
         root.addView(title);
 
         TextView sub = new TextView(this);
-        sub.setText("أرسل هدايا فخمة لأصدقائك");
+        sub.setText(getString(R.string.gifts_subtitle));
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(12);
         sub.setGravity(Gravity.CENTER);
@@ -93,16 +93,16 @@ public class GiftsActivity extends Activity {
         balanceCard.addView(balanceView);
         root.addView(balanceCard);
 
-        addSectionHeader(root, "🟢 هدايا عادية");
+        addSectionHeader(root, getString(R.string.gifts_common));
         addGiftGrid(root, GiftCatalog.getCommonGifts());
 
-        addSectionHeader(root, "🔵 هدايا نادرة");
+        addSectionHeader(root, getString(R.string.gifts_rare));
         addGiftGrid(root, GiftCatalog.getRareGifts());
 
-        addSectionHeader(root, "🟡 هدايا أسطورية");
+        addSectionHeader(root, getString(R.string.gifts_legendary));
         addGiftGrid(root, GiftCatalog.getLegendaryGifts());
 
-        addSectionHeader(root, "📜 سجل الهدايا");
+        addSectionHeader(root, getString(R.string.gifts_history));
 
         LinearLayout tabs = new LinearLayout(this);
         tabs.setOrientation(LinearLayout.HORIZONTAL);
@@ -254,7 +254,7 @@ public class GiftsActivity extends Activity {
             recReg = fm.listenReceivedGifts(me.nationalId, list -> runOnUiThread(() -> {
                 historyContainer.removeAllViews();
                 if (list.isEmpty()) {
-                    historyContainer.addView(emptyView("لم تستقبل هدايا بعد"));
+                    historyContainer.addView(emptyView(getString(R.string.gifts_no_received)));
                 } else {
                     for (FirebaseManager.GiftEntry g : list) {
                         historyContainer.addView(buildHistoryCard(g, false));
@@ -265,7 +265,7 @@ public class GiftsActivity extends Activity {
             sentReg = fm.listenSentGifts(me.nationalId, list -> runOnUiThread(() -> {
                 historyContainer.removeAllViews();
                 if (list.isEmpty()) {
-                    historyContainer.addView(emptyView("لم ترسل هدايا بعد"));
+                    historyContainer.addView(emptyView(getString(R.string.gifts_no_sent)));
                 } else {
                     for (FirebaseManager.GiftEntry g : list) {
                         historyContainer.addView(buildHistoryCard(g, true));
@@ -371,7 +371,7 @@ public class GiftsActivity extends Activity {
         content.addView(priceView);
 
         final EditText idInput = new EditText(this);
-        idInput.setHint("رقم المواطن الوطني");
+        idInput.setHint(getString(R.string.gifts_national_id));
         idInput.setTextColor(Color.WHITE);
         idInput.setHintTextColor(Color.GRAY);
         idInput.setInputType(InputType.TYPE_CLASS_TEXT);
@@ -384,7 +384,7 @@ public class GiftsActivity extends Activity {
                 String toId = idInput.getText().toString().trim();
                 if (toId.isEmpty()) return;
                 if (toId.equals(me.nationalId)) {
-                    Toast.makeText(this, "لا يمكنك الإرسال لنفسك", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.gifts_cant_send_self), Toast.LENGTH_SHORT).show();
                     return;
                 }
                 fm.sendGift(me.nationalId, me.name, toId,
@@ -428,7 +428,7 @@ public class GiftsActivity extends Activity {
 
         AlertDialog dialog = new AlertDialog.Builder(this)
             .setView(content)
-            .setPositiveButton("رائع!", null)
+            .setPositiveButton(getString(R.string.gifts_awesome), null)
             .create();
         dialog.show();
 

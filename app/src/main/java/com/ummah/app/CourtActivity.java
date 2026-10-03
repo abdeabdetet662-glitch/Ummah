@@ -47,7 +47,7 @@ public class CourtActivity extends Activity {
         scroll.addView(root);
 
         TextView title = new TextView(this);
-        title.setText("⚖️ محكمة أُمّة");
+        title.setText(getString(R.string.court_title));
         title.setTextColor(Color.parseColor("#D4AF37"));
         title.setTextSize(28);
         title.setTypeface(null, Typeface.BOLD);
@@ -55,7 +55,7 @@ public class CourtActivity extends Activity {
         root.addView(title);
 
         TextView sub = new TextView(this);
-        sub.setText("العدالة للجميع، بلا محاباة");
+        sub.setText(getString(R.string.court_subtitle));
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(12);
         sub.setGravity(Gravity.CENTER);
@@ -63,7 +63,7 @@ public class CourtActivity extends Activity {
         root.addView(sub);
 
         Button fileBtn = new Button(this);
-        fileBtn.setText("📜  رفع دعوى جديدة");
+        fileBtn.setText(getString(R.string.court_new_case));
         fileBtn.setTextSize(15);
         fileBtn.setOnClickListener(v -> showFileDialog());
         root.addView(fileBtn);
@@ -99,7 +99,7 @@ public class CourtActivity extends Activity {
         listContainer.removeAllViews();
         if (list.isEmpty()) {
             TextView empty = new TextView(this);
-            empty.setText("لا توجد قضايا بعد. الدولة تعيش بسلام!");
+            empty.setText(getString(R.string.court_no_cases));
             empty.setTextColor(Color.parseColor("#616161"));
             empty.setTextSize(13);
             empty.setGravity(Gravity.CENTER);
@@ -156,7 +156,7 @@ public class CourtActivity extends Activity {
             verdict.setPadding(20, 14, 20, 14);
 
             TextView vh = new TextView(this);
-            vh.setText("⚖️ الحكم:");
+            vh.setText(getString(R.string.court_verdict));
             vh.setTextColor(Color.parseColor("#D4AF37"));
             vh.setTextSize(12);
             vh.setTypeface(null, Typeface.BOLD);
@@ -177,16 +177,16 @@ public class CourtActivity extends Activity {
         String statusText;
         int statusColor;
         if ("agreed".equals(c.status)) {
-            statusText = "✅ تم الاتفاق";
+            statusText = getString(R.string.court_agreed);
             statusColor = Color.parseColor("#4CAF50");
         } else if ("appealed".equals(c.status)) {
             statusText = "⚠️ استئناف";
             statusColor = Color.parseColor("#FF9800");
         } else if ("closed".equals(c.status)) {
-            statusText = "🔒 مغلقة";
+            statusText = getString(R.string.court_closed);
             statusColor = Color.parseColor("#9E9E9E");
         } else {
-            statusText = "⏳ قيد النظر";
+            statusText = getString(R.string.court_pending);
             statusColor = Color.parseColor("#2196F3");
         }
         status.setText(statusText);
@@ -212,14 +212,14 @@ public class CourtActivity extends Activity {
                 row.setPadding(0, 12, 0, 0);
 
                 Button agreeBtn = new Button(this);
-                agreeBtn.setText("✅ أوافق على الحكم");
+                agreeBtn.setText(getString(R.string.court_accept_verdict));
                 agreeBtn.setTextSize(12);
                 agreeBtn.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
                 agreeBtn.setOnClickListener(v -> updateStatus(c.id, "agreed"));
                 row.addView(agreeBtn);
 
                 Button appealBtn = new Button(this);
-                appealBtn.setText("⚠️ أستأنف");
+                appealBtn.setText(getString(R.string.court_appeal));
                 appealBtn.setTextSize(12);
                 appealBtn.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
                 appealBtn.setOnClickListener(v -> updateStatus(c.id, "appealed"));
@@ -235,7 +235,7 @@ public class CourtActivity extends Activity {
     private void updateStatus(final String caseId, final String status) {
         fm.updateCaseStatus(caseId, status, new FirebaseManager.OnDone() {
             @Override public void onSuccess() {
-                Toast.makeText(CourtActivity.this, "تم التحديث", Toast.LENGTH_SHORT).show();
+                Toast.makeText(CourtActivity.this, getString(R.string.court_updated), Toast.LENGTH_SHORT).show();
             }
             @Override public void onError(String msg) {
                 Toast.makeText(CourtActivity.this, "خطأ: " + msg, Toast.LENGTH_SHORT).show();
@@ -252,14 +252,14 @@ public class CourtActivity extends Activity {
         c.setPadding(40, 20, 40, 20);
 
         final EditText idInput = new EditText(this);
-        idInput.setHint("رقم المدعى عليه الوطني");
+        idInput.setHint(getString(R.string.court_defendant_id));
         idInput.setTextColor(Color.WHITE);
         idInput.setHintTextColor(Color.GRAY);
         idInput.setInputType(InputType.TYPE_CLASS_TEXT);
         c.addView(idInput);
 
         final EditText claimInput = new EditText(this);
-        claimInput.setHint("اكتب دعواك بالتفصيل...");
+        claimInput.setHint(getString(R.string.court_describe));
         claimInput.setTextColor(Color.WHITE);
         claimInput.setHintTextColor(Color.GRAY);
         claimInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
@@ -267,18 +267,18 @@ public class CourtActivity extends Activity {
         c.addView(claimInput);
 
         new AlertDialog.Builder(this)
-            .setTitle("رفع دعوى")
+            .setTitle(getString(R.string.court_file_case))
             .setMessage("⚠️ الدعاوى الكاذبة تُعاقب بخصم 50 Đ")
             .setView(c)
-            .setPositiveButton("رفع", (d, w) -> {
+            .setPositiveButton(getString(R.string.court_submit), (d, w) -> {
                 String defId = idInput.getText().toString().trim();
                 String claim = claimInput.getText().toString().trim();
                 if (defId.isEmpty() || claim.isEmpty()) {
-                    Toast.makeText(this, "املأ الحقول", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.court_fill_fields), Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if (defId.equals(me.nationalId)) {
-                    Toast.makeText(this, "لا يمكنك رفع دعوى ضد نفسك", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.court_cant_sue_self), Toast.LENGTH_SHORT).show();
                     return;
                 }
                 // ابحث عن المدعى عليه
@@ -287,7 +287,7 @@ public class CourtActivity extends Activity {
                         String rec = generateRecommendation(claim);
                         fm.fileCase(me.nationalId, me.name, defId, defName, claim, rec, new FirebaseManager.OnDone() {
                             @Override public void onSuccess() {
-                                Toast.makeText(CourtActivity.this, "📜 تم رفع الدعوى", Toast.LENGTH_LONG).show();
+                                Toast.makeText(CourtActivity.this, getString(R.string.court_filed), Toast.LENGTH_LONG).show();
                             }
                             @Override public void onError(String msg) {
                                 Toast.makeText(CourtActivity.this, "خطأ: " + msg, Toast.LENGTH_SHORT).show();
@@ -295,7 +295,7 @@ public class CourtActivity extends Activity {
                         });
                     }
                     @Override public void onNotFound() {
-                        Toast.makeText(CourtActivity.this, "❌ المدعى عليه غير موجود", Toast.LENGTH_LONG).show();
+                        Toast.makeText(CourtActivity.this, getString(R.string.court_defendant_not_found), Toast.LENGTH_LONG).show();
                     }
                 });
             })

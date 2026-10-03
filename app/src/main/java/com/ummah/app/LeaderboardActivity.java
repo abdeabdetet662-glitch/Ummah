@@ -39,7 +39,7 @@ public class LeaderboardActivity extends Activity {
         scroll.addView(root);
 
         TextView title = new TextView(this);
-        title.setText("🏆 المتصدرون");
+        title.setText(getString(R.string.leaderboard_title));
         title.setTextColor(Color.parseColor("#D4AF37"));
         title.setTextSize(28);
         title.setTypeface(null, Typeface.BOLD);
@@ -47,7 +47,7 @@ public class LeaderboardActivity extends Activity {
         root.addView(title);
 
         TextView sub = new TextView(this);
-        sub.setText("أغنى 20 مواطناً في أُمّة");
+        sub.setText(getString(R.string.leaderboard_richest));
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(12);
         sub.setGravity(Gravity.CENTER);
@@ -123,7 +123,7 @@ public class LeaderboardActivity extends Activity {
 
             // الاسم
             TextView name = new TextView(this);
-            name.setText((c.name != null ? c.name : "مجهول") + (isMe ? "  (أنت)" : ""));
+            name.setText((c.name != null ? c.name : "مجهول") + (isMe ? getString(R.string.citizens_you) : ""));
             name.setTextColor(Color.WHITE);
             name.setTextSize(15);
             name.setTypeface(null, Typeface.BOLD);

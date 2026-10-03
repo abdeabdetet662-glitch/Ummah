@@ -68,7 +68,7 @@ public class MarketActivity extends Activity {
         header.addView(icon);
 
         TextView title = new TextView(this);
-        title.setText("  السوق العام");
+        title.setText(getString(R.string.market_title));
         title.setTextColor(Color.parseColor("#D4AF37"));
         title.setTextSize(26);
         title.setTypeface(null, Typeface.BOLD);
@@ -77,7 +77,7 @@ public class MarketActivity extends Activity {
         root.addView(header);
 
         TextView sub = new TextView(this);
-        sub.setText("اشترِ سيارات، منازل، وكل ما تحتاج");
+        sub.setText(getString(R.string.market_subtitle));
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(13);
         sub.setGravity(Gravity.CENTER);
@@ -105,10 +105,10 @@ public class MarketActivity extends Activity {
 
     private void buildTabs() {
         tabsContainer.removeAllViews();
-        addTab("🚗", "مركبات", "vehicle");
-        addTab("🏠", "عقارات", "property");
-        addTab("📱", "إلكترونيات", "electronics");
-        addTab("👕", "ملابس", "clothing");
+        addTab("🚗", getString(R.string.market_category_vehicles), "vehicle");
+        addTab("🏠", getString(R.string.market_category_realestate), "property");
+        addTab("📱", getString(R.string.market_category_electronics), "electronics");
+        addTab("👕", getString(R.string.market_category_clothes), "clothing");
     }
 
     private void addTab(String emoji, String label, final String category) {
@@ -197,7 +197,7 @@ public class MarketActivity extends Activity {
             emptyBox.addView(icon);
 
             TextView empty = new TextView(this);
-            empty.setText("لا توجد منتجات في هذي الفئة");
+            empty.setText(getString(R.string.market_no_products));
             empty.setTextColor(Color.parseColor("#D4AF37"));
             empty.setTextSize(16);
             empty.setTypeface(null, Typeface.BOLD);
@@ -293,10 +293,10 @@ public class MarketActivity extends Activity {
     private String getRarityLabel(String r) {
         if (r == null) return "";
         switch (r) {
-            case "common": return "شائع";
-            case "rare": return "نادر ⭐";
-            case "epic": return "ملحمي ✨";
-            case "legendary": return "أسطوري 👑";
+            case "common": return getString(R.string.market_quality_common);
+            case "rare": return getString(R.string.market_quality_rare);
+            case "epic": return getString(R.string.market_quality_epic);
+            case "legendary": return getString(R.string.market_quality_legendary);
             default: return "";
         }
     }
@@ -306,11 +306,11 @@ public class MarketActivity extends Activity {
         if (me == null) return;
 
         new android.app.AlertDialog.Builder(this)
-                .setTitle("تأكيد الشراء")
+                .setTitle(getString(R.string.market_confirm_purchase))
                 .setMessage("هل تريد شراء:\n\n" + item.name + "\n\nبسعر: " + item.price + " Đ")
                 .setPositiveButton("شراء", (d, w) -> mm.buyItem(me.nationalId, item, new MarketManager.OnDone() {
                     @Override public void onSuccess() {
-                        Toast.makeText(MarketActivity.this, "✅ تم الشراء!", Toast.LENGTH_LONG).show();
+                        Toast.makeText(MarketActivity.this, getString(R.string.market_purchased), Toast.LENGTH_LONG).show();
                     }
                     @Override public void onError(String msg) {
                         Toast.makeText(MarketActivity.this, "❌ " + msg, Toast.LENGTH_LONG).show();

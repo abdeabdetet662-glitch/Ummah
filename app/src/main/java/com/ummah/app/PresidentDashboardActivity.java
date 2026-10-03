@@ -49,11 +49,11 @@ public class PresidentDashboardActivity extends Activity {
         crown.setGravity(Gravity.CENTER);
         root.addView(crown);
 
-        TextView title = UiHelper.goldTitle(this, "لوحة الرئيس", 28);
+        TextView title = UiHelper.goldTitle(this, getString(R.string.pres_dashboard), 28);
         root.addView(title);
 
         TextView sub = new TextView(this);
-        sub.setText("أدوات القيادة العليا");
+        sub.setText(getString(R.string.pres_subtitle));
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(13);
         sub.setGravity(Gravity.CENTER);
@@ -66,30 +66,30 @@ public class PresidentDashboardActivity extends Activity {
         root.addView(statsContainer);
 
         // ═══ Sections ═══
-        addSection(root, "📢  الإعلام والاتصال");
-        addCard(root, "📢", "إعلان رئاسي", "رسالة رسمية لكل المواطنين",
+        addSection(root, getString(R.string.pres_section_media));
+        addCard(root, "📢", getString(R.string.pres_announcement), getString(R.string.pres_official_message),
                 PresidentAnnounceActivity.class, "#C62828");
 
-        addSection(root, "🎁  السلطات الرئاسية");
-        addCard(root, "🎁", "هدية رئاسية", "وزّع فلوس من الخزينة",
+        addSection(root, getString(R.string.pres_section_powers));
+        addCard(root, "🎁", getString(R.string.pres_gift), getString(R.string.pres_distribute_funds),
                 PresidentGiftActivity.class, "#2E7D32");
-        addCard(root, "⚖️", "عفو رئاسي", "ارفع الحظر والكتم",
+        addCard(root, "⚖️", getString(R.string.pres_pardon), getString(R.string.pres_lift_bans),
                 PresidentPardonActivity.class, "#5D4037");
 
-        addSection(root, "🏛️  الحكومة");
-        addCard(root, "👥", "تعيين وزراء", "اختر مواطنين للمناصب",
+        addSection(root, getString(R.string.pres_section_gov));
+        addCard(root, "👥", getString(R.string.pres_appoint_ministers), getString(R.string.pres_choose_ministers),
                 PresidentMinistersActivity.class, "#4A148C");
-        addCard(root, "🏦", "التحكم في الخزينة", "أضف أو اسحب أموال",
+        addCard(root, "🏦", getString(R.string.pres_control_treasury), getString(R.string.pres_add_remove_money),
                 PresidentTreasuryActivity.class, "#1A237E");
 
-        addSection(root, "🎖️  الألقاب والمراسيم");
-        addCard(root, "🏅", "منح الألقاب", "امنح مواطن لقب شرفي",
+        addSection(root, getString(R.string.pres_section_titles));
+        addCard(root, "🏅", getString(R.string.pres_grant_titles), getString(R.string.pres_grant_title),
                 PresidentTitlesActivity.class, "#E65100");
-        addCard(root, "📜", "إصدار مرسوم", "قرار رسمي للدولة",
+        addCard(root, "📜", getString(R.string.pres_issue_decree), getString(R.string.pres_official_decision),
                 PresidentDecreesActivity.class, "#00695C");
 
-        addSection(root, "📊  السجلات");
-        addCard(root, "📋", "الإعلانات السابقة", "كل الإعلانات الرئاسية",
+        addSection(root, getString(R.string.pres_section_logs));
+        addCard(root, "📋", getString(R.string.pres_prev_announcements), getString(R.string.pres_all_announcements),
                 PresidentAnnouncementsListActivity.class, "#0D47A1");
 
         setContentView(scroll);
@@ -100,7 +100,7 @@ public class PresidentDashboardActivity extends Activity {
         if (treasuryReg != null) treasuryReg.remove();
         treasuryReg = pm.listenTreasury(balance -> runOnUiThread(() -> {
             statsContainer.removeAllViews();
-            addStatCard("🏦", "رصيد الخزينة", balance + " Đ", "#FFD700");
+            addStatCard("🏦", getString(R.string.pres_treasury_balance), balance + " Đ", "#FFD700");
         }));
     }
 

@@ -52,7 +52,7 @@ public class ElectionActivity extends Activity {
         scroll.addView(root);
 
         TextView title = new TextView(this);
-        title.setText("👑 الانتخابات الرئاسية");
+        title.setText(getString(R.string.elec_title));
         title.setTextColor(Color.parseColor("#D4AF37"));
         title.setTextSize(26);
         title.setTypeface(null, Typeface.BOLD);
@@ -60,7 +60,7 @@ public class ElectionActivity extends Activity {
         root.addView(title);
 
         TextView sub = new TextView(this);
-        sub.setText("انتخب رئيس دولة أُمّة");
+        sub.setText(getString(R.string.elec_elect_president));
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(12);
         sub.setGravity(Gravity.CENTER);
@@ -84,13 +84,13 @@ public class ElectionActivity extends Activity {
         root.addView(myVoteView);
 
         Button candBtn = new Button(this);
-        candBtn.setText("📢  ترشّح للرئاسة");
+        candBtn.setText(getString(R.string.elec_announce));
         candBtn.setTextSize(15);
         candBtn.setOnClickListener(v -> showCandidateDialog());
         root.addView(candBtn);
 
         Button celebrateBtn = new Button(this);
-        celebrateBtn.setText("🎉  احتفال تنصيب الرئيس");
+        celebrateBtn.setText(getString(R.string.elec_inauguration));
         celebrateBtn.setTextSize(15);
         celebrateBtn.setTextColor(Color.WHITE);
         celebrateBtn.setBackgroundColor(Color.parseColor("#B8860B"));
@@ -126,7 +126,7 @@ public class ElectionActivity extends Activity {
                     String candidate = doc.getString("candidateName");
                     myVoteView.setText("✅ صوّتت لـ: " + (candidate != null ? candidate : ""));
                 } else {
-                    myVoteView.setText("لم تصوّت بعد");
+                    myVoteView.setText(getString(R.string.elec_not_voted));
                     myVoteView.setTextColor(Color.parseColor("#9E9E9E"));
                 }
             });
@@ -160,7 +160,7 @@ public class ElectionActivity extends Activity {
 
         if (list.isEmpty()) {
             TextView empty = new TextView(this);
-            empty.setText("لا يوجد مرشحون بعد. كن أول رئيس!");
+            empty.setText(getString(R.string.elec_be_first));
             empty.setTextColor(Color.parseColor("#616161"));
             empty.setTextSize(14);
             empty.setGravity(Gravity.CENTER);
@@ -193,7 +193,7 @@ public class ElectionActivity extends Activity {
         card.setLayoutParams(lp);
 
         TextView rankView = new TextView(this);
-        rankView.setText(rank == 1 ? "🥇 الرئيس الحالي" : "المركز " + rank);
+        rankView.setText(rank == 1 ? getString(R.string.elec_current_president) : "المركز " + rank);
         rankView.setTextColor(rank == 1 ? Color.parseColor("#D4AF37") : Color.parseColor("#9E9E9E"));
         rankView.setTextSize(12);
         rankView.setTypeface(null, Typeface.BOLD);
@@ -217,7 +217,7 @@ public class ElectionActivity extends Activity {
         }
 
         TextView votesView = new TextView(this);
-        votesView.setText("🗳️  " + votes + " صوت");
+        votesView.setText("🗳️  " + votes + getString(R.string.elec_vote_count));
         votesView.setTextColor(Color.parseColor("#D4AF37"));
         votesView.setTextSize(15);
         votesView.setGravity(Gravity.CENTER);
@@ -229,14 +229,14 @@ public class ElectionActivity extends Activity {
 
         if (isMySelf) {
             TextView mine = new TextView(this);
-            mine.setText("(هذا أنت)");
+            mine.setText(getString(R.string.elec_you));
             mine.setTextColor(Color.parseColor("#9E9E9E"));
             mine.setTextSize(12);
             mine.setGravity(Gravity.CENTER);
             card.addView(mine);
         } else {
             Button voteBtn = new Button(this);
-            voteBtn.setText("✅  انتخبه");
+            voteBtn.setText(getString(R.string.elec_elect_btn));
             voteBtn.setTextSize(14);
             voteBtn.setOnClickListener(v -> castVote(id, name));
             card.addView(voteBtn);
@@ -252,7 +252,7 @@ public class ElectionActivity extends Activity {
         db.collection("votes").document(me.nationalId).get()
             .addOnSuccessListener(doc -> {
                 if (doc.exists()) {
-                    Toast.makeText(this, "لقد صوّتت مسبقاً", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, getString(R.string.elec_already_voted), Toast.LENGTH_LONG).show();
                     return;
                 }
                 Map<String, Object> v = new HashMap<>();
@@ -290,7 +290,7 @@ public class ElectionActivity extends Activity {
                 Long v = d.getLong("votes");
                 int votes = v != null ? v.intValue() : 0;
                 if (votes == 0) {
-                    Toast.makeText(this, "لا توجد أصوات بعد", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.elec_no_votes), Toast.LENGTH_SHORT).show();
                     return;
                 }
                 android.content.Intent i = new android.content.Intent(
@@ -311,7 +311,7 @@ public class ElectionActivity extends Activity {
         db.collection("candidates").whereEqualTo("nationalId", me.nationalId).get()
             .addOnSuccessListener(q -> {
                 if (!q.isEmpty()) {
-                    Toast.makeText(this, "أنت مرشّح بالفعل", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, getString(R.string.elec_already_candidate), Toast.LENGTH_LONG).show();
                     return;
                 }
 
@@ -320,14 +320,14 @@ public class ElectionActivity extends Activity {
                 c.setPadding(40, 20, 40, 20);
 
                 final EditText sloganInput = new EditText(this);
-                sloganInput.setHint("شعارك الانتخابي");
+                sloganInput.setHint(getString(R.string.elec_slogan));
                 sloganInput.setTextColor(Color.WHITE);
                 sloganInput.setHintTextColor(Color.GRAY);
                 sloganInput.setInputType(InputType.TYPE_CLASS_TEXT);
                 c.addView(sloganInput);
 
                 new AlertDialog.Builder(this)
-                    .setTitle("ترشّح للرئاسة")
+                    .setTitle(getString(R.string.elec_run_for_president))
                     .setMessage("ستظهر باسم: " + me.name)
                     .setView(c)
                     .setPositiveButton("ترشّح", (d, w) -> {
@@ -340,7 +340,7 @@ public class ElectionActivity extends Activity {
                         cand.put("timestamp", System.currentTimeMillis());
 
                         db.collection("candidates").add(cand)
-                            .addOnSuccessListener(x -> Toast.makeText(this, "تم الترشح!", Toast.LENGTH_SHORT).show())
+                            .addOnSuccessListener(x -> Toast.makeText(this, getString(R.string.elec_registered), Toast.LENGTH_SHORT).show())
                             .addOnFailureListener(e -> Toast.makeText(this, "خطأ: " + e.getMessage(), Toast.LENGTH_SHORT).show());
                     })
                     .setNegativeButton("إلغاء", null)

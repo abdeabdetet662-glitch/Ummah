@@ -46,7 +46,7 @@ public class ParliamentActivity extends Activity {
         scroll.addView(root);
 
         TextView title = new TextView(this);
-        title.setText("🗳️ البرلمان");
+        title.setText(getString(R.string.parl_header));
         title.setTextColor(Color.parseColor("#D4AF37"));
         title.setTextSize(28);
         title.setTypeface(null, Typeface.BOLD);
@@ -54,7 +54,7 @@ public class ParliamentActivity extends Activity {
         root.addView(title);
 
         TextView sub = new TextView(this);
-        sub.setText("اقترح. صوّت. اكسب. مع كل مواطني العالم");
+        sub.setText(getString(R.string.parl_subtitle));
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(12);
         sub.setGravity(Gravity.CENTER);
@@ -62,7 +62,7 @@ public class ParliamentActivity extends Activity {
         root.addView(sub);
 
         Button addBtn = new Button(this);
-        addBtn.setText("➕  تقديم اقتراح (+20 Đ)");
+        addBtn.setText(getString(R.string.parl_submit));
         addBtn.setTextSize(15);
         addBtn.setOnClickListener(v -> showProposalDialog());
         root.addView(addBtn);
@@ -91,7 +91,7 @@ public class ParliamentActivity extends Activity {
         listContainer.removeAllViews();
         if (list.isEmpty()) {
             TextView empty = new TextView(this);
-            empty.setText("لا توجد اقتراحات بعد. كن أول من يقترح!");
+            empty.setText(getString(R.string.parl_no_proposals));
             empty.setTextColor(Color.parseColor("#616161"));
             empty.setTextSize(14);
             empty.setGravity(Gravity.CENTER);
@@ -146,14 +146,14 @@ public class ParliamentActivity extends Activity {
         row.setOrientation(LinearLayout.HORIZONTAL);
 
         Button y = new Button(this);
-        y.setText("✅ موافق");
+        y.setText(getString(R.string.parl_agree));
         y.setTextSize(13);
         y.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
         y.setOnClickListener(v -> castProposalVote(p, true));
         row.addView(y);
 
         Button n = new Button(this);
-        n.setText("❌ رافض");
+        n.setText(getString(R.string.parl_reject));
         n.setTextSize(13);
         n.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
         n.setOnClickListener(v -> castProposalVote(p, false));
@@ -183,13 +183,13 @@ public class ParliamentActivity extends Activity {
         c.setPadding(40, 20, 40, 20);
 
         final EditText titleInput = new EditText(this);
-        titleInput.setHint("عنوان الاقتراح");
+        titleInput.setHint(getString(R.string.parl_title_hint));
         titleInput.setTextColor(Color.WHITE);
         titleInput.setHintTextColor(Color.GRAY);
         c.addView(titleInput);
 
         final EditText bodyInput = new EditText(this);
-        bodyInput.setHint("اشرح اقتراحك...");
+        bodyInput.setHint(getString(R.string.parl_describe));
         bodyInput.setTextColor(Color.WHITE);
         bodyInput.setHintTextColor(Color.GRAY);
         bodyInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
@@ -197,9 +197,9 @@ public class ParliamentActivity extends Activity {
         c.addView(bodyInput);
 
         new AlertDialog.Builder(this)
-            .setTitle("اقتراح جديد")
+            .setTitle(getString(R.string.parl_new_proposal))
             .setView(c)
-            .setPositiveButton("نشر", (d, w) -> {
+            .setPositiveButton(getString(R.string.parl_publish), (d, w) -> {
                 String t = titleInput.getText().toString().trim();
                 String bd = bodyInput.getText().toString().trim();
                 if (t.isEmpty() || bd.isEmpty()) return;
