@@ -174,6 +174,12 @@ public class NotificationListener {
             java.util.Map<String, Object> update = new java.util.HashMap<>();
             update.put("notifications", current + 1);
             ref.set(update, com.google.firebase.firestore.SetOptions.merge());
+            
+            // حفظ في SharedPreferences
+            ctx.getSharedPreferences("notif_state", Context.MODE_PRIVATE)
+                .edit()
+                .putInt("notif_count", (int)(current + 1))
+                .apply();
         });
     }
     

@@ -98,6 +98,13 @@ public class MainActivity extends Activity {
                         unreadNotifs = newNotifs;
                         unreadChat = newChats;
                         
+                        // حفظ في SharedPreferences
+                        getSharedPreferences("notif_state", MODE_PRIVATE)
+                                .edit()
+                                .putInt("notif_count", newNotifs)
+                                .putInt("chat_count", newChats)
+                                .apply();
+                        
                         // تحديث BottomNav
                         try {
                             BottomNavHelper.updateChatBadge(MainActivity.this, newChats);
@@ -550,7 +557,15 @@ if (countReg != null) countReg.remove();
     //  القائمة الجانبية (Nav Drawer)
     // ═══════════════════════════════════════
     private void openNavDrawer() {
-        NavDrawerHelper.show(this, currentCitizen, wm.getBalance(), unreadNotifs, unreadChat, new NavDrawerHelper.OnDrawerClick() {
+        // قراءة القيم المحدّثة من SharedPreferences
+        int freshNotif = getSharedPreferences("notif_state", MODE_PRIVATE)
+                .getInt("notif_count", unreadNotifs);
+        int freshChat = getSharedPreferences("notif_state", MODE_PRIVATE)
+                .getInt("chat_count", unreadChat);
+        unreadNotifs = freshNotif;
+        unreadChat = freshChat;
+        
+        NavDrawerHelper.show(this, currentCitizen, wm.getBalance(), freshNotif, freshChat, new NavDrawerHelper.OnDrawerClick() {
             @Override
             public void onItem(int itemId, String title) {
                 handleDrawerClick(itemId, title);

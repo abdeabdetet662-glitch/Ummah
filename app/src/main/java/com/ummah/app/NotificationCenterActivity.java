@@ -57,6 +57,13 @@ public class NotificationCenterActivity extends Activity {
                     // 1. تصفير في Firestore
                     NotificationListener.clearNotifCount(uidReset);
                     
+                    // حفظ 0 في SharedPreferences (للتحديث الفوري)
+                    getSharedPreferences("notif_state", MODE_PRIVATE)
+                        .edit()
+                        .putInt("notif_count", 0)
+                        .putInt("chat_count", 0)
+                        .apply();
+                    
                     // 2. إخفاء Badge أيقونة التطبيق
                     BadgeHelper.clearAppBadge(this);
                     
