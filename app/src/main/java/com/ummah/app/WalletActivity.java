@@ -141,7 +141,7 @@ public class WalletActivity extends Activity {
         showIdBtn.setOnClickListener(v -> {
             new AlertDialog.Builder(WalletActivity.this)
                 .setTitle("رقمك للاستقبال")
-                .setMessage("أعطِ هذا الرقم لمن يريد أن يرسل لك ديناراً:\n\n" + c.nationalId)
+                .setMessage(getString(R.string.wallet_give_number) + "\n\n" + c.nationalId)
                 .setPositiveButton(getString(R.string.btn_ok), null)
                 .show();
         });
@@ -189,14 +189,14 @@ public class WalletActivity extends Activity {
         root.addView(sectionTitle);
 
         // بطاقات طرق الكسب
-        addEarningCard(root, "🎁", "مكافأة يومية", "+5 Đ كل يوم");
-        addEarningCard(root, "🗳️", "التصويت على اقتراح", "+5 Đ لكل تصويت");
-        addEarningCard(root, "📝", "تقديم اقتراح", "+20 Đ لكل اقتراح");
-        addEarningCard(root, "👑", "الفوز بالانتخابات", "+500 Đ");
+        addEarningCard(root, "🎁", getString(R.string.wallet_daily_reward), getString(R.string.wallet_daily_reward_amount));
+        addEarningCard(root, "🗳️", getString(R.string.wallet_voting), getString(R.string.wallet_voting_amount));
+        addEarningCard(root, "📝", getString(R.string.wallet_propose), getString(R.string.wallet_propose_amount));
+        addEarningCard(root, "👑", getString(R.string.wallet_winning_election), "+500 Đ");
 
         // Footer
         TextView footer = new TextView(this);
-        footer.setText("دولة أُمّة الرقمية\nدينار واحد = تفاعل واحد");
+        footer.setText(getString(R.string.wallet_footer_1) + "\n" + getString(R.string.wallet_footer_2));
         footer.setTextColor(Color.parseColor("#616161"));
         footer.setTextSize(11);
         footer.setGravity(Gravity.CENTER);

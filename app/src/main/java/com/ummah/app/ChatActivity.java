@@ -170,7 +170,7 @@ public class ChatActivity extends Activity {
             long remaining = mutedUntil - System.currentTimeMillis();
             long minutes = remaining / 60000;
             input.setEnabled(false);
-            input.setHint("🔇 أنت مكتوم — " + minutes + " دقيقة");
+            input.setHint(getString(R.string.chat_muted) + minutes + getString(R.string.chat_minutes));
             sendBtn.setEnabled(false);
             sendBtn.setAlpha(0.4f);
         } else {
@@ -196,7 +196,7 @@ public class ChatActivity extends Activity {
         fm.sendGlobalMessage(me.name, me.nationalId, text, new FirebaseManager.OnDone() {
             @Override public void onSuccess() {}
             @Override public void onError(String msg) {
-                Toast.makeText(ChatActivity.this, "خطأ: " + msg, Toast.LENGTH_SHORT).show();
+                Toast.makeText(ChatActivity.this, getString(R.string.chat_error) + msg, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -325,7 +325,7 @@ public class ChatActivity extends Activity {
     private void reportMessage(final FirebaseManager.ChatMessage m) {
         new AlertDialog.Builder(this)
             .setTitle("🚩 إبلاغ عن الرسالة")
-            .setMessage("هل تريد الإبلاغ عن هذه الرسالة؟\n\n\"" + m.text + "\"\n\nمن: " + m.author)
+            .setMessage(getString(R.string.chat_report_title) + "\n\n\"" + m.text + "\"\n\n" + getString(R.string.chat_from) + m.author)
             .setPositiveButton("إبلاغ", (d, w) -> {
                 fm.reportMessage(me.nationalId, me.name, m.nationalId, m.author,
                         m.id, m.text, new FirebaseManager.OnDone() {
@@ -334,7 +334,7 @@ public class ChatActivity extends Activity {
                             "✅ تم الإبلاغ — شكراً لك", Toast.LENGTH_LONG).show();
                     }
                     @Override public void onError(String msg) {
-                        Toast.makeText(ChatActivity.this, "خطأ: " + msg, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ChatActivity.this, getString(R.string.chat_error) + msg, Toast.LENGTH_SHORT).show();
                     }
                 });
             })

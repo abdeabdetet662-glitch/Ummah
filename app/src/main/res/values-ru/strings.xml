@@ -276,4 +276,27 @@
     <string name="setting_delete_done">🗑️ Аккаунт удалён</string>
     <string name="setting_cancel">Отмена</string>
     <string name="setting_toggle_msg">%1$s %2$s</string>
+    <string name="wallet_give_number">Дайте этот номер тому, кто хочет отправить вам динары:</string>
+    <string name="wallet_daily_reward">Ежедневная награда</string>
+    <string name="wallet_daily_reward_amount">+5 Đ каждый день</string>
+    <string name="wallet_voting">Голосование за предложение</string>
+    <string name="wallet_voting_amount">+5 Đ за голос</string>
+    <string name="wallet_propose">Подать предложение</string>
+    <string name="wallet_propose_amount">+20 Đ за предложение</string>
+    <string name="wallet_winning_election">Победа на выборах</string>
+    <string name="wallet_footer_1">Цифровое государство Умма</string>
+    <string name="wallet_footer_2">Один динар = одно взаимодействие</string>
+    <string name="transfer_balance">Ваш баланс:</string>
+    <string name="transfer_history">История переводов</string>
+    <string name="transfer_sent">📤 Отправлено</string>
+    <string name="transfer_received">📥 Получено</string>
+    <string name="transfer_to">Кому: </string>
+    <string name="transfer_from">От: </string>
+    <string name="transfer_id_hint">Национальный ID (UMM-XXXX-XXXX-XXXX)</string>
+    <string name="transfer_give_number">Дайте этот номер тому, кто хочет отправить вам:</string>
+    <string name="chat_muted">🔇 Вы в муте — </string>
+    <string name="chat_minutes"> мин</string>
+    <string name="chat_error">Ошибка: </string>
+    <string name="chat_report_title">Вы хотите пожаловаться на это сообщение?</string>
+    <string name="chat_from">От: </string>
 </resources>

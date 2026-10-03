@@ -278,4 +278,27 @@
     <string name="setting_delete_done">🗑️ تم حذف حسابك</string>
     <string name="setting_cancel">إلغاء</string>
     <string name="setting_toggle_msg">%1$s %2$s</string>
+    <string name="wallet_give_number">أعطِ هذا الرقم لمن يريد أن يرسل لك ديناراً:</string>
+    <string name="wallet_daily_reward">مكافأة يومية</string>
+    <string name="wallet_daily_reward_amount">+5 Đ كل يوم</string>
+    <string name="wallet_voting">التصويت على اقتراح</string>
+    <string name="wallet_voting_amount">+5 Đ لكل تصويت</string>
+    <string name="wallet_propose">تقديم اقتراح</string>
+    <string name="wallet_propose_amount">+20 Đ لكل اقتراح</string>
+    <string name="wallet_winning_election">الفوز بالانتخابات</string>
+    <string name="wallet_footer_1">دولة أُمّة الرقمية</string>
+    <string name="wallet_footer_2">دينار واحد = تفاعل واحد</string>
+    <string name="transfer_balance">رصيدك:</string>
+    <string name="transfer_history">سجل التحويلات</string>
+    <string name="transfer_sent">📤 أرسلت</string>
+    <string name="transfer_received">📥 استقبلت</string>
+    <string name="transfer_to">إلى: </string>
+    <string name="transfer_from">من: </string>
+    <string name="transfer_id_hint">الرقم الوطني (UMM-XXXX-XXXX-XXXX)</string>
+    <string name="transfer_give_number">أعطِ هذا الرقم لمن يريد أن يرسل لك:</string>
+    <string name="chat_muted">🔇 أنت مكتوم — </string>
+    <string name="chat_minutes"> دقيقة</string>
+    <string name="chat_error">خطأ: </string>
+    <string name="chat_report_title">هل تريد الإبلاغ عن هذه الرسالة؟</string>
+    <string name="chat_from">من: </string>
 </resources>

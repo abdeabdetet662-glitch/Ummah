@@ -276,4 +276,27 @@
     <string name="setting_delete_done">🗑️ Compte supprimé</string>
     <string name="setting_cancel">Annuler</string>
     <string name="setting_toggle_msg">%1$s %2$s</string>
+    <string name="wallet_give_number">Donnez ce numéro à quiconque veut vous envoyer des dinars:</string>
+    <string name="wallet_daily_reward">Récompense quotidienne</string>
+    <string name="wallet_daily_reward_amount">+5 Đ chaque jour</string>
+    <string name="wallet_voting">Voter sur une proposition</string>
+    <string name="wallet_voting_amount">+5 Đ par vote</string>
+    <string name="wallet_propose">Soumettre une proposition</string>
+    <string name="wallet_propose_amount">+20 Đ par proposition</string>
+    <string name="wallet_winning_election">Gagner les élections</string>
+    <string name="wallet_footer_1">État numérique Ummah</string>
+    <string name="wallet_footer_2">Un dinar = une interaction</string>
+    <string name="transfer_balance">Votre solde:</string>
+    <string name="transfer_history">Historique des transferts</string>
+    <string name="transfer_sent">📤 Envoyé</string>
+    <string name="transfer_received">📥 Reçu</string>
+    <string name="transfer_to">À: </string>
+    <string name="transfer_from">De: </string>
+    <string name="transfer_id_hint">ID national (UMM-XXXX-XXXX-XXXX)</string>
+    <string name="transfer_give_number">Donnez ce numéro à quiconque veut vous envoyer:</string>
+    <string name="chat_muted">🔇 Vous êtes en sourdine — </string>
+    <string name="chat_minutes"> min</string>
+    <string name="chat_error">Erreur: </string>
+    <string name="chat_report_title">Voulez-vous signaler ce message?</string>
+    <string name="chat_from">De: </string>
 </resources>

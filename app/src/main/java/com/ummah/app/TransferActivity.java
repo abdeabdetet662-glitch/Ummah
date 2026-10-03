@@ -68,7 +68,7 @@ public class TransferActivity extends Activity {
         root.addView(sub);
 
         TextView bLabel = new TextView(this);
-        bLabel.setText("رصيدك:");
+        bLabel.setText(getString(R.string.transfer_balance));
         bLabel.setTextColor(Color.parseColor("#9E9E9E"));
         bLabel.setTextSize(12);
         bLabel.setGravity(Gravity.CENTER);
@@ -96,7 +96,7 @@ public class TransferActivity extends Activity {
         root.addView(myIdBtn);
 
         TextView sep = new TextView(this);
-        sep.setText("\n━━━ سجل التحويلات ━━━\n");
+        sep.setText(getString(R.string.transfer_history));
         sep.setTextColor(Color.parseColor("#D4AF37"));
         sep.setTextSize(14);
         sep.setTypeface(null, Typeface.BOLD);
@@ -167,14 +167,14 @@ public class TransferActivity extends Activity {
             card.setLayoutParams(lp);
 
             TextView dir = new TextView(this);
-            dir.setText(isSender ? "📤 أرسلت" : "📥 استقبلت");
+            dir.setText(isSender ? getString(R.string.transfer_sent) : getString(R.string.transfer_received));
             dir.setTextColor(isSender ? Color.parseColor("#F44336") : Color.parseColor("#4CAF50"));
             dir.setTextSize(13);
             dir.setTypeface(null, Typeface.BOLD);
             card.addView(dir);
 
             TextView other = new TextView(this);
-            other.setText((isSender ? "إلى: " : "من: ") + (isSender ? t.to : t.from));
+            other.setText((isSender ? getString(R.string.transfer_to) : getString(R.string.transfer_from)) + (isSender ? t.to : t.from));
             other.setTextColor(Color.WHITE);
             other.setTextSize(12);
             other.setPadding(0, 6, 0, 4);
@@ -214,7 +214,7 @@ public class TransferActivity extends Activity {
         c.setPadding(40, 20, 40, 20);
 
         final EditText idInput = new EditText(this);
-        idInput.setHint("الرقم الوطني (UMM-XXXX-XXXX-XXXX)");
+        idInput.setHint(getString(R.string.transfer_id_hint));
         idInput.setTextColor(Color.WHITE);
         idInput.setHintTextColor(Color.GRAY);
         idInput.setInputType(InputType.TYPE_CLASS_TEXT);
@@ -276,7 +276,7 @@ public class TransferActivity extends Activity {
         if (me == null) return;
         new AlertDialog.Builder(this)
             .setTitle("📥 رقمك للاستقبال")
-            .setMessage("أعطِ هذا الرقم لمن يريد أن يرسل لك:\n\n" + me.nationalId)
+            .setMessage(getString(R.string.transfer_give_number) + "\n\n" + me.nationalId)
             .setPositiveButton("نسخ", (d, w) -> {
                 ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                 cm.setPrimaryClip(ClipData.newPlainText("ID", me.nationalId));
