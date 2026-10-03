@@ -140,15 +140,6 @@ public class NotificationHelper {
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setWhen(System.currentTimeMillis())
                 .setShowWhen(true);
-
-        // إضافة زر "فتح"
-        Intent openIntent = new Intent(ctx, NotificationCenterActivity.class);
-        openIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        PendingIntent openPi = PendingIntent.getActivity(
-                ctx, id + 1000, openIntent, flags);
-
-        builder.addAction(R.drawable.ic_launcher_foreground, "افتح", openPi);
-
         // عرض الإشعار
         try {
             NotificationManagerCompat nm = NotificationManagerCompat.from(ctx);
