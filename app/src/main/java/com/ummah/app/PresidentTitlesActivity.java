@@ -17,21 +17,22 @@ public class PresidentTitlesActivity extends Activity {
 
     private IdentityManager im;
     private PresidentManager pm;
-
-    private static final String[] TITLES = {
-            getString(R.string.ptitles_knight),
-            getString(R.string.ptitles_star),
-            getString(R.string.ptitles_hero),
-            getString(R.string.ptitles_noble),
-            getString(R.string.ptitles_role_model),
-            getString(R.string.ptitles_jewel),
-            getString(R.string.ptitles_falcon),
-            getString(R.string.ptitles_lion),
-    };
+    private String[] TITLES;
 
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
+
+        TITLES = new String[]{
+                getString(R.string.ptitles_knight),
+                getString(R.string.ptitles_star),
+                getString(R.string.ptitles_hero),
+                getString(R.string.ptitles_noble),
+                getString(R.string.ptitles_role_model),
+                getString(R.string.ptitles_jewel),
+                getString(R.string.ptitles_falcon),
+                getString(R.string.ptitles_lion),
+        };
         im = new IdentityManager(this);
         pm = new PresidentManager();
 
