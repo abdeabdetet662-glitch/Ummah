@@ -828,6 +828,6 @@
     <string name="notif_no_notifs">📭 Нет уведомлений</string>
     <string name="notif_count">📊 %1$d уведомление</string>
     <string name="sell_original_price_fmt">💰 Исходная цена покупки: %1$d Đ</string>
-    <string name="sell_commission_fmt">⚠️ Комиссия: 5%\nот %1$d Đ → Вы получите %2$d Đ</string>
+    <string name="sell_commission_fmt" formatted="false">⚠️ Комиссия: 5%\nот %1$d Đ → Вы получите %2$d Đ</string>
 
 </resources>

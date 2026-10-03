@@ -320,7 +320,7 @@
     <string name="gifts_price">Price:</string>
     <string name="gifts_awesome">Awesome!</string>
     <string name="gifts_national_id">Citizen national ID</string>
-    <string name="gifts_cant_send_self">You can\'t send to yourself</string>
+    <string name="gifts_cant_send_self">You can\\u2019t send to yourself</string>
     <string name="gifts_no_sent">No gifts sent yet</string>
     <string name="gifts_no_received">No gifts received yet</string>
     <string name="gifts_from">From:</string>
@@ -389,9 +389,9 @@
     <string name="court_updated">Updated</string>
     <string name="court_submit">Submit</string>
     <string name="court_file_case">File a case</string>
-    <string name="court_defendant_id">Defendant\'s national ID</string>
+    <string name="court_defendant_id">Defendant\\u2019s national ID</string>
     <string name="court_no_cases">No cases. The state lives in peace!</string>
-    <string name="court_cant_sue_self">You can\'t sue yourself</string>
+    <string name="court_cant_sue_self">You can\\u2019t sue yourself</string>
     <string name="court_can_agree">Parties may agree or appeal.</string>
     <string name="court_point1">• Fair compensation if damage proven.</string>
     <string name="court_point2">• Peaceful dialogue between parties.</string>
@@ -807,7 +807,7 @@
     <string name="id_start_journey">🎁 Start your journey</string>
     <string name="id_country_hint">Where are you from? Choose your country:</string>
     <string name="id_name_tip">💡 Choose a known name, this is your official name in the state</string>
-    <string name="id_seed_warning">⚠️ Keep these words safe — it's your only identity!</string>
+    <string name="id_seed_warning">⚠️ Keep these words safe — it\u2019s your only identity!</string>
     <string name="id_copy_seed">📋 Copy words</string>
     <string name="id_confirm_saved">✓ I saved the words safely</string>
     <string name="id_congrats">Congratulations %1$s!</string>
@@ -828,6 +828,6 @@
     <string name="notif_no_notifs">📭 No notifications</string>
     <string name="notif_count">📊 %1$d notification(s)</string>
     <string name="sell_original_price_fmt">💰 Original purchase price: %1$d Đ</string>
-    <string name="sell_commission_fmt">⚠️ App commission: 5%\nof %1$d Đ → You receive %2$d Đ</string>
+    <string name="sell_commission_fmt" formatted="false">⚠️ App commission: 5%\nof %1$d Đ → You receive %2$d Đ</string>
 
 </resources>

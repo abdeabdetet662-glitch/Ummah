@@ -830,6 +830,6 @@
     <string name="notif_no_notifs">📭 ماكانش إشعارات</string>
     <string name="notif_count">📊 %1$d إشعار</string>
     <string name="sell_original_price_fmt">💰 سعر الشراء الأصلي: %1$d Đ</string>
-    <string name="sell_commission_fmt">⚠️ عمولة التطبيق: 5%\nمن %1$d Đ → تستلم %2$d Đ</string>
+    <string name="sell_commission_fmt" formatted="false">⚠️ عمولة التطبيق: 5%\nمن %1$d Đ → تستلم %2$d Đ</string>
 
 </resources>
