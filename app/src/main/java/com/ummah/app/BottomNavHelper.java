@@ -38,10 +38,10 @@ public class BottomNavHelper {
         nav.setPadding(8, 10, 8, 10);
         wrapper.addView(nav);
 
-        addTab(act, nav, "🏠", "الرئيسية", TAB_HOME, activeTab == TAB_HOME, listener);
-        addTab(act, nav, "🛒", "السوق", TAB_MARKET, activeTab == TAB_MARKET, listener);
-        addTab(act, nav, "💬", "الدردشة", TAB_CHAT, activeTab == TAB_CHAT, listener);
-        addTab(act, nav, "👤", "حسابي", TAB_PROFILE, activeTab == TAB_PROFILE, listener);
+        addTab(act, nav, act.getString(R.string.tab_home), act.getString(R.string.tab_home_label), TAB_HOME, activeTab == TAB_HOME, listener);
+        addTab(act, nav, act.getString(R.string.tab_market), act.getString(R.string.tab_market_label), TAB_MARKET, activeTab == TAB_MARKET, listener);
+        addTab(act, nav, act.getString(R.string.tab_chat), act.getString(R.string.tab_chat_label), TAB_CHAT, activeTab == TAB_CHAT, listener);
+        addTab(act, nav, act.getString(R.string.tab_profile), act.getString(R.string.tab_profile_label), TAB_PROFILE, activeTab == TAB_PROFILE, listener);
 
         return wrapper;
     }

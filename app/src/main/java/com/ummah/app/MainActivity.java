@@ -122,7 +122,7 @@ public class MainActivity extends Activity {
                 }
             }
             @Override public void onError(String msg) {
-                Toast.makeText(MainActivity.this, "خطأ اتصال: " + msg, Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, getString(R.string.common_error_connection) + msg, Toast.LENGTH_LONG).show();
                 if (im.isCitizen()) {
                     currentCitizen = im.getCitizen();
                     showCard(currentCitizen);
@@ -166,7 +166,7 @@ public class MainActivity extends Activity {
                 fm.registerCitizen(c, wm.getBalance(), new FirebaseManager.OnDone() {
                     @Override public void onSuccess() { showCard(c); }
                     @Override public void onError(String msg) {
-                        Toast.makeText(MainActivity.this, "خطأ: " + msg, Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, getString(R.string.common_error_prefix) + msg, Toast.LENGTH_LONG).show();
                         showCard(c);
                     }
                 });
@@ -383,7 +383,7 @@ public class MainActivity extends Activity {
                 showSeedDialog(citizen);
             }
             @Override public void onError(String msg) {
-                Toast.makeText(MainActivity.this, "خطأ: " + msg, Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, getString(R.string.common_error_prefix) + msg, Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -512,7 +512,7 @@ public class MainActivity extends Activity {
                 break;
             case NavDrawerHelper.ITEM_SETTINGS:
                 try { startActivity(new Intent(this, SettingsActivity.class)); } catch (Exception e) {
-                    Toast.makeText(this, "الإعدادات — قريباً", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.main_settings_soon, Toast.LENGTH_SHORT).show();
                 }
                 break;
             case NavDrawerHelper.ITEM_ABOUT:
@@ -533,14 +533,14 @@ public class MainActivity extends Activity {
                 try { 
                     startActivity(new Intent(this, NotificationCenterActivity.class)); 
                 } catch (Exception e) {
-                    Toast.makeText(this, "تعذر فتح الإشعارات", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.main_notif_error, Toast.LENGTH_SHORT).show();
                 }
                 break;
             case NavDrawerHelper.ITEM_REDEEM:
                 try { 
                     startActivity(new Intent(this, RedeemCodeActivity.class)); 
                 } catch (Exception e) {
-                    Toast.makeText(this, "تعذر فتح الصفحة", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.main_page_error, Toast.LENGTH_SHORT).show();
                 }
                 break;
             case NavDrawerHelper.ITEM_LOGOUT:
@@ -551,7 +551,7 @@ public class MainActivity extends Activity {
 
     private void showLogoutDialog() {
         new AlertDialog.Builder(this)
-                .setTitle("🚪 تسجيل الخروج")
+                .setTitle(R.string.dialog_logout)
                 .setMessage("واش راك متأكد؟ رايح تحتاج كلماتك السرية للدخول مرة ثانية.")
                 .setPositiveButton("تسجيل الخروج", (d, w) -> {
                     getSharedPreferences("ummah_prefs", MODE_PRIVATE).edit().clear().apply();

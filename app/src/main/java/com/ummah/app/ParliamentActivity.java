@@ -212,7 +212,7 @@ public class ParliamentActivity extends Activity {
                         Toast.makeText(ParliamentActivity.this, "+20 Đ", Toast.LENGTH_SHORT).show();
                     }
                     @Override public void onError(String msg) {
-                        Toast.makeText(ParliamentActivity.this, "خطأ: " + msg, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ParliamentActivity.this, getString(R.string.common_error_prefix) + msg, Toast.LENGTH_SHORT).show();
                     }
                 });
             })

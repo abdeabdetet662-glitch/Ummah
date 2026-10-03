@@ -174,7 +174,7 @@ public class ConstitutionActivity extends Activity {
                 recreate();
             }
             @Override public void onError(String msg) {
-                Toast.makeText(ConstitutionActivity.this, "خطأ: " + msg, Toast.LENGTH_SHORT).show();
+                Toast.makeText(ConstitutionActivity.this, getString(R.string.common_error_prefix) + msg, Toast.LENGTH_SHORT).show();
             }
         });
     }

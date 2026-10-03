@@ -832,4 +832,45 @@
     <string name="sell_original_price_fmt">💰 سعر الشراء الأصلي: %1$d Đ</string>
     <string name="sell_commission_fmt" formatted="false">⚠️ عمولة التطبيق: 5%\nمن %1$d Đ → تستلم %2$d Đ</string>
 
+
+    <!-- Batch 7 -->
+    <string name="common_error_connection">خطأ اتصال: </string>
+    <string name="congrats">🎉 مبروك!</string>
+    <string name="no_candidates">لا يوجد مرشحون</string>
+    <string name="citizen_ummah">مواطن أُمّة</string>
+    <string name="main_settings_soon">الإعدادات — قريباً</string>
+    <string name="main_notif_error">تعذر فتح الإشعارات</string>
+    <string name="main_page_error">تعذر فتح الصفحة</string>
+    <string name="dialog_logout">🚪 تسجيل الخروج</string>
+    <string name="chat_blocked">🚫 أنت محظور من الإرسال</string>
+    <string name="dialog_report">🚩 إبلاغ عن الرسالة</string>
+    <string name="election_voted_short">صوّتت لـ </string>
+    <string name="gifts_send_prefix">🎁 إرسال </string>
+    <string name="transfer_dialog_title">تحويل دينار</string>
+    <string name="cmarket_confirm_dialog">تأكيد الشراء</string>
+    <string name="pardon_dialog_title">⚖️  عفو رئاسي</string>
+    <string name="tab_home">🏠</string>
+    <string name="tab_market">🛒</string>
+    <string name="tab_chat">💬</string>
+    <string name="tab_profile">👤</string>
+    <string name="tab_home_label">الرئيسية</string>
+    <string name="tab_market_label">السوق</string>
+    <string name="tab_chat_label">الدردشة</string>
+    <string name="tab_profile_label">حسابي</string>
+
+
+    <!-- Batch 7.1 -->
+    <string name="toast_fill_fields">املأ الحقول</string>
+    <string name="toast_invalid_amount">مبلغ غير صالح</string>
+    <string name="toast_transfer_done">✅ تم التحويل</string>
+    <string name="toast_copied">تم النسخ</string>
+    <string name="toast_copied_check">✓ تم النسخ</string>
+    <string name="toast_updating">جاري التحديث...</string>
+    <string name="toast_avatar_saved">✅ تم حفظ شخصيتك!</string>
+    <string name="id_error_country">⚠️ اختر بلدك أولاً</string>
+    <string name="id_error_name_empty">⚠️ لازم تكتب اسم</string>
+    <string name="id_error_name_short">⚠️ الاسم قصير برشا</string>
+    <string name="id_error_confirm">⚠️ أكد أنك حفظت الكلمات</string>
+    <string name="pres_invalid_amount">مبلغ غير صحيح</string>
+
 </resources>

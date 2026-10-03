@@ -85,7 +85,7 @@ public class GarageActivity extends Activity {
                 runOnUiThread(() -> renderVehicles());
             }
             @Override public void onError(String msg) {
-                runOnUiThread(() -> Toast.makeText(GarageActivity.this, "خطأ: " + msg, Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(GarageActivity.this, getString(R.string.common_error_prefix) + msg, Toast.LENGTH_SHORT).show());
             }
         });
     }

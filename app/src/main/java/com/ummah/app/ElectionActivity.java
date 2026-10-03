@@ -266,7 +266,7 @@ public class ElectionActivity extends Activity {
                         db.collection("candidates").document(candidateId)
                             .update("votes", com.google.firebase.firestore.FieldValue.increment(1))
                             .addOnSuccessListener(x -> {
-                                Toast.makeText(this, "صوّتت لـ " + candidateName, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(this, getString(R.string.election_voted_short) + candidateName, Toast.LENGTH_SHORT).show();
                                 myVoteView.setText(getString(R.string.election_voted_for) + candidateName);
                                 myVoteView.setTextColor(Color.parseColor("#4CAF50"));
                             });
@@ -281,7 +281,7 @@ public class ElectionActivity extends Activity {
             .get()
             .addOnSuccessListener(q -> {
                 if (q.isEmpty()) {
-                    Toast.makeText(this, "لا يوجد مرشحون", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.no_candidates, Toast.LENGTH_SHORT).show();
                     return;
                 }
                 com.google.firebase.firestore.DocumentSnapshot d = q.getDocuments().get(0);
@@ -301,7 +301,7 @@ public class ElectionActivity extends Activity {
                 startActivity(i);
             })
             .addOnFailureListener(e ->
-                Toast.makeText(this, "خطأ: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                Toast.makeText(this, getString(R.string.common_error_prefix) + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
     private void showCandidateDialog() {
@@ -341,7 +341,7 @@ public class ElectionActivity extends Activity {
 
                         db.collection("candidates").add(cand)
                             .addOnSuccessListener(x -> Toast.makeText(this, getString(R.string.elec_registered), Toast.LENGTH_SHORT).show())
-                            .addOnFailureListener(e -> Toast.makeText(this, "خطأ: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                            .addOnFailureListener(e -> Toast.makeText(this, getString(R.string.common_error_prefix) + e.getMessage(), Toast.LENGTH_SHORT).show());
                     })
                     .setNegativeButton("إلغاء", null)
                     .show();

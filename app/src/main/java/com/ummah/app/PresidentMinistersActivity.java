@@ -149,7 +149,7 @@ public class PresidentMinistersActivity extends Activity {
                     String id = idInput.getText().toString().trim();
                     String role = roleInput.getText().toString().trim();
                     if (id.isEmpty() || role.isEmpty()) {
-                        Toast.makeText(this, "أكمل الحقول", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, R.string.toast_fill_fields, Toast.LENGTH_SHORT).show();
                         return;
                     }
                     Citizen me = im.getCitizen();

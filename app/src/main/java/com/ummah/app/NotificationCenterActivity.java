@@ -281,7 +281,7 @@ public class NotificationCenterActivity extends Activity {
             }
             if (intent != null) startActivity(intent);
         } catch (Exception e) {
-            Toast.makeText(this, "تعذر فتح الصفحة", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.main_page_error, Toast.LENGTH_SHORT).show();
         }
     }
 

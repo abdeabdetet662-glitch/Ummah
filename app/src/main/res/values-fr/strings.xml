@@ -830,4 +830,45 @@
     <string name="sell_original_price_fmt">💰 Prix d\u2019achat original: %1$d Đ</string>
     <string name="sell_commission_fmt" formatted="false">⚠️ Commission: 5%\nde %1$d Đ → Vous recevez %2$d Đ</string>
 
+
+    <!-- Batch 7 -->
+    <string name="common_error_connection">Erreur de connexion: </string>
+    <string name="congrats">🎉 Félicitations!</string>
+    <string name="no_candidates">Aucun candidat</string>
+    <string name="citizen_ummah">Citoyen d\u2019Ummah</string>
+    <string name="main_settings_soon">Paramètres — bientôt</string>
+    <string name="main_notif_error">Impossible d\u2019ouvrir les notifications</string>
+    <string name="main_page_error">Impossible d\u2019ouvrir la page</string>
+    <string name="dialog_logout">🚪 Déconnexion</string>
+    <string name="chat_blocked">🚫 Vous êtes bloqué de l\u2019envoi</string>
+    <string name="dialog_report">🚩 Signaler le message</string>
+    <string name="election_voted_short">Vous avez voté pour </string>
+    <string name="gifts_send_prefix">🎁 Envoyer </string>
+    <string name="transfer_dialog_title">Transfert de dinar</string>
+    <string name="cmarket_confirm_dialog">Confirmer l\u2019achat</string>
+    <string name="pardon_dialog_title">⚖️  Grâce présidentielle</string>
+    <string name="tab_home">🏠</string>
+    <string name="tab_market">🛒</string>
+    <string name="tab_chat">💬</string>
+    <string name="tab_profile">👤</string>
+    <string name="tab_home_label">Accueil</string>
+    <string name="tab_market_label">Marché</string>
+    <string name="tab_chat_label">Chat</string>
+    <string name="tab_profile_label">Profil</string>
+
+
+    <!-- Batch 7.1 -->
+    <string name="toast_fill_fields">Remplissez les champs</string>
+    <string name="toast_invalid_amount">Montant invalide</string>
+    <string name="toast_transfer_done">✅ Transfert effectué</string>
+    <string name="toast_copied">Copié</string>
+    <string name="toast_copied_check">✓ Copié</string>
+    <string name="toast_updating">Mise à jour...</string>
+    <string name="toast_avatar_saved">✅ Votre avatar est sauvegardé!</string>
+    <string name="id_error_country">⚠️ Choisissez d\u2019abord votre pays</string>
+    <string name="id_error_name_empty">⚠️ Vous devez écrire un nom</string>
+    <string name="id_error_name_short">⚠️ Nom trop court</string>
+    <string name="id_error_confirm">⚠️ Confirmez avoir sauvegardé les mots</string>
+    <string name="pres_invalid_amount">Montant incorrect</string>
+
 </resources>

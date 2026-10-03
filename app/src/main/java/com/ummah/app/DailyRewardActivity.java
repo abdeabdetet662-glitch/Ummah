@@ -116,7 +116,7 @@ public class DailyRewardActivity extends Activity {
                 updateUI();
             }
             @Override public void onError(String msg) {
-                Toast.makeText(DailyRewardActivity.this, "خطأ: " + msg, Toast.LENGTH_SHORT).show();
+                Toast.makeText(DailyRewardActivity.this, getString(R.string.common_error_prefix) + msg, Toast.LENGTH_SHORT).show();
             }
         });
     }

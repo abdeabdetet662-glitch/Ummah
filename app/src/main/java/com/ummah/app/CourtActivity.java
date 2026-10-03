@@ -238,7 +238,7 @@ public class CourtActivity extends Activity {
                 Toast.makeText(CourtActivity.this, getString(R.string.court_updated), Toast.LENGTH_SHORT).show();
             }
             @Override public void onError(String msg) {
-                Toast.makeText(CourtActivity.this, "خطأ: " + msg, Toast.LENGTH_SHORT).show();
+                Toast.makeText(CourtActivity.this, getString(R.string.common_error_prefix) + msg, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -290,7 +290,7 @@ public class CourtActivity extends Activity {
                                 Toast.makeText(CourtActivity.this, getString(R.string.court_filed), Toast.LENGTH_LONG).show();
                             }
                             @Override public void onError(String msg) {
-                                Toast.makeText(CourtActivity.this, "خطأ: " + msg, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(CourtActivity.this, getString(R.string.common_error_prefix) + msg, Toast.LENGTH_SHORT).show();
                             }
                         });
                     }

@@ -118,7 +118,7 @@ public class CityMapActivity extends Activity {
                 runOnUiThread(() -> sendToWeb());
             }
             @Override public void onError(String msg) {
-                runOnUiThread(() -> Toast.makeText(CityMapActivity.this, "خطأ: " + msg, Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(CityMapActivity.this, getString(R.string.common_error_prefix) + msg, Toast.LENGTH_SHORT).show());
             }
         });
     }
@@ -196,7 +196,7 @@ public class CityMapActivity extends Activity {
                         .show();
             }
         } catch (Exception e) {
-            Toast.makeText(this, "خطأ: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.common_error_prefix) + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 

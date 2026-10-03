@@ -386,7 +386,7 @@ public class IdentityCreationActivity extends Activity {
         btnCopy.setOnClickListener(v -> {
             ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
             cm.setPrimaryClip(ClipData.newPlainText("seed", seedPhrase));
-            Toast.makeText(this, "✓ تم النسخ", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.toast_copied_check, Toast.LENGTH_SHORT).show();
         });
         contentBox.addView(btnCopy);
 
@@ -483,7 +483,7 @@ public class IdentityCreationActivity extends Activity {
         switch (currentStep) {
             case 1:
                 if (selectedCountry == null || selectedCountry.isEmpty()) {
-                    Toast.makeText(this, "⚠️ اختر بلدك أولاً", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.id_error_country, Toast.LENGTH_SHORT).show();
                     return;
                 }
                 showStep(2);
@@ -492,11 +492,11 @@ public class IdentityCreationActivity extends Activity {
             case 2:
                 userName = etName.getText().toString().trim();
                 if (userName.isEmpty()) {
-                    Toast.makeText(this, "⚠️ لازم تكتب اسم", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.id_error_name_empty, Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if (userName.length() < 2) {
-                    Toast.makeText(this, "⚠️ الاسم قصير برشا", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.id_error_name_short, Toast.LENGTH_SHORT).show();
                     return;
                 }
                 showStep(3);
@@ -504,7 +504,7 @@ public class IdentityCreationActivity extends Activity {
 
             case 3:
                 if (cbConfirm == null || !cbConfirm.isChecked()) {
-                    Toast.makeText(this, "⚠️ أكد أنك حفظت الكلمات", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.id_error_confirm, Toast.LENGTH_SHORT).show();
                     return;
                 }
                 showStep(4);
@@ -561,7 +561,7 @@ public class IdentityCreationActivity extends Activity {
 
         // رسالة تأكيد
         new AlertDialog.Builder(this)
-                .setTitle("🎉 مبروك!")
+                .setTitle(R.string.congrats)
                 .setMessage("راك مواطن أُمّة رسمياً!\n\n💰 +5 دج في محفظتك\n\nيلا نبداو رحلتك")
                 .setPositiveButton("🚀 ابدأ", (d, w) -> {
                     startActivity(new Intent(this, MainActivity.class));

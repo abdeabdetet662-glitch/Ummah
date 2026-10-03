@@ -301,7 +301,7 @@ public class RedeemCodeActivity extends Activity {
 
         // Dialog النجاح
         new AlertDialog.Builder(this)
-            .setTitle("🎉 مبروك!")
+            .setTitle(R.string.congrats)
             .setMessage("✅ تم استبدال الكود بنجاح!\n\n" +
                     "💰 +" + amount + " Đ\n" +
                     (note != null && !note.isEmpty() ? "📝 " + note : ""))

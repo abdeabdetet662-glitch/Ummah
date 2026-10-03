@@ -183,11 +183,11 @@ public class ChatActivity extends Activity {
 
     private void sendMessage() {
         if (isBlocked) {
-            Toast.makeText(this, "🚫 أنت محظور من الإرسال", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.chat_blocked, Toast.LENGTH_LONG).show();
             return;
         }
         if (isMuted && mutedUntil > System.currentTimeMillis()) {
-            Toast.makeText(this, "🔇 أنت مكتوم مؤقتاً", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.chat_muted, Toast.LENGTH_LONG).show();
             return;
         }
         String text = input.getText().toString().trim();
@@ -324,7 +324,7 @@ public class ChatActivity extends Activity {
 
     private void reportMessage(final FirebaseManager.ChatMessage m) {
         new AlertDialog.Builder(this)
-            .setTitle("🚩 إبلاغ عن الرسالة")
+            .setTitle(R.string.dialog_report)
             .setMessage(getString(R.string.chat_report_title) + "\n\n\"" + m.text + "\"\n\n" + getString(R.string.chat_from) + m.author)
             .setPositiveButton("إبلاغ", (d, w) -> {
                 fm.reportMessage(me.nationalId, me.name, m.nationalId, m.author,

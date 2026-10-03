@@ -184,7 +184,7 @@ public class NewsActivity extends Activity {
                         Toast.makeText(NewsActivity.this, getString(R.string.news_published), Toast.LENGTH_SHORT).show();
                     }
                     @Override public void onError(String msg) {
-                        Toast.makeText(NewsActivity.this, "خطأ: " + msg, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(NewsActivity.this, getString(R.string.common_error_prefix) + msg, Toast.LENGTH_SHORT).show();
                     }
                 });
             })

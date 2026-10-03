@@ -197,7 +197,7 @@ public class WheelActivity extends Activity {
                 runOnUiThread(() -> wheelView.setSegments(list));
             }
             @Override public void onError(String msg) {
-                runOnUiThread(() -> Toast.makeText(WheelActivity.this, "خطأ: " + msg, Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(WheelActivity.this, getString(R.string.common_error_prefix) + msg, Toast.LENGTH_SHORT).show());
             }
         });
 

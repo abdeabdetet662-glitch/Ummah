@@ -72,7 +72,7 @@ public class CitizenMarketActivity extends Activity {
                 runOnUiThread(() -> render(listings));
             }
             @Override public void onError(String msg) {
-                runOnUiThread(() -> Toast.makeText(CitizenMarketActivity.this, "خطأ: " + msg, Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(CitizenMarketActivity.this, getString(R.string.common_error_prefix) + msg, Toast.LENGTH_SHORT).show());
             }
         });
     }
@@ -206,7 +206,7 @@ public class CitizenMarketActivity extends Activity {
         }
 
         new AlertDialog.Builder(this)
-                .setTitle("تأكيد الشراء")
+                .setTitle(R.string.cmarket_confirm_dialog)
                 .setMessage("هل تريد شراء:\\n\\n" + cl.itemName +
                         "\\n\\nمن: " + cl.sellerName +
                         "\\n\\nبسعر: " + cl.price + " Đ")

@@ -89,7 +89,7 @@ public class JobsActivity extends Activity {
                 runOnUiThread(() -> renderJobs(jobs));
             }
             @Override public void onError(String msg) {
-                runOnUiThread(() -> Toast.makeText(JobsActivity.this, "خطأ: " + msg, Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(JobsActivity.this, getString(R.string.common_error_prefix) + msg, Toast.LENGTH_SHORT).show());
             }
         });
     }

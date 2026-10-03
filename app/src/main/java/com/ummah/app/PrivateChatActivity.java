@@ -117,7 +117,7 @@ public class PrivateChatActivity extends Activity {
         fm.sendPrivateMessage(me.nationalId, me.name, otherId, text, new FirebaseManager.OnDone() {
             @Override public void onSuccess() {}
             @Override public void onError(String msg) {
-                Toast.makeText(PrivateChatActivity.this, "خطأ: " + msg, Toast.LENGTH_SHORT).show();
+                Toast.makeText(PrivateChatActivity.this, getString(R.string.common_error_prefix) + msg, Toast.LENGTH_SHORT).show();
             }
         });
     }

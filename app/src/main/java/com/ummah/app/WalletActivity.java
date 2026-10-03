@@ -140,7 +140,7 @@ public class WalletActivity extends Activity {
         Button showIdBtn = UiHelper.secondaryButton(this, "عرض الرقم");
         showIdBtn.setOnClickListener(v -> {
             new AlertDialog.Builder(WalletActivity.this)
-                .setTitle("رقمك للاستقبال")
+                .setTitle(R.string.wallet_id_label)
                 .setMessage(getString(R.string.wallet_give_number) + "\n\n" + c.nationalId)
                 .setPositiveButton(getString(R.string.btn_ok), null)
                 .show();
@@ -152,7 +152,7 @@ public class WalletActivity extends Activity {
         // زر تحديث
         Button refreshBtn = UiHelper.actionButton(this, "🔄  تحديث الرصيد", "#1B5E20");
         refreshBtn.setOnClickListener(v -> {
-            Toast.makeText(WalletActivity.this, "جاري التحديث...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(WalletActivity.this, R.string.toast_updating, Toast.LENGTH_SHORT).show();
             startBalanceListener();
         });
         root.addView(refreshBtn);

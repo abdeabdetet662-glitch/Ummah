@@ -378,7 +378,7 @@ public class GiftsActivity extends Activity {
         content.addView(idInput);
 
         new AlertDialog.Builder(this)
-            .setTitle("🎁 إرسال " + gift.name)
+            .setTitle(getString(R.string.gifts_send_prefix) + gift.name)
             .setView(content)
             .setPositiveButton("🎁 إرسال", (d, w) -> {
                 String toId = idInput.getText().toString().trim();
@@ -395,7 +395,7 @@ public class GiftsActivity extends Activity {
                         showCelebration(gift);
                     }
                     @Override public void onError(String msg) {
-                        Toast.makeText(GiftsActivity.this, "خطأ: " + msg, Toast.LENGTH_LONG).show();
+                        Toast.makeText(GiftsActivity.this, getString(R.string.common_error_prefix) + msg, Toast.LENGTH_LONG).show();
                     }
                 });
             })

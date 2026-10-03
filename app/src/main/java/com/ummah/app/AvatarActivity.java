@@ -229,7 +229,7 @@ public class AvatarActivity extends Activity {
         if (c == null) return;
         am.saveAvatar(c.nationalId, current, new AvatarManager.OnDone() {
             @Override public void onSuccess() {
-                Toast.makeText(AvatarActivity.this, "✅ تم حفظ شخصيتك!", Toast.LENGTH_LONG).show();
+                Toast.makeText(AvatarActivity.this, R.string.toast_avatar_saved, Toast.LENGTH_LONG).show();
             }
             @Override public void onError(String msg) {
                 Toast.makeText(AvatarActivity.this, "❌ " + msg, Toast.LENGTH_LONG).show();

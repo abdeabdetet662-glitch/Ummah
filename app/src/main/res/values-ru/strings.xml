@@ -830,4 +830,45 @@
     <string name="sell_original_price_fmt">💰 Исходная цена покупки: %1$d Đ</string>
     <string name="sell_commission_fmt" formatted="false">⚠️ Комиссия: 5%\nот %1$d Đ → Вы получите %2$d Đ</string>
 
+
+    <!-- Batch 7 -->
+    <string name="common_error_connection">Ошибка соединения: </string>
+    <string name="congrats">🎉 Поздравляем!</string>
+    <string name="no_candidates">Нет кандидатов</string>
+    <string name="citizen_ummah">Гражданин Уммы</string>
+    <string name="main_settings_soon">Настройки — скоро</string>
+    <string name="main_notif_error">Не удаётся открыть уведомления</string>
+    <string name="main_page_error">Не удаётся открыть страницу</string>
+    <string name="dialog_logout">🚪 Выход</string>
+    <string name="chat_blocked">🚫 Вам запрещено отправлять</string>
+    <string name="dialog_report">🚩 Пожаловаться на сообщение</string>
+    <string name="election_voted_short">Вы проголосовали за </string>
+    <string name="gifts_send_prefix">🎁 Отправить </string>
+    <string name="transfer_dialog_title">Перевод динара</string>
+    <string name="cmarket_confirm_dialog">Подтвердить покупку</string>
+    <string name="pardon_dialog_title">⚖️  Президентское помилование</string>
+    <string name="tab_home">🏠</string>
+    <string name="tab_market">🛒</string>
+    <string name="tab_chat">💬</string>
+    <string name="tab_profile">👤</string>
+    <string name="tab_home_label">Главная</string>
+    <string name="tab_market_label">Рынок</string>
+    <string name="tab_chat_label">Чат</string>
+    <string name="tab_profile_label">Профиль</string>
+
+
+    <!-- Batch 7.1 -->
+    <string name="toast_fill_fields">Заполните поля</string>
+    <string name="toast_invalid_amount">Неверная сумма</string>
+    <string name="toast_transfer_done">✅ Перевод выполнен</string>
+    <string name="toast_copied">Скопировано</string>
+    <string name="toast_copied_check">✓ Скопировано</string>
+    <string name="toast_updating">Обновление...</string>
+    <string name="toast_avatar_saved">✅ Ваш аватар сохранён!</string>
+    <string name="id_error_country">⚠️ Сначала выберите страну</string>
+    <string name="id_error_name_empty">⚠️ Введите имя</string>
+    <string name="id_error_name_short">⚠️ Имя слишком короткое</string>
+    <string name="id_error_confirm">⚠️ Подтвердите сохранение слов</string>
+    <string name="pres_invalid_amount">Неверная сумма</string>
+
 </resources>

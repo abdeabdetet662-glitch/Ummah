@@ -830,4 +830,45 @@
     <string name="sell_original_price_fmt">💰 Original purchase price: %1$d Đ</string>
     <string name="sell_commission_fmt" formatted="false">⚠️ App commission: 5%\nof %1$d Đ → You receive %2$d Đ</string>
 
+
+    <!-- Batch 7 -->
+    <string name="common_error_connection">Connection error: </string>
+    <string name="congrats">🎉 Congratulations!</string>
+    <string name="no_candidates">No candidates</string>
+    <string name="citizen_ummah">Ummah Citizen</string>
+    <string name="main_settings_soon">Settings — coming soon</string>
+    <string name="main_notif_error">Cannot open notifications</string>
+    <string name="main_page_error">Cannot open page</string>
+    <string name="dialog_logout">🚪 Logout</string>
+    <string name="chat_blocked">🚫 You are blocked from sending</string>
+    <string name="dialog_report">🚩 Report message</string>
+    <string name="election_voted_short">You voted for </string>
+    <string name="gifts_send_prefix">🎁 Send </string>
+    <string name="transfer_dialog_title">Transfer Dinar</string>
+    <string name="cmarket_confirm_dialog">Confirm Purchase</string>
+    <string name="pardon_dialog_title">⚖️  Presidential Pardon</string>
+    <string name="tab_home">🏠</string>
+    <string name="tab_market">🛒</string>
+    <string name="tab_chat">💬</string>
+    <string name="tab_profile">👤</string>
+    <string name="tab_home_label">Home</string>
+    <string name="tab_market_label">Market</string>
+    <string name="tab_chat_label">Chat</string>
+    <string name="tab_profile_label">Profile</string>
+
+
+    <!-- Batch 7.1 -->
+    <string name="toast_fill_fields">Fill in the fields</string>
+    <string name="toast_invalid_amount">Invalid amount</string>
+    <string name="toast_transfer_done">✅ Transfer complete</string>
+    <string name="toast_copied">Copied</string>
+    <string name="toast_copied_check">✓ Copied</string>
+    <string name="toast_updating">Updating...</string>
+    <string name="toast_avatar_saved">✅ Your avatar is saved!</string>
+    <string name="id_error_country">⚠️ Choose your country first</string>
+    <string name="id_error_name_empty">⚠️ You must enter a name</string>
+    <string name="id_error_name_short">⚠️ Name is too short</string>
+    <string name="id_error_confirm">⚠️ Confirm you saved the words</string>
+    <string name="pres_invalid_amount">Incorrect amount</string>
+
 </resources>

@@ -155,7 +155,7 @@ public class TreasuryActivity extends Activity {
                     }
                     @Override public void onError(String msg) {
                         wm.add(finalAmount);
-                        Toast.makeText(TreasuryActivity.this, "خطأ: " + msg, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(TreasuryActivity.this, getString(R.string.common_error_prefix) + msg, Toast.LENGTH_SHORT).show();
                     }
                 });
             })

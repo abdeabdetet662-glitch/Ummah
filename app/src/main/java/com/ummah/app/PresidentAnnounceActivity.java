@@ -81,7 +81,7 @@ public class PresidentAnnounceActivity extends Activity {
             String t = titleInput.getText().toString().trim();
             String c = contentInput.getText().toString().trim();
             if (t.isEmpty() || c.isEmpty()) {
-                Toast.makeText(this, "أكمل الحقول", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.toast_fill_fields, Toast.LENGTH_SHORT).show();
                 return;
             }
             new AlertDialog.Builder(this)

@@ -109,7 +109,7 @@ public class PresidentGiftActivity extends Activity {
             }
             int amt;
             try { amt = Integer.parseInt(amtS); } catch (Exception e) {
-                Toast.makeText(this, "مبلغ غير صحيح", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.pres_invalid_amount, Toast.LENGTH_SHORT).show();
                 return;
             }
             if (amt < 1) { Toast.makeText(this, getString(R.string.pgift_amount_positive), Toast.LENGTH_SHORT).show(); return; }

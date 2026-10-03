@@ -139,7 +139,7 @@ public class PresidentPardonActivity extends Activity {
 
     private void confirmPardon(final PresidentManager.PresidentCitizen pc) {
         new AlertDialog.Builder(this)
-                .setTitle("⚖️  عفو رئاسي")
+                .setTitle(R.string.pardon_dialog_title)
                 .setMessage("رفع الحظر والكتم عن:\n\n👤 " + pc.name + "\n🆔 " + pc.nationalId)
                 .setPositiveButton("إصدار العفو", (d, w) -> {
                     Citizen me = im.getCitizen();

@@ -239,7 +239,7 @@ public class TransferActivity extends Activity {
         c.addView(noteInput);
 
         new AlertDialog.Builder(this)
-            .setTitle("تحويل دينار")
+            .setTitle(R.string.transfer_dialog_title)
             .setView(c)
             .setPositiveButton("إرسال", (d, w) -> {
                 String toId = idInput.getText().toString().trim();
@@ -248,19 +248,19 @@ public class TransferActivity extends Activity {
                 Citizen me = im.getCitizen();
                 if (me == null) return;
                 if (toId.isEmpty() || amtStr.isEmpty()) {
-                    Toast.makeText(this, "املأ الحقول", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.toast_fill_fields, Toast.LENGTH_SHORT).show();
                     return;
                 }
                 int amount;
                 try { amount = Integer.parseInt(amtStr); }
                 catch (Exception e) { amount = 0; }
                 if (amount <= 0) {
-                    Toast.makeText(this, "مبلغ غير صالح", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.toast_invalid_amount, Toast.LENGTH_SHORT).show();
                     return;
                 }
                 fm.transfer(me.nationalId, toId, amount, note, new FirebaseManager.OnDone() {
                     @Override public void onSuccess() {
-                        Toast.makeText(TransferActivity.this, "✅ تم التحويل", Toast.LENGTH_LONG).show();
+                        Toast.makeText(TransferActivity.this, R.string.toast_transfer_done, Toast.LENGTH_LONG).show();
                     }
                     @Override public void onError(String msg) {
                         Toast.makeText(TransferActivity.this, "❌ " + msg, Toast.LENGTH_LONG).show();
@@ -275,12 +275,12 @@ public class TransferActivity extends Activity {
         Citizen me = im.getCitizen();
         if (me == null) return;
         new AlertDialog.Builder(this)
-            .setTitle("📥 رقمك للاستقبال")
+            .setTitle(R.string.wallet_id_label)
             .setMessage(getString(R.string.transfer_give_number) + "\n\n" + me.nationalId)
             .setPositiveButton("نسخ", (d, w) -> {
                 ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                 cm.setPrimaryClip(ClipData.newPlainText("ID", me.nationalId));
-                Toast.makeText(this, "تم النسخ", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.toast_copied, Toast.LENGTH_SHORT).show();
             })
             .setNegativeButton("إغلاق", null)
             .show();
