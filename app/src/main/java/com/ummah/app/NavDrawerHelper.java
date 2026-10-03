@@ -241,7 +241,7 @@ public class NavDrawerHelper {
 
         TextView name = new TextView(activity);
         String userName = (citizen != null && citizen.name != null && !citizen.name.isEmpty())
-                ? citizen.name : getString(R.string.citizen_ummah);
+                ? citizen.name : activity.getString(R.string.citizen_ummah);
         name.setText(userName);
         name.setTextColor(Color.parseColor("#D4AF37"));
         name.setTextSize(18);
