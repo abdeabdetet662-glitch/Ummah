@@ -64,40 +64,7 @@ public class MainActivity extends Activity {
         // بدء الاستماع للإشعارات
         notifListener = new NotificationListener(this);
         
-        // ═══ اختبار إشعار محلي (مؤقت للتشخيص) ═══
-        android.os.Handler testHandler = new android.os.Handler();
-        testHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    String uidDebug = "غير معروف";
-                    try {
-                        IdentityManager imDbg = new IdentityManager(MainActivity.this);
-                        if (imDbg.isCitizen() && imDbg.getCitizen() != null) {
-                            uidDebug = imDbg.getCitizen().nationalId;
-                        }
-                    } catch (Exception ignored) {}
-                    
-                    // Toast ب UID
-                    Toast.makeText(MainActivity.this,
-                        "🔍 UID: " + uidDebug,
-                        Toast.LENGTH_LONG).show();
-                    
-                    // إشعار محلي فوري
-                    NotificationHelper.show(
-                        MainActivity.this,
-                        "🎁 اختبار محلي",
-                        "إذا شفت هاد الإشعار، النظام يخدم! UID: " + uidDebug,
-                        "gift",
-                        12345
-                    );
-                    
-                    android.util.Log.d("UmmahTest", "🧪 اختبار محلي: " + uidDebug);
-                } catch (Exception e) {
-                    android.util.Log.e("UmmahTest", "❌ فشل الاختبار", e);
-                }
-            }
-        }, 3000);
+        
         
         
         try {
