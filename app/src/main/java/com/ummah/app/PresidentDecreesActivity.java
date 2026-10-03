@@ -43,23 +43,23 @@ public class PresidentDecreesActivity extends Activity {
         root.setPadding(30, 50, 30, 60);
         scroll.addView(root);
 
-        TextView title = UiHelper.goldTitle(this, "📜  المراسيم الرئاسية", 26);
+        TextView title = UiHelper.goldTitle(this, getString(R.string.pdecree_history), 26);
         root.addView(title);
 
         TextView sub = new TextView(this);
-        sub.setText("أصدر قرارات رسمية للدولة");
+        sub.setText(getString(R.string.pdecree_subtitle));
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(13);
         sub.setGravity(Gravity.CENTER);
         sub.setPadding(0, 0, 0, 24);
         root.addView(sub);
 
-        Button addBtn = UiHelper.primaryButton(this, "➕  إصدار مرسوم جديد");
+        Button addBtn = UiHelper.primaryButton(this, getString(R.string.pdecree_new));
         addBtn.setOnClickListener(v -> showIssueDialog());
         root.addView(addBtn);
 
         TextView listTitle = new TextView(this);
-        listTitle.setText("📋  المراسيم السابقة");
+        listTitle.setText(getString(R.string.pdecree_previous));
         listTitle.setTextColor(Color.parseColor("#D4AF37"));
         listTitle.setTextSize(15);
         listTitle.setTypeface(null, Typeface.BOLD);
@@ -89,7 +89,7 @@ public class PresidentDecreesActivity extends Activity {
 
         if (list.isEmpty()) {
             TextView empty = new TextView(this);
-            empty.setText("ما فيه مراسيم بعد");
+            empty.setText(getString(R.string.pdecree_empty));
             empty.setTextColor(Color.parseColor("#9E9E9E"));
             empty.setGravity(Gravity.CENTER);
             empty.setPadding(0, 40, 0, 0);
@@ -121,7 +121,7 @@ public class PresidentDecreesActivity extends Activity {
         Long ts = (Long) m.get("timestamp");
 
         TextView t = new TextView(this);
-        t.setText("📜 " + (title != null ? title : "مرسوم"));
+        t.setText("📜 " + (title != null ? title : getString(R.string.pdecree_decree)));
         t.setTextColor(Color.parseColor("#FFD700"));
         t.setTextSize(16);
         t.setTypeface(null, Typeface.BOLD);
@@ -135,7 +135,7 @@ public class PresidentDecreesActivity extends Activity {
         card.addView(c);
 
         TextView footer = new TextView(this);
-        footer.setText("👑 " + (president != null ? president : "الرئيس")
+        footer.setText("👑 " + (president != null ? president : getString(R.string.pdecree_president))
                 + "  •  " + (ts != null ? sdf.format(new Date(ts)) : ""));
         footer.setTextColor(Color.parseColor("#9E9E9E"));
         footer.setTextSize(10);
@@ -149,18 +149,18 @@ public class PresidentDecreesActivity extends Activity {
         box.setOrientation(LinearLayout.VERTICAL);
         box.setPadding(40, 20, 40, 20);
 
-        final EditText titleInput = UiHelper.input(this, "عنوان المرسوم");
+        final EditText titleInput = UiHelper.input(this, getString(R.string.pdecree_title_hint));
         box.addView(titleInput);
 
-        final EditText contentInput = UiHelper.input(this, "نص المرسوم الكامل...");
+        final EditText contentInput = UiHelper.input(this, getString(R.string.pdecree_body_hint));
         contentInput.setMinLines(4);
         contentInput.setGravity(Gravity.TOP | Gravity.START);
         box.addView(contentInput);
 
         new AlertDialog.Builder(this)
-                .setTitle("📜  إصدار مرسوم")
+                .setTitle(getString(R.string.pdecree_issue_title))
                 .setView(box)
-                .setPositiveButton("أصدر", (d, w) -> {
+                .setPositiveButton(getString(R.string.pdecree_issue), (d, w) -> {
                     String t = titleInput.getText().toString().trim();
                     String c = contentInput.getText().toString().trim();
                     if (t.isEmpty() || c.isEmpty()) {
@@ -173,7 +173,7 @@ public class PresidentDecreesActivity extends Activity {
                             new PresidentManager.OnDone() {
                         @Override public void onSuccess() {
                             Toast.makeText(PresidentDecreesActivity.this,
-                                    "✅ تم إصدار المرسوم!", Toast.LENGTH_LONG).show();
+                                    getString(R.string.pdecree_issued), Toast.LENGTH_LONG).show();
                         }
                         @Override public void onError(String m) {
                             Toast.makeText(PresidentDecreesActivity.this,

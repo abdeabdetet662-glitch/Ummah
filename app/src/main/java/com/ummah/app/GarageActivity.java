@@ -195,7 +195,7 @@ public class GarageActivity extends Activity {
 
         // السعر
         TextView price = new TextView(this);
-        price.setText("💰 سعر الشراء: " + item.price + " Đ");
+        price.setText(getString(R.string.garage_price) + item.price + " Đ");
         price.setTextColor(Color.parseColor("#D4AF37"));
         price.setTextSize(13);
         price.setPadding(0, 12, 0, 16);

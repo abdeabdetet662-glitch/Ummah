@@ -21,7 +21,7 @@ public class ElectionCelebrationActivity extends Activity {
         String slogan = getIntent().getStringExtra("president_slogan");
         int votes = getIntent().getIntExtra("votes", 0);
         if (name == null) name = "الرئيس";
-        if (slogan == null || slogan.isEmpty()) slogan = "معاً نبني أُمّة";
+        if (slogan == null || slogan.isEmpty()) slogan = getString(R.string.ecel_together);
 
         FrameLayout root = new FrameLayout(this);
         root.setBackgroundColor(Color.parseColor("#0A0A0A"));
@@ -45,15 +45,15 @@ public class ElectionCelebrationActivity extends Activity {
         crown.setScaleY(0f);
         center.addView(crown);
 
-        TextView line1 = mkText("أُعلن انتخاب", 20, "#9E9E9E", false, 30);
+        TextView line1 = mkText(getString(R.string.ecel_announce_election), 20, "#9E9E9E", false, 30);
         center.addView(line1);
         TextView presName = mkText(name, 46, "#D4AF37", true, 20);
         center.addView(presName);
-        TextView line3 = mkText("رئيساً لدولة أُمّة", 24, "#FFFFFF", false, 0);
+        TextView line3 = mkText(getString(R.string.ecel_as_president), 24, "#FFFFFF", false, 0);
         center.addView(line3);
         TextView slog = mkText("« " + slogan + " »", 18, "#FFD700", false, 40);
         center.addView(slog);
-        TextView votesV = mkText("بأصوات " + votes + " مواطن", 16, "#4CAF50", false, 20);
+        TextView votesV = mkText("بأصوات " + votes + getString(R.string.ecel_citizen), 16, "#4CAF50", false, 20);
         center.addView(votesV);
         TextView close = mkText("(اضغط في أي مكان للإغلاق)", 11, "#616161", false, 60);
         close.setAlpha(0f);

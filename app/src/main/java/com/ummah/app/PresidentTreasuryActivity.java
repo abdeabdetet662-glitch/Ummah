@@ -35,11 +35,11 @@ public class PresidentTreasuryActivity extends Activity {
         root.setPadding(30, 50, 30, 60);
         scroll.addView(root);
 
-        TextView title = UiHelper.goldTitle(this, "🏦  خزينة الدولة", 26);
+        TextView title = UiHelper.goldTitle(this, getString(R.string.ptreasury_title), 26);
         root.addView(title);
 
         TextView sub = new TextView(this);
-        sub.setText("أضف أو اسحب أموال من الخزينة");
+        sub.setText(getString(R.string.ptreasury_subtitle));
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(13);
         sub.setGravity(Gravity.CENTER);
@@ -58,7 +58,7 @@ public class PresidentTreasuryActivity extends Activity {
         card.setLayoutParams(clp);
 
         TextView lbl = new TextView(this);
-        lbl.setText("رصيد الخزينة");
+        lbl.setText(getString(R.string.ptreasury_balance));
         lbl.setTextColor(Color.parseColor("#9E9E9E"));
         lbl.setTextSize(13);
         lbl.setGravity(Gravity.CENTER);
@@ -82,11 +82,11 @@ public class PresidentTreasuryActivity extends Activity {
 
         root.addView(card);
 
-        Button addBtn = UiHelper.primaryButton(this, "➕  إضافة للخزينة");
+        Button addBtn = UiHelper.primaryButton(this, getString(R.string.ptreasury_add_section));
         addBtn.setOnClickListener(v -> showAmountDialog(true));
         root.addView(addBtn);
 
-        Button withdrawBtn = UiHelper.actionButton(this, "➖  سحب من الخزينة", "#C62828");
+        Button withdrawBtn = UiHelper.actionButton(this, getString(R.string.ptreasury_withdraw_section), "#C62828");
         withdrawBtn.setOnClickListener(v -> showAmountDialog(false));
         root.addView(withdrawBtn);
 
@@ -110,9 +110,9 @@ public class PresidentTreasuryActivity extends Activity {
         box.addView(input);
 
         new AlertDialog.Builder(this)
-                .setTitle(isAdd ? "➕ إضافة للخزينة" : "➖ سحب من الخزينة")
+                .setTitle(isAdd ? getString(R.string.ptreasury_add_btn) : getString(R.string.ptreasury_withdraw_btn))
                 .setView(box)
-                .setPositiveButton(isAdd ? "إضافة" : "سحب", (d, w) -> {
+                .setPositiveButton(isAdd ? getString(R.string.ptreasury_add) : getString(R.string.ptreasury_withdraw), (d, w) -> {
                     String txt = input.getText().toString().trim();
                     if (txt.isEmpty()) return;
                     long amt;
@@ -123,7 +123,7 @@ public class PresidentTreasuryActivity extends Activity {
                         pm.addToTreasury(amt, new PresidentManager.OnDone() {
                             @Override public void onSuccess() {
                                 Toast.makeText(PresidentTreasuryActivity.this,
-                                        "✅ تمت الإضافة", Toast.LENGTH_SHORT).show();
+                                        getString(R.string.ptreasury_added), Toast.LENGTH_SHORT).show();
                             }
                             @Override public void onError(String msg) {
                                 Toast.makeText(PresidentTreasuryActivity.this,
@@ -134,7 +134,7 @@ public class PresidentTreasuryActivity extends Activity {
                         pm.withdrawFromTreasury(amt, new PresidentManager.OnDone() {
                             @Override public void onSuccess() {
                                 Toast.makeText(PresidentTreasuryActivity.this,
-                                        "✅ تم السحب", Toast.LENGTH_SHORT).show();
+                                        getString(R.string.ptreasury_withdrawn), Toast.LENGTH_SHORT).show();
                             }
                             @Override public void onError(String msg) {
                                 Toast.makeText(PresidentTreasuryActivity.this,

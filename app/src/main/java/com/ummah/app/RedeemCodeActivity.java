@@ -69,7 +69,7 @@ public class RedeemCodeActivity extends Activity {
         root.addView(icon);
 
         TextView title = new TextView(this);
-        title.setText("استبدال كود");
+        title.setText(R.string.redeem_title);
         title.setTextColor(Color.parseColor("#D4AF37"));
         title.setTextSize(28);
         title.setTypeface(null, Typeface.BOLD);
@@ -78,7 +78,7 @@ public class RedeemCodeActivity extends Activity {
         root.addView(title);
 
         TextView sub = new TextView(this);
-        sub.setText("عندك كود من الإدارة؟ استبدلو دابا!");
+        sub.setText(R.string.redeem_sub);
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(14);
         sub.setGravity(Gravity.CENTER);
@@ -93,7 +93,7 @@ public class RedeemCodeActivity extends Activity {
         balanceCard.setGravity(Gravity.CENTER);
 
         TextView balLbl = new TextView(this);
-        balLbl.setText("💰 رصيدك الحالي");
+        balLbl.setText(R.string.redeem_balance);
         balLbl.setTextColor(Color.parseColor("#D4AF37"));
         balLbl.setTextSize(14);
         balLbl.setGravity(Gravity.CENTER);
@@ -122,7 +122,7 @@ public class RedeemCodeActivity extends Activity {
         inputCard.setPadding(40, 40, 40, 40);
 
         TextView inputLbl = new TextView(this);
-        inputLbl.setText("🎫 اكتب الكود هنا");
+        inputLbl.setText(R.string.redeem_input);
         inputLbl.setTextColor(Color.parseColor("#D4AF37"));
         inputLbl.setTextSize(16);
         inputLbl.setTypeface(null, Typeface.BOLD);
@@ -150,7 +150,7 @@ public class RedeemCodeActivity extends Activity {
 
         // ═══ زر اللصق ═══
         Button btnPaste = new Button(this);
-        btnPaste.setText("📋 لصق من الحافظة");
+        btnPaste.setText(R.string.redeem_paste);
         btnPaste.setTextSize(13);
         btnPaste.setAllCaps(false);
         btnPaste.setTextColor(Color.parseColor("#D4AF37"));
@@ -176,7 +176,7 @@ public class RedeemCodeActivity extends Activity {
 
         // ═══ زر الاستبدال ═══
         btnRedeem = new Button(this);
-        btnRedeem.setText("✨ استبدل الكود");
+        btnRedeem.setText(R.string.redeem_btn);
         btnRedeem.setTextSize(20);
         btnRedeem.setTypeface(null, Typeface.BOLD);
         btnRedeem.setTextColor(Color.BLACK);
@@ -193,7 +193,7 @@ public class RedeemCodeActivity extends Activity {
 
         // ═══ Footer ═══
         TextView footer = new TextView(this);
-        footer.setText("⚠️ كل كود يُستعمل مرة واحدة فقط");
+        footer.setText(R.string.redeem_footer);
         footer.setTextColor(Color.parseColor("#9E9E9E"));
         footer.setTextSize(11);
         footer.setGravity(Gravity.CENTER);
@@ -221,7 +221,7 @@ public class RedeemCodeActivity extends Activity {
         }
 
         btnRedeem.setEnabled(false);
-        btnRedeem.setText("⏳ جاري التحقق...");
+        btnRedeem.setText(R.string.redeem_verifying);
 
         final String finalCode = code;
         final String myId = me.nationalId;
@@ -292,7 +292,7 @@ public class RedeemCodeActivity extends Activity {
 
     private void success(int amount, String note) {
         btnRedeem.setEnabled(true);
-        btnRedeem.setText("✨ استبدل الكود");
+        btnRedeem.setText(R.string.redeem_btn);
         etCode.setText("");
 
         // نحدّثو الرصيد في WalletManager (local cache)
@@ -312,7 +312,7 @@ public class RedeemCodeActivity extends Activity {
 
     private void fail(String msg) {
         btnRedeem.setEnabled(true);
-        btnRedeem.setText("✨ استبدل الكود");
+        btnRedeem.setText(R.string.redeem_btn);
         toast(msg);
     }
 

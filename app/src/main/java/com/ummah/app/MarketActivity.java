@@ -157,7 +157,7 @@ public class MarketActivity extends Activity {
 
         // Loading
         TextView loading = new TextView(this);
-        loading.setText("جاري التحميل...");
+        loading.setText(R.string.common_loading);
         loading.setTextColor(Color.parseColor("#9E9E9E"));
         loading.setGravity(Gravity.CENTER);
         loading.setPadding(0, 40, 0, 40);
@@ -171,7 +171,7 @@ public class MarketActivity extends Activity {
                 runOnUiThread(() -> {
                     itemsContainer.removeAllViews();
                     TextView err = new TextView(MarketActivity.this);
-                    err.setText("خطأ: " + msg);
+                    err.setText(getString(R.string.common_error_prefix) + msg);
                     err.setTextColor(Color.parseColor("#CF6679"));
                     err.setGravity(Gravity.CENTER);
                     err.setPadding(0, 40, 0, 40);

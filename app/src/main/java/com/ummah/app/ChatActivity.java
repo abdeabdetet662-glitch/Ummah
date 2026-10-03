@@ -65,7 +65,7 @@ public class ChatActivity extends Activity {
         header.setPadding(20, 40, 20, 20);
 
         TextView title = new TextView(this);
-        title.setText("💬  دردشة أُمّة");
+        title.setText(R.string.chat_title);
         title.setTextColor(Color.parseColor("#D4AF37"));
         title.setTextSize(22);
         title.setTypeface(null, Typeface.BOLD);
@@ -74,7 +74,7 @@ public class ChatActivity extends Activity {
         header.addView(title);
 
         TextView sub = new TextView(this);
-        sub.setText("✦  كل مواطني العالم هنا  ✦");
+        sub.setText(R.string.chat_subtitle);
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(11);
         sub.setGravity(Gravity.CENTER);
@@ -220,7 +220,7 @@ public class ChatActivity extends Activity {
             emptyBox.addView(icon);
 
             TextView empty = new TextView(this);
-            empty.setText("لا توجد رسائل بعد");
+            empty.setText(R.string.chat_empty);
             empty.setTextColor(Color.parseColor("#D4AF37"));
             empty.setTextSize(16);
             empty.setTypeface(null, Typeface.BOLD);
@@ -229,7 +229,7 @@ public class ChatActivity extends Activity {
             emptyBox.addView(empty);
 
             TextView hint = new TextView(this);
-            hint.setText("كن أول من يتكلم!");
+            hint.setText(R.string.chat_first_hint);
             hint.setTextColor(Color.parseColor("#9E9E9E"));
             hint.setTextSize(13);
             hint.setGravity(Gravity.CENTER);

@@ -67,7 +67,7 @@ public class NotificationCenterActivity extends Activity {
         root.addView(icon);
 
         TextView title = new TextView(this);
-        title.setText("مركز الإشعارات");
+        title.setText(R.string.notif_title);
         title.setTextColor(Color.parseColor("#D4AF37"));
         title.setTextSize(26);
         title.setTypeface(null, Typeface.BOLD);
@@ -76,7 +76,7 @@ public class NotificationCenterActivity extends Activity {
         root.addView(title);
 
         statsView = new TextView(this);
-        statsView.setText("⏳ جاري التحميل...");
+        statsView.setText(R.string.notif_loading);
         statsView.setTextColor(Color.parseColor("#9E9E9E"));
         statsView.setTextSize(12);
         statsView.setGravity(Gravity.CENTER);
@@ -90,7 +90,7 @@ public class NotificationCenterActivity extends Activity {
 
         // ═══ Empty view ═══
         emptyView = new TextView(this);
-        emptyView.setText("📭\n\nماكانش إشعارات حالياً");
+        emptyView.setText(R.string.notif_empty);
         emptyView.setTextColor(Color.parseColor("#9E9E9E"));
         emptyView.setTextSize(16);
         emptyView.setGravity(Gravity.CENTER);
@@ -110,7 +110,7 @@ public class NotificationCenterActivity extends Activity {
     private void loadNotifications() {
         Citizen me = im.getCitizen();
         if (me == null) {
-            statsView.setText("❌ ما راكش مسجل");
+            statsView.setText(R.string.notif_not_registered);
             emptyView.setVisibility(View.VISIBLE);
             return;
         }
@@ -144,12 +144,12 @@ public class NotificationCenterActivity extends Activity {
 
         if (list.isEmpty()) {
             emptyView.setVisibility(View.VISIBLE);
-            statsView.setText("📭 ماكانش إشعارات");
+            statsView.setText(R.string.notif_no_notifs);
             return;
         }
 
         emptyView.setVisibility(View.GONE);
-        statsView.setText("📊 " + list.size() + " إشعار");
+        statsView.setText(getString(R.string.notif_count, list.size()));
 
         for (DocumentSnapshot d : list) {
             addNotificationCard(d);

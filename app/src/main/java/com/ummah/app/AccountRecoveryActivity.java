@@ -37,7 +37,7 @@ public class AccountRecoveryActivity extends Activity {
         root.addView(icon);
 
         TextView title = new TextView(this);
-        title.setText("استعادة الحساب");
+        title.setText(getString(R.string.recovery_title));
         title.setTextColor(Color.parseColor("#D4AF37"));
         title.setTextSize(26);
         title.setTypeface(null, Typeface.BOLD);
@@ -46,7 +46,7 @@ public class AccountRecoveryActivity extends Activity {
         root.addView(title);
 
         TextView desc = new TextView(this);
-        desc.setText("أدخل كلماتك السرية الـ 12 لاستعادة\nرقمك الوطني ورصيدك على أي هاتف");
+        desc.setText(R.string.recovery_subtitle);
         desc.setTextColor(Color.parseColor("#9E9E9E"));
         desc.setTextSize(13);
         desc.setGravity(Gravity.CENTER);
@@ -55,7 +55,7 @@ public class AccountRecoveryActivity extends Activity {
         root.addView(desc);
 
         final EditText input = new EditText(this);
-        input.setHint("الكلمات السرية مفصولة بمسافات");
+        input.setHint(getString(R.string.recovery_seed_hint));
         input.setTextColor(Color.WHITE);
         input.setHintTextColor(Color.GRAY);
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
@@ -65,7 +65,7 @@ public class AccountRecoveryActivity extends Activity {
         root.addView(input);
 
         Button recoverBtn = new Button(this);
-        recoverBtn.setText("🔄  استعادة");
+        recoverBtn.setText(getString(R.string.recovery_restore_btn));
         recoverBtn.setTextSize(16);
         recoverBtn.setPadding(40, 30, 40, 30);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
@@ -76,7 +76,7 @@ public class AccountRecoveryActivity extends Activity {
         root.addView(recoverBtn);
 
         TextView warn = new TextView(this);
-        warn.setText("\n⚠️ لا يمكن التراجع عن الاستعادة.\nقد تفقد حسابك الحالي.");
+        warn.setText(R.string.recovery_warning);
         warn.setTextColor(Color.parseColor("#F44336"));
         warn.setTextSize(11);
         warn.setGravity(Gravity.CENTER);
@@ -88,7 +88,7 @@ public class AccountRecoveryActivity extends Activity {
 
     private void recover(String seed) {
         if (seed.isEmpty()) {
-            Toast.makeText(this, "أدخل الكلمات السرية", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.recovery_enter_seed), Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -98,11 +98,11 @@ public class AccountRecoveryActivity extends Activity {
         fm.lookupBySeedHash(hash, new FirebaseManager.SeedLookup() {
             @Override public void onFound(final FirebaseManager.CitizenItem c) {
                 new AlertDialog.Builder(AccountRecoveryActivity.this)
-                    .setTitle("✅ تم العثور على حسابك")
+                    .setTitle(getString(R.string.recovery_found))
                     .setMessage("الاسم: " + c.name + "\n" +
                             "الرصيد: " + c.balance + " Đ\n\n" +
-                            "هل تريد استعادة هذا الحساب؟")
-                    .setPositiveButton("استعادة", (d, w) -> {
+                            getString(R.string.recovery_confirm))
+                    .setPositiveButton(getString(R.string.recovery_restore), (d, w) -> {
                         // إعادة التسجيل في IdentityManager
                         IdentityManager im = new IdentityManager(AccountRecoveryActivity.this);
                         String country = c.country != null ? c.country : "DZ";
@@ -116,7 +116,7 @@ public class AccountRecoveryActivity extends Activity {
             }
             @Override public void onNotFound() {
                 Toast.makeText(AccountRecoveryActivity.this,
-                        "❌ لم يتم العثور على حساب بهذه الكلمات", Toast.LENGTH_LONG).show();
+                        getString(R.string.recovery_not_found), Toast.LENGTH_LONG).show();
             }
         });
     }

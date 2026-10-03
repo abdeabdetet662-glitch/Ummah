@@ -33,11 +33,11 @@ public class PresidentAnnounceActivity extends Activity {
         root.setPadding(30, 50, 30, 60);
         scroll.addView(root);
 
-        TextView title = UiHelper.goldTitle(this, "📢  إعلان رئاسي", 26);
+        TextView title = UiHelper.goldTitle(this, getString(R.string.pannounce_title_main), 26);
         root.addView(title);
 
         TextView sub = new TextView(this);
-        sub.setText("رسالة رسمية تظهر لكل المواطنين");
+        sub.setText(getString(R.string.pannounce_subtitle));
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(13);
         sub.setGravity(Gravity.CENTER);
@@ -47,7 +47,7 @@ public class PresidentAnnounceActivity extends Activity {
         LinearLayout card = UiHelper.card(this);
 
         TextView lbl1 = new TextView(this);
-        lbl1.setText("📝 عنوان الإعلان");
+        lbl1.setText(getString(R.string.pannounce_title_label));
         lbl1.setTextColor(Color.parseColor("#D4AF37"));
         lbl1.setTextSize(14);
         lbl1.setTypeface(null, Typeface.BOLD);
@@ -55,11 +55,11 @@ public class PresidentAnnounceActivity extends Activity {
         lbl1.setPadding(0, 0, 0, 12);
         card.addView(lbl1);
 
-        final EditText titleInput = UiHelper.input(this, "عنوان الإعلان...");
+        final EditText titleInput = UiHelper.input(this, getString(R.string.pannounce_title_hint));
         card.addView(titleInput);
 
         TextView lbl2 = new TextView(this);
-        lbl2.setText("📄 نص الإعلان");
+        lbl2.setText(getString(R.string.pannounce_body_label));
         lbl2.setTextColor(Color.parseColor("#D4AF37"));
         lbl2.setTextSize(14);
         lbl2.setTypeface(null, Typeface.BOLD);
@@ -67,14 +67,14 @@ public class PresidentAnnounceActivity extends Activity {
         lbl2.setPadding(0, 20, 0, 12);
         card.addView(lbl2);
 
-        final EditText contentInput = UiHelper.input(this, "نص الإعلان الكامل...");
+        final EditText contentInput = UiHelper.input(this, getString(R.string.pannounce_body_hint));
         contentInput.setMinLines(5);
         contentInput.setGravity(Gravity.TOP | Gravity.START);
         card.addView(contentInput);
 
         root.addView(card);
 
-        Button publish = UiHelper.primaryButton(this, "📢  نشر الإعلان");
+        Button publish = UiHelper.primaryButton(this, getString(R.string.pannounce_publish));
         publish.setMinHeight(160);
         publish.setTextSize(18);
         publish.setOnClickListener(v -> {
@@ -85,7 +85,7 @@ public class PresidentAnnounceActivity extends Activity {
                 return;
             }
             new AlertDialog.Builder(this)
-                    .setTitle("تأكيد النشر")
+                    .setTitle(getString(R.string.pannounce_confirm))
                     .setMessage("العنوان: " + t + "\n\nسيراه كل مواطني أُمّة.")
                     .setPositiveButton("نشر", (d, w) -> {
                         Citizen me = im.getCitizen();
@@ -94,7 +94,7 @@ public class PresidentAnnounceActivity extends Activity {
                                 new PresidentManager.OnDone() {
                             @Override public void onSuccess() {
                                 Toast.makeText(PresidentAnnounceActivity.this,
-                                        "✅ تم النشر!", Toast.LENGTH_LONG).show();
+                                        getString(R.string.pannounce_published), Toast.LENGTH_LONG).show();
                                 finish();
                             }
                             @Override public void onError(String msg) {

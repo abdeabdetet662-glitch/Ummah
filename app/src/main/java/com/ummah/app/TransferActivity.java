@@ -52,7 +52,7 @@ public class TransferActivity extends Activity {
         scroll.addView(root);
 
         TextView title = new TextView(this);
-        title.setText("💸 التحويلات");
+        title.setText(R.string.transfer_title);
         title.setTextColor(Color.parseColor("#D4AF37"));
         title.setTextSize(26);
         title.setTypeface(null, Typeface.BOLD);
@@ -60,7 +60,7 @@ public class TransferActivity extends Activity {
         root.addView(title);
 
         TextView sub = new TextView(this);
-        sub.setText("أرسل ديناراً لمواطن آخر في أي مكان في العالم");
+        sub.setText(R.string.transfer_sub);
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(12);
         sub.setGravity(Gravity.CENTER);
@@ -84,13 +84,13 @@ public class TransferActivity extends Activity {
         root.addView(balanceView);
 
         Button sendBtn = new Button(this);
-        sendBtn.setText("📤  إرسال دينار");
+        sendBtn.setText(R.string.transfer_send_btn);
         sendBtn.setTextSize(16);
         sendBtn.setOnClickListener(v -> showSendDialog());
         root.addView(sendBtn);
 
         Button myIdBtn = new Button(this);
-        myIdBtn.setText("📥  رقمي للاستقبال");
+        myIdBtn.setText(R.string.transfer_my_id);
         myIdBtn.setTextSize(14);
         myIdBtn.setOnClickListener(v -> showMyId());
         root.addView(myIdBtn);
@@ -146,7 +146,7 @@ public class TransferActivity extends Activity {
 
         if (list.isEmpty()) {
             TextView empty = new TextView(this);
-            empty.setText("لا توجد تحويلات بعد.");
+            empty.setText(R.string.transfer_empty);
             empty.setTextColor(Color.parseColor("#616161"));
             empty.setTextSize(13);
             empty.setGravity(Gravity.CENTER);

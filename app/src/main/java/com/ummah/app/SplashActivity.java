@@ -63,7 +63,7 @@ public class SplashActivity extends Activity {
         root.addView(line);
 
         final TextView sub = new TextView(this);
-        sub.setText("أول دولة رقمية عربية");
+        sub.setText(R.string.splash_sub);
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(16);
         sub.setGravity(Gravity.CENTER);
@@ -72,7 +72,7 @@ public class SplashActivity extends Activity {
         root.addView(sub);
 
         final TextView footer = new TextView(this);
-        footer.setText("☆  حوكمة رقمية حقيقية  ☆");
+        footer.setText(R.string.splash_footer);
         footer.setTextColor(Color.parseColor("#616161"));
         footer.setTextSize(11);
         footer.setGravity(Gravity.CENTER);

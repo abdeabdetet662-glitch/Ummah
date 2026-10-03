@@ -55,11 +55,11 @@ public class SellItemActivity extends Activity {
         root.setPadding(30, 50, 30, 60);
         scroll.addView(root);
 
-        TextView title = UiHelper.goldTitle(this, "🏷️ عرض للبيع", 28);
+        TextView title = UiHelper.goldTitle(this, getString(R.string.sell_listed), 28);
         root.addView(title);
 
         TextView sub = new TextView(this);
-        sub.setText("حدد سعر البيع للمواطنين الآخرين");
+        sub.setText(getString(R.string.sell_set_price));
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(13);
         sub.setGravity(Gravity.CENTER);
@@ -97,7 +97,7 @@ public class SellItemActivity extends Activity {
         card.addView(brand);
 
         TextView orig = new TextView(this);
-        orig.setText("💰 سعر الشراء الأصلي: " + originalPrice + " Đ");
+        orig.setText(getString(R.string.sell_original_price_fmt, originalPrice));
         orig.setTextColor(Color.parseColor("#D4AF37"));
         orig.setTextSize(14);
         orig.setTypeface(null, Typeface.BOLD);
@@ -109,7 +109,7 @@ public class SellItemActivity extends Activity {
         LinearLayout priceCard = UiHelper.card(this);
 
         TextView priceLabel = new TextView(this);
-        priceLabel.setText("💵 سعر البيع المقترح");
+        priceLabel.setText(getString(R.string.sell_suggested_price));
         priceLabel.setTextColor(Color.parseColor("#D4AF37"));
         priceLabel.setTextSize(14);
         priceLabel.setTypeface(null, Typeface.BOLD);
@@ -117,14 +117,14 @@ public class SellItemActivity extends Activity {
         priceLabel.setPadding(0, 0, 0, 12);
         priceCard.addView(priceLabel);
 
-        final EditText priceInput = UiHelper.input(this, "السعر بالدينار");
+        final EditText priceInput = UiHelper.input(this, getString(R.string.sell_price_dinar));
         priceInput.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
         priceInput.setText(String.valueOf(originalPrice));
         priceCard.addView(priceInput);
 
         int commission = (int) (originalPrice * 0.05);
         TextView hint = new TextView(this);
-        hint.setText("⚠️ عمولة التطبيق: 5%\\nمن " + originalPrice + " Đ → تستلم " + (originalPrice - commission) + " Đ");
+        hint.setText(getString(R.string.sell_commission_fmt, originalPrice, originalPrice - commission));
         hint.setTextColor(Color.parseColor("#9E9E9E"));
         hint.setTextSize(11);
         hint.setGravity(Gravity.CENTER);
@@ -144,21 +144,21 @@ public class SellItemActivity extends Activity {
 
         root.addView(quick);
 
-        Button publishBtn = UiHelper.primaryButton(this, "✅  نشر العرض");
+        Button publishBtn = UiHelper.primaryButton(this, getString(R.string.sell_publish_offer));
         publishBtn.setMinHeight(160);
         publishBtn.setTextSize(20);
         publishBtn.setOnClickListener(v -> {
             String txt = priceInput.getText().toString().trim();
             if (txt.isEmpty()) {
-                Toast.makeText(this, "أدخل سعراً", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.sell_enter_price), Toast.LENGTH_SHORT).show();
                 return;
             }
             int price;
             try { price = Integer.parseInt(txt); }
-            catch (Exception e) { Toast.makeText(this, "سعر غير صحيح", Toast.LENGTH_SHORT).show(); return; }
+            catch (Exception e) { Toast.makeText(this, getString(R.string.sell_invalid_price), Toast.LENGTH_SHORT).show(); return; }
 
-            if (price < 1) { Toast.makeText(this, "السعر > 0", Toast.LENGTH_SHORT).show(); return; }
-            if (price > 100000000) { Toast.makeText(this, "السعر مرتفع", Toast.LENGTH_SHORT).show(); return; }
+            if (price < 1) { Toast.makeText(this, getString(R.string.sell_price_positive), Toast.LENGTH_SHORT).show(); return; }
+            if (price > 100000000) { Toast.makeText(this, getString(R.string.sell_price_high), Toast.LENGTH_SHORT).show(); return; }
 
             Citizen c = im.getCitizen();
             if (c == null) return;
@@ -176,7 +176,7 @@ public class SellItemActivity extends Activity {
 
             clm.createListing(c.nationalId, c.name, mi, price, invDocId, new CitizenListingManager.OnDone() {
                 @Override public void onSuccess() {
-                    Toast.makeText(SellItemActivity.this, "✅ تم نشر العرض!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(SellItemActivity.this, getString(R.string.sell_published), Toast.LENGTH_LONG).show();
                     finish();
                 }
                 @Override public void onError(String msg) {

@@ -165,7 +165,7 @@ public class JobsActivity extends Activity {
         info.addView(desc);
 
         TextView salary = new TextView(this);
-        salary.setText("💰 " + job.salary + " Đ / عملة");
+        salary.setText(getString(R.string.jobs_salary_format, job.salary));
         salary.setTextColor(Color.parseColor("#D4AF37"));
         salary.setTextSize(14);
         salary.setTypeface(null, Typeface.BOLD);

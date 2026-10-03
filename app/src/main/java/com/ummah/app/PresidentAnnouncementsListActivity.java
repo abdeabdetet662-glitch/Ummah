@@ -37,11 +37,11 @@ public class PresidentAnnouncementsListActivity extends Activity {
         root.setPadding(30, 50, 30, 60);
         scroll.addView(root);
 
-        TextView title = UiHelper.goldTitle(this, "📋  الإعلانات الرئاسية", 26);
+        TextView title = UiHelper.goldTitle(this, getString(R.string.pann_list_title), 26);
         root.addView(title);
 
         TextView sub = new TextView(this);
-        sub.setText("كل الإعلانات الرسمية السابقة");
+        sub.setText(getString(R.string.pann_list_subtitle));
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(13);
         sub.setGravity(Gravity.CENTER);
@@ -70,7 +70,7 @@ public class PresidentAnnouncementsListActivity extends Activity {
 
         if (list.isEmpty()) {
             TextView empty = new TextView(this);
-            empty.setText("ما فيه إعلانات بعد");
+            empty.setText(getString(R.string.pann_list_empty));
             empty.setTextColor(Color.parseColor("#9E9E9E"));
             empty.setGravity(Gravity.CENTER);
             empty.setPadding(0, 60, 0, 0);
@@ -97,7 +97,7 @@ public class PresidentAnnouncementsListActivity extends Activity {
         card.setLayoutParams(lp);
 
         TextView badge = new TextView(this);
-        badge.setText("📢 إعلان رئاسي");
+        badge.setText(getString(R.string.pann_list_item));
         badge.setTextColor(Color.parseColor("#1A1A1A"));
         badge.setTextSize(10);
         badge.setTypeface(null, Typeface.BOLD);
@@ -117,7 +117,7 @@ public class PresidentAnnouncementsListActivity extends Activity {
         Long ts = (Long) m.get("timestamp");
 
         TextView t = new TextView(this);
-        t.setText(title != null ? title : "إعلان");
+        t.setText(title != null ? title : getString(R.string.pann_list_announcement));
         t.setTextColor(Color.parseColor("#FFD700"));
         t.setTextSize(17);
         t.setTypeface(null, Typeface.BOLD);
@@ -133,7 +133,7 @@ public class PresidentAnnouncementsListActivity extends Activity {
         card.addView(c);
 
         TextView footer = new TextView(this);
-        footer.setText("👑 " + (president != null ? president : "الرئيس")
+        footer.setText("👑 " + (president != null ? president : getString(R.string.president_unknown))
                 + "  •  " + (ts != null ? sdf.format(new Date(ts)) : ""));
         footer.setTextColor(Color.parseColor("#9E9E9E"));
         footer.setTextSize(10);

@@ -199,7 +199,7 @@ public class MainActivity extends Activity {
         hero.addView(title);
 
         TextView sub = new TextView(this);
-        sub.setText("أول دولة رقمية في العالم العربي");
+        sub.setText(R.string.main_subtitle);
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(15);
         sub.setGravity(Gravity.CENTER);
@@ -215,7 +215,7 @@ public class MainActivity extends Activity {
         counter.setPadding(40, 40, 40, 40);
 
         TextView cLabel = new TextView(this);
-        cLabel.setText("المواطنون");
+        cLabel.setText(R.string.main_citizens);
         cLabel.setTextColor(Color.parseColor("#9E9E9E"));
         cLabel.setTextSize(12);
         cLabel.setGravity(Gravity.CENTER);
@@ -254,7 +254,7 @@ public class MainActivity extends Activity {
 
         // ═══ Hint ═══
         TextView hint = new TextView(this);
-        hint.setText("انضم إلى آلاف المواطنين في أول دولة رقمية عربية");
+        hint.setText(R.string.main_join_hint);
         hint.setTextColor(Color.parseColor("#666666"));
         hint.setTextSize(12);
         hint.setGravity(Gravity.CENTER);

@@ -39,23 +39,23 @@ public class PresidentMinistersActivity extends Activity {
         root.setPadding(30, 50, 30, 60);
         scroll.addView(root);
 
-        TextView title = UiHelper.goldTitle(this, "👥  تعيين الوزراء", 26);
+        TextView title = UiHelper.goldTitle(this, getString(R.string.pministers_section), 26);
         root.addView(title);
 
         TextView sub = new TextView(this);
-        sub.setText("اختر مواطنين لمناصب وزارية");
+        sub.setText(getString(R.string.pministers_subtitle));
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(13);
         sub.setGravity(Gravity.CENTER);
         sub.setPadding(0, 0, 0, 24);
         root.addView(sub);
 
-        Button addBtn = UiHelper.primaryButton(this, "➕  تعيين وزير جديد");
+        Button addBtn = UiHelper.primaryButton(this, getString(R.string.pministers_new));
         addBtn.setOnClickListener(v -> showAppointDialog());
         root.addView(addBtn);
 
         TextView listTitle = new TextView(this);
-        listTitle.setText("🏛️  الوزراء الحاليون");
+        listTitle.setText(getString(R.string.pministers_current));
         listTitle.setTextColor(Color.parseColor("#D4AF37"));
         listTitle.setTextSize(15);
         listTitle.setTypeface(null, Typeface.BOLD);
@@ -91,7 +91,7 @@ public class PresidentMinistersActivity extends Activity {
         }
         if (!any) {
             TextView empty = new TextView(this);
-            empty.setText("ما فيه وزراء حالياً");
+            empty.setText(getString(R.string.pministers_empty));
             empty.setTextColor(Color.parseColor("#9E9E9E"));
             empty.setGravity(Gravity.CENTER);
             empty.setPadding(0, 40, 0, 0);
@@ -118,13 +118,13 @@ public class PresidentMinistersActivity extends Activity {
         card.addView(name);
 
         TextView role = new TextView(this);
-        role.setText("🏛️  " + (pc.ministerRole != null ? pc.ministerRole : "وزير"));
+        role.setText("🏛️  " + (pc.ministerRole != null ? pc.ministerRole : getString(R.string.pministers_minister)));
         role.setTextColor(Color.parseColor("#FFD700"));
         role.setTextSize(13);
         role.setPadding(0, 6, 0, 12);
         card.addView(role);
 
-        Button remove = UiHelper.dangerButton(this, "🚫  إلغاء التعيين");
+        Button remove = UiHelper.dangerButton(this, getString(R.string.pministers_dismiss_section));
         remove.setOnClickListener(v -> confirmRemove(pc));
         card.addView(remove);
 
@@ -143,9 +143,9 @@ public class PresidentMinistersActivity extends Activity {
         box.addView(roleInput);
 
         new AlertDialog.Builder(this)
-                .setTitle("👥  تعيين وزير")
+                .setTitle(getString(R.string.pministers_appoint_one))
                 .setView(box)
-                .setPositiveButton("تعيين", (d, w) -> {
+                .setPositiveButton(getString(R.string.pministers_appoint), (d, w) -> {
                     String id = idInput.getText().toString().trim();
                     String role = roleInput.getText().toString().trim();
                     if (id.isEmpty() || role.isEmpty()) {
@@ -158,7 +158,7 @@ public class PresidentMinistersActivity extends Activity {
                             new PresidentManager.OnDone() {
                         @Override public void onSuccess() {
                             Toast.makeText(PresidentMinistersActivity.this,
-                                    "✅ تم التعيين!", Toast.LENGTH_LONG).show();
+                                    getString(R.string.pministers_appointed), Toast.LENGTH_LONG).show();
                         }
                         @Override public void onError(String m) {
                             Toast.makeText(PresidentMinistersActivity.this,
@@ -172,16 +172,16 @@ public class PresidentMinistersActivity extends Activity {
 
     private void confirmRemove(final PresidentManager.PresidentCitizen pc) {
         new AlertDialog.Builder(this)
-                .setTitle("إلغاء التعيين")
+                .setTitle(getString(R.string.pministers_dismiss))
                 .setMessage("إلغاء منصب: " + pc.name + "؟")
-                .setPositiveButton("إلغاء التعيين", (d, w) -> {
+                .setPositiveButton(getString(R.string.pministers_dismiss), (d, w) -> {
                     Citizen me = im.getCitizen();
                     if (me == null) return;
                     pm.removeMinister(me.nationalId, pc.nationalId,
                             new PresidentManager.OnDone() {
                         @Override public void onSuccess() {
                             Toast.makeText(PresidentMinistersActivity.this,
-                                    "✅ تم الإلغاء", Toast.LENGTH_LONG).show();
+                                    getString(R.string.pministers_dismissed), Toast.LENGTH_LONG).show();
                         }
                         @Override public void onError(String m) {
                             Toast.makeText(PresidentMinistersActivity.this,
@@ -189,7 +189,7 @@ public class PresidentMinistersActivity extends Activity {
                         }
                     });
                 })
-                .setNegativeButton("رجوع", null)
+                .setNegativeButton(getString(R.string.pministers_back), null)
                 .show();
     }
 

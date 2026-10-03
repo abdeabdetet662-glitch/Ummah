@@ -19,14 +19,14 @@ public class PresidentTitlesActivity extends Activity {
     private PresidentManager pm;
 
     private static final String[] TITLES = {
-            "🏅 فارس أُمّة",
-            "⭐ نجم أُمّة",
-            "🎖️ بطل أُمّة",
-            "👑 نبيل",
-            "🌟 قدوة",
-            "💎 جوهرة",
-            "🦅 صقر",
-            "🦁 أسد",
+            getString(R.string.ptitles_knight),
+            getString(R.string.ptitles_star),
+            getString(R.string.ptitles_hero),
+            getString(R.string.ptitles_noble),
+            getString(R.string.ptitles_role_model),
+            getString(R.string.ptitles_jewel),
+            getString(R.string.ptitles_falcon),
+            getString(R.string.ptitles_lion),
     };
 
     @Override
@@ -44,11 +44,11 @@ public class PresidentTitlesActivity extends Activity {
         root.setPadding(30, 50, 30, 60);
         scroll.addView(root);
 
-        TextView title = UiHelper.goldTitle(this, "🏅  منح الألقاب", 26);
+        TextView title = UiHelper.goldTitle(this, getString(R.string.ptitles_section), 26);
         root.addView(title);
 
         TextView sub = new TextView(this);
-        sub.setText("امنح مواطن لقب شرفي");
+        sub.setText(getString(R.string.ptitles_subtitle));
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(13);
         sub.setGravity(Gravity.CENTER);
@@ -58,7 +58,7 @@ public class PresidentTitlesActivity extends Activity {
         LinearLayout card = UiHelper.card(this);
 
         TextView lbl = new TextView(this);
-        lbl.setText("🎯 الرقم الوطني للمواطن");
+        lbl.setText(getString(R.string.ptitles_citizen_id));
         lbl.setTextColor(Color.parseColor("#D4AF37"));
         lbl.setTextSize(14);
         lbl.setTypeface(null, Typeface.BOLD);
@@ -72,7 +72,7 @@ public class PresidentTitlesActivity extends Activity {
         root.addView(card);
 
         TextView pickLbl = new TextView(this);
-        pickLbl.setText("🎖️  اختر اللقب");
+        pickLbl.setText(getString(R.string.ptitles_choose));
         pickLbl.setTextColor(Color.parseColor("#D4AF37"));
         pickLbl.setTextSize(15);
         pickLbl.setTypeface(null, Typeface.BOLD);
@@ -93,7 +93,7 @@ public class PresidentTitlesActivity extends Activity {
         btn.setOnClickListener(v -> {
             String id = idInput.getText().toString().trim();
             if (id.isEmpty()) {
-                Toast.makeText(this, "أدخل الرقم الوطني أولاً", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.ptitles_enter_id), Toast.LENGTH_SHORT).show();
                 return;
             }
             confirmGrant(id, titleText);
@@ -103,16 +103,16 @@ public class PresidentTitlesActivity extends Activity {
 
     private void confirmGrant(final String citizenId, final String titleText) {
         new AlertDialog.Builder(this)
-                .setTitle("🏅  منح لقب")
+                .setTitle(getString(R.string.ptitles_grant_title))
                 .setMessage("منح اللقب:\n\n" + titleText + "\n\nللمواطن:\n" + citizenId + "؟")
-                .setPositiveButton("امنح", (d, w) -> {
+                .setPositiveButton(getString(R.string.ptitles_grant), (d, w) -> {
                     Citizen me = im.getCitizen();
                     if (me == null) return;
                     pm.grantTitle(me.nationalId, me.name, citizenId, titleText,
                             new PresidentManager.OnDone() {
                         @Override public void onSuccess() {
                             Toast.makeText(PresidentTitlesActivity.this,
-                                    "✅ تم منح اللقب!", Toast.LENGTH_LONG).show();
+                                    getString(R.string.ptitles_granted), Toast.LENGTH_LONG).show();
                         }
                         @Override public void onError(String m) {
                             Toast.makeText(PresidentTitlesActivity.this,

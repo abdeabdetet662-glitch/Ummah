@@ -33,11 +33,11 @@ public class PresidentGiftActivity extends Activity {
         root.setPadding(30, 50, 30, 60);
         scroll.addView(root);
 
-        TextView title = UiHelper.goldTitle(this, "🎁  هدية رئاسية", 26);
+        TextView title = UiHelper.goldTitle(this, getString(R.string.pgift_title), 26);
         root.addView(title);
 
         TextView sub = new TextView(this);
-        sub.setText("وزّع فلوس من الخزينة لمواطن");
+        sub.setText(getString(R.string.pgift_subtitle));
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(13);
         sub.setGravity(Gravity.CENTER);
@@ -47,7 +47,7 @@ public class PresidentGiftActivity extends Activity {
         LinearLayout card = UiHelper.card(this);
 
         TextView lbl1 = new TextView(this);
-        lbl1.setText("🎯 الرقم الوطني");
+        lbl1.setText(getString(R.string.pgift_national_id));
         lbl1.setTextColor(Color.parseColor("#D4AF37"));
         lbl1.setTextSize(14);
         lbl1.setTypeface(null, Typeface.BOLD);
@@ -59,7 +59,7 @@ public class PresidentGiftActivity extends Activity {
         card.addView(idInput);
 
         TextView lbl2 = new TextView(this);
-        lbl2.setText("💰 المبلغ (Đ)");
+        lbl2.setText(getString(R.string.pgift_amount));
         lbl2.setTextColor(Color.parseColor("#D4AF37"));
         lbl2.setTextSize(14);
         lbl2.setTypeface(null, Typeface.BOLD);
@@ -67,12 +67,12 @@ public class PresidentGiftActivity extends Activity {
         lbl2.setPadding(0, 20, 0, 12);
         card.addView(lbl2);
 
-        final EditText amountInput = UiHelper.input(this, "المبلغ بالدينار");
+        final EditText amountInput = UiHelper.input(this, getString(R.string.pgift_amount_dinar));
         amountInput.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
         card.addView(amountInput);
 
         TextView lbl3 = new TextView(this);
-        lbl3.setText("📝 رسالة (اختياري)");
+        lbl3.setText(getString(R.string.pgift_message));
         lbl3.setTextColor(Color.parseColor("#D4AF37"));
         lbl3.setTextSize(14);
         lbl3.setTypeface(null, Typeface.BOLD);
@@ -80,7 +80,7 @@ public class PresidentGiftActivity extends Activity {
         lbl3.setPadding(0, 20, 0, 12);
         card.addView(lbl3);
 
-        final EditText msgInput = UiHelper.input(this, "رسالة للمواطن...");
+        final EditText msgInput = UiHelper.input(this, getString(R.string.pgift_message_hint));
         card.addView(msgInput);
 
         root.addView(card);
@@ -96,7 +96,7 @@ public class PresidentGiftActivity extends Activity {
 
         root.addView(quick);
 
-        Button send = UiHelper.primaryButton(this, "🎁  إرسال الهدية");
+        Button send = UiHelper.primaryButton(this, getString(R.string.pgift_send));
         send.setMinHeight(160);
         send.setTextSize(18);
         send.setOnClickListener(v -> {
@@ -104,7 +104,7 @@ public class PresidentGiftActivity extends Activity {
             String amtS = amountInput.getText().toString().trim();
             String msg = msgInput.getText().toString().trim();
             if (id.isEmpty() || amtS.isEmpty()) {
-                Toast.makeText(this, "أكمل الحقول", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.pgift_fill_fields), Toast.LENGTH_SHORT).show();
                 return;
             }
             int amt;
@@ -112,11 +112,11 @@ public class PresidentGiftActivity extends Activity {
                 Toast.makeText(this, "مبلغ غير صحيح", Toast.LENGTH_SHORT).show();
                 return;
             }
-            if (amt < 1) { Toast.makeText(this, "المبلغ > 0", Toast.LENGTH_SHORT).show(); return; }
+            if (amt < 1) { Toast.makeText(this, getString(R.string.pgift_amount_positive), Toast.LENGTH_SHORT).show(); return; }
 
             final int finalAmt = amt;
             new AlertDialog.Builder(this)
-                    .setTitle("تأكيد الهدية")
+                    .setTitle(getString(R.string.pgift_confirm))
                     .setMessage("إرسال " + amt + " Đ إلى:\n" + id + "؟")
                     .setPositiveButton("إرسال", (d, w) -> {
                         Citizen me = im.getCitizen();

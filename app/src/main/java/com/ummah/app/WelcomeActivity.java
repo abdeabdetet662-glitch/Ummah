@@ -65,7 +65,7 @@ public class WelcomeActivity extends Activity {
         topBox.setLayoutParams(topLp);
 
         btnSkip = new Button(this);
-        btnSkip.setText("تخطي");
+        btnSkip.setText(R.string.welcome_skip);
         btnSkip.setTextColor(GRAY);
         btnSkip.setTextSize(14);
         btnSkip.setBackgroundColor(Color.TRANSPARENT);
@@ -138,7 +138,7 @@ public class WelcomeActivity extends Activity {
         btnBox.setPadding(30, 15, 30, 40);
 
         btnNext = new Button(this);
-        btnNext.setText("التالي ←");
+        btnNext.setText(R.string.welcome_next);
         btnNext.setTextSize(18);
         btnNext.setTypeface(null, Typeface.BOLD);
         btnNext.setTextColor(Color.BLACK);
@@ -150,7 +150,7 @@ public class WelcomeActivity extends Activity {
         btnBox.addView(btnNext);
 
         Button btnHaveAccount = new Button(this);
-        btnHaveAccount.setText("لدي حساب — استعادة");
+        btnHaveAccount.setText(R.string.welcome_have_account);
         btnHaveAccount.setTextSize(15);
         btnHaveAccount.setTextColor(GOLD);
         btnHaveAccount.setBackgroundColor(Color.TRANSPARENT);
@@ -198,9 +198,9 @@ public class WelcomeActivity extends Activity {
         tvDesc.animate().alpha(1f).setDuration(500).start();
 
         if (page == 2) {
-            btnNext.setText("🚀 ابدأ الآن");
+            btnNext.setText(R.string.welcome_start);
         } else {
-            btnNext.setText("التالي ←");
+            btnNext.setText(R.string.welcome_next);
         }
 
         updateDots();

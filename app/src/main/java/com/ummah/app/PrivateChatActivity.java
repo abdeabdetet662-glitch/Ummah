@@ -48,14 +48,14 @@ public class PrivateChatActivity extends Activity {
         otherId = getIntent().getStringExtra("other_id");
         otherName = getIntent().getStringExtra("other_name");
         if (otherId == null) { finish(); return; }
-        if (otherName == null) otherName = "مواطن";
+        if (otherName == null) otherName = getString(R.string.pchat_citizen);
 
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
         root.setBackgroundColor(Color.parseColor("#0A0A0A"));
 
         TextView title = new TextView(this);
-        title.setText("💬 دردشة خاصة");
+        title.setText(getString(R.string.pchat_title));
         title.setTextColor(Color.parseColor("#D4AF37"));
         title.setTextSize(16);
         title.setTypeface(null, Typeface.BOLD);
@@ -64,7 +64,7 @@ public class PrivateChatActivity extends Activity {
         root.addView(title);
 
         TextView sub = new TextView(this);
-        sub.setText("مع: " + otherName);
+        sub.setText(getString(R.string.pchat_with) + otherName);
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(11);
         sub.setGravity(Gravity.CENTER);
@@ -86,14 +86,14 @@ public class PrivateChatActivity extends Activity {
         bar.setBackgroundColor(Color.parseColor("#141414"));
 
         input = new EditText(this);
-        input.setHint("اكتب رسالة...");
+        input.setHint(getString(R.string.pchat_write));
         input.setTextColor(Color.WHITE);
         input.setHintTextColor(Color.GRAY);
         input.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
         bar.addView(input);
 
         Button send = new Button(this);
-        send.setText("إرسال");
+        send.setText(getString(R.string.pchat_send));
         send.setTextSize(14);
         send.setOnClickListener(v -> sendMessage());
         bar.addView(send);
@@ -130,7 +130,7 @@ public class PrivateChatActivity extends Activity {
         messagesContainer.removeAllViews();
         if (list.isEmpty()) {
             TextView empty = new TextView(this);
-            empty.setText("لا توجد رسائل بعد.\nابدأ المحادثة!");
+            empty.setText(R.string.pchat_empty_full);
             empty.setTextColor(Color.parseColor("#616161"));
             empty.setTextSize(13);
             empty.setGravity(Gravity.CENTER);

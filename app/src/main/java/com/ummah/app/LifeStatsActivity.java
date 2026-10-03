@@ -56,7 +56,7 @@ public class LifeStatsActivity extends Activity {
         balCard.setGravity(Gravity.CENTER);
 
         TextView balLabel = new TextView(this);
-        balLabel.setText("💰  رصيدك");
+        balLabel.setText(R.string.life_balance);
         balLabel.setTextColor(Color.parseColor("#9E9E9E"));
         balLabel.setTextSize(12);
         balLabel.setGravity(Gravity.CENTER);

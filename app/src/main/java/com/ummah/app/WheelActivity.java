@@ -177,8 +177,8 @@ public class WheelActivity extends Activity {
             @Override public void onConfig(WheelManager.WheelConfig c) {
                 config = c;
                 runOnUiThread(() -> {
-                    spinBtn.setText("🎰  دوّر العجلة (" + c.spinCost + " Đ)");
-                    if (!c.jackpotEnabled) jackpotView.setText("معطّل");
+                    spinBtn.setText(getString(R.string.wheel_spin_cost, c.spinCost));
+                    if (!c.jackpotEnabled) jackpotView.setText(R.string.wheel_disabled);
                     if (!c.active) {
                         spinBtn.setEnabled(false);
                         spinBtn.setAlpha(0.5f);
@@ -243,7 +243,7 @@ public class WheelActivity extends Activity {
             long remaining = nextFreeAt - System.currentTimeMillis();
             long hours = remaining / (60 * 60 * 1000);
             long minutes = (remaining % (60 * 60 * 1000)) / (60 * 1000);
-            freeSpinView.setText("⏳ الدورة المجانية القادمة بعد: " + hours + " س " + minutes + " د");
+            freeSpinView.setText(getString(R.string.wheel_free_spin, hours, minutes));
             freeSpinView.setTextColor(Color.parseColor("#FFA500"));
             freeSpinBtn.setEnabled(false);
             freeSpinBtn.setAlpha(0.5f);

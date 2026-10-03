@@ -246,7 +246,7 @@ public class CityMapActivity extends Activity {
 
         // ═══ Header ═══
         TextView header = new TextView(this);
-        header.setText("💰 رصيدك: " + myBalance + " Đ");
+        header.setText(getString(R.string.city_balance) + myBalance + " Đ");
         header.setTextColor(Color.parseColor("#00FF88"));
         header.setTextSize(16);
         header.setTypeface(null, Typeface.BOLD);
@@ -256,7 +256,7 @@ public class CityMapActivity extends Activity {
 
         // ═══ نصيحة ═══
         TextView hint = new TextView(this);
-        hint.setText("اختر نوع المبنى 👇");
+        hint.setText(R.string.city_choose_building);
         hint.setTextColor(Color.parseColor("#9E9E9E"));
         hint.setTextSize(14);
         hint.setGravity(Gravity.CENTER);

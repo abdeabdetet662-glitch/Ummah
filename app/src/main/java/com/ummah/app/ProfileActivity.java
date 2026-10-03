@@ -47,7 +47,7 @@ public class ProfileActivity extends Activity {
         scroll.addView(root);
 
         TextView title = new TextView(this);
-        title.setText("👤 ملفي الشخصي");
+        title.setText(getString(R.string.profile_title));
         title.setTextColor(Color.parseColor("#D4AF37"));
         title.setTextSize(28);
         title.setTypeface(null, Typeface.BOLD);
@@ -64,7 +64,7 @@ public class ProfileActivity extends Activity {
         root.addView(photoView);
 
         Button changePhoto = new Button(this);
-        changePhoto.setText("📷  تغيير الصورة");
+        changePhoto.setText(getString(R.string.profile_change_photo));
         changePhoto.setTextSize(16);
         changePhoto.setTextColor(Color.WHITE);
         changePhoto.setBackgroundColor(Color.parseColor("#1565C0"));
@@ -72,10 +72,10 @@ public class ProfileActivity extends Activity {
         changePhoto.setOnClickListener(v -> pickImage());
         root.addView(changePhoto);
 
-        addInfo(root, "الاسم", me.name);
-        addInfo(root, "الرقم الوطني", me.nationalId);
-        addInfo(root, "البلد", CountryList.getName(me.country));
-        addInfo(root, "تاريخ الانضمام", me.joinDate);
+        addInfo(root, getString(R.string.profile_name), me.name);
+        addInfo(root, getString(R.string.profile_national_id), me.nationalId);
+        addInfo(root, getString(R.string.profile_country), CountryList.getName(me.country));
+        addInfo(root, getString(R.string.profile_join_date), me.joinDate);
 
         setContentView(scroll);
         startPhotoListener();
@@ -111,8 +111,8 @@ public class ProfileActivity extends Activity {
 
     private void pickImage() {
         new AlertDialog.Builder(this)
-            .setTitle("اختر مصدر الصورة")
-            .setItems(new String[]{"📷  المعرض"}, (d, w) -> {
+            .setTitle(getString(R.string.profile_choose_image))
+            .setItems(new String[]{getString(R.string.profile_gallery)}, (d, w) -> {
                 Intent i = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 i.setType("image/*");
                 startActivityForResult(i, PICK_IMAGE);
@@ -125,10 +125,10 @@ public class ProfileActivity extends Activity {
         super.onActivityResult(req, res, data);
         if (req == PICK_IMAGE && res == RESULT_OK && data != null && data.getData() != null) {
             Uri uri = data.getData();
-            Toast.makeText(this, "جاري رفع الصورة...", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.profile_uploading), Toast.LENGTH_LONG).show();
             fm.uploadToImgBB(me.nationalId, uri, new FirebaseManager.PhotoUploadListener() {
                 @Override public void onSuccess(String url) {
-                    Toast.makeText(ProfileActivity.this, "✅ تم تحديث الصورة", Toast.LENGTH_LONG).show();
+                    Toast.makeText(ProfileActivity.this, getString(R.string.profile_updated), Toast.LENGTH_LONG).show();
                     Glide.with(ProfileActivity.this).load(url).into(photoView);
                 }
                 @Override public void onError(String msg) {

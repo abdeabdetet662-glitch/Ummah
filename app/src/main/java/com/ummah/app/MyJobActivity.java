@@ -154,7 +154,7 @@ public class MyJobActivity extends Activity {
         lvlCard.setGravity(Gravity.CENTER);
 
         levelView = new TextView(this);
-        levelView.setText("⭐ المستوى: " + level);
+        levelView.setText(getString(R.string.job_level) + level);
         levelView.setTextColor(Color.WHITE);
         levelView.setTextSize(18);
         levelView.setTypeface(null, Typeface.BOLD);
@@ -241,7 +241,7 @@ public class MyJobActivity extends Activity {
             long remaining = cooldownMs - elapsed;
             long min = remaining / 60000;
             long sec = (remaining % 60000) / 1000;
-            cooldownView.setText("⏳ انتظر: " + min + ":" + String.format("%02d", sec));
+            cooldownView.setText(getString(R.string.job_cooldown) + min + ":" + String.format("%02d", sec));
             cooldownView.setTextColor(Color.parseColor("#FFC107"));
             workBtn.setEnabled(false);
             workBtn.setAlpha(0.5f);

@@ -83,7 +83,7 @@ public class WalletActivity extends Activity {
         balanceCard.setGravity(Gravity.CENTER);
 
         TextView balLabel = new TextView(this);
-        balLabel.setText("✦  رصيدك الحالي  ✦");
+        balLabel.setText(R.string.wallet_bal_label);
         balLabel.setTextColor(Color.parseColor("#D4AF37"));
         balLabel.setTextSize(13);
         balLabel.setTypeface(null, Typeface.BOLD);
@@ -120,7 +120,7 @@ public class WalletActivity extends Activity {
         idCard.setGravity(Gravity.CENTER);
 
         TextView idLabel = new TextView(this);
-        idLabel.setText("📥  رقمك للاستقبال");
+        idLabel.setText(R.string.wallet_id_label);
         idLabel.setTextColor(Color.parseColor("#D4AF37"));
         idLabel.setTextSize(14);
         idLabel.setTypeface(null, Typeface.BOLD);
@@ -174,7 +174,7 @@ public class WalletActivity extends Activity {
         sectionTitle.addView(lineL);
 
         TextView secText = new TextView(this);
-        secText.setText("  💎  طرق كسب الدينار  ");
+        secText.setText(R.string.wallet_earn_section);
         secText.setTextColor(Color.parseColor("#D4AF37"));
         secText.setTextSize(15);
         secText.setTypeface(null, Typeface.BOLD);

@@ -46,11 +46,11 @@ public class CitizenMarketActivity extends Activity {
         root.setPadding(30, 50, 30, 60);
         scroll.addView(root);
 
-        TextView title = UiHelper.goldTitle(this, "🤝 سوق المواطنين", 28);
+        TextView title = UiHelper.goldTitle(this, getString(R.string.cmarket_title), 28);
         root.addView(title);
 
         TextView sub = new TextView(this);
-        sub.setText("منتجات يعرضها المواطنون للبيع");
+        sub.setText(getString(R.string.cmarket_subtitle));
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(13);
         sub.setGravity(Gravity.CENTER);
@@ -93,7 +93,7 @@ public class CitizenMarketActivity extends Activity {
             box.addView(ic);
 
             TextView t = new TextView(this);
-            t.setText("ما فيه حتى عرض بعد");
+            t.setText(getString(R.string.cmarket_empty));
             t.setTextColor(Color.parseColor("#D4AF37"));
             t.setTextSize(16);
             t.setTypeface(null, Typeface.BOLD);
@@ -123,7 +123,7 @@ public class CitizenMarketActivity extends Activity {
         card.setLayoutParams(lp);
 
         TextView badge = new TextView(this);
-        badge.setText("🤝 عرض مواطن");
+        badge.setText(getString(R.string.cmarket_citizen_offer));
         badge.setTextColor(Color.parseColor("#D4AF37"));
         badge.setTextSize(11);
         badge.setTypeface(null, Typeface.BOLD);
@@ -201,7 +201,7 @@ public class CitizenMarketActivity extends Activity {
         if (me == null) return;
 
         if (me.nationalId.equals(cl.sellerId)) {
-            Toast.makeText(this, "⚠️ هذا منتجك", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.cmarket_your_product), Toast.LENGTH_SHORT).show();
             return;
         }
 

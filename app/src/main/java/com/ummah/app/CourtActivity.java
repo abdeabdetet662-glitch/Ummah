@@ -69,7 +69,7 @@ public class CourtActivity extends Activity {
         root.addView(fileBtn);
 
         TextView sep = new TextView(this);
-        sep.setText("\n━━━ سجل القضايا ━━━\n");
+        sep.setText(R.string.court_case_log);
         sep.setTextColor(Color.parseColor("#D4AF37"));
         sep.setTextSize(14);
         sep.setTypeface(null, Typeface.BOLD);
@@ -124,7 +124,7 @@ public class CourtActivity extends Activity {
 
         // الشاكي
         TextView plaintiff = new TextView(this);
-        plaintiff.setText("📢 الشاكي: " + c.plaintiffName);
+        plaintiff.setText(getString(R.string.court_plaintiff) + c.plaintiffName);
         plaintiff.setTextColor(Color.parseColor("#4CAF50"));
         plaintiff.setTextSize(13);
         plaintiff.setTypeface(null, Typeface.BOLD);
@@ -132,7 +132,7 @@ public class CourtActivity extends Activity {
 
         // المدعى عليه
         TextView defendant = new TextView(this);
-        defendant.setText("👤 المدعى عليه: " + c.defendantName);
+        defendant.setText(getString(R.string.court_defendant) + c.defendantName);
         defendant.setTextColor(Color.parseColor("#F44336"));
         defendant.setTextSize(13);
         defendant.setTypeface(null, Typeface.BOLD);

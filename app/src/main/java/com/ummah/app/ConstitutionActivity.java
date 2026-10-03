@@ -36,7 +36,7 @@ public class ConstitutionActivity extends Activity {
         scroll.addView(root);
 
         TextView title = new TextView(this);
-        title.setText("🏛️ دستور أُمّة");
+        title.setText(getString(R.string.const_title));
         title.setTextColor(Color.parseColor("#D4AF37"));
         title.setTextSize(28);
         title.setTypeface(null, Typeface.BOLD);
@@ -44,7 +44,7 @@ public class ConstitutionActivity extends Activity {
         root.addView(title);
 
         TextView sub = new TextView(this);
-        sub.setText("صوّت مع كل مواطني العالم");
+        sub.setText(getString(R.string.const_subtitle));
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(12);
         sub.setGravity(Gravity.CENTER);
@@ -89,7 +89,7 @@ public class ConstitutionActivity extends Activity {
         card.setLayoutParams(lp);
 
         TextView num = new TextView(this);
-        num.setText("المادة " + a.number);
+        num.setText(getString(R.string.const_article) + " " + a.number);
         num.setTextColor(Color.parseColor("#D4AF37"));
         num.setTextSize(13);
         num.setTypeface(null, Typeface.BOLD);
@@ -135,7 +135,7 @@ public class ConstitutionActivity extends Activity {
 
         if (vm.getVote(a.number) != 0) {
             TextView voted = new TextView(this);
-            voted.setText("✔️ صوّتت على هذه المادة");
+            voted.setText(getString(R.string.const_voted_this));
             voted.setTextColor(Color.parseColor("#4CAF50"));
             voted.setTextSize(12);
             voted.setGravity(Gravity.CENTER);
@@ -145,14 +145,14 @@ public class ConstitutionActivity extends Activity {
             row.setOrientation(LinearLayout.HORIZONTAL);
 
             Button y = new Button(this);
-            y.setText("✅ موافق");
+            y.setText(R.string.const_yes);
             y.setTextSize(13);
             y.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
             y.setOnClickListener(v -> castVote(a.number, true));
             row.addView(y);
 
             Button n = new Button(this);
-            n.setText("❌ رافض");
+            n.setText(R.string.const_no);
             n.setTextSize(13);
             n.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
             n.setOnClickListener(v -> castVote(a.number, false));
@@ -170,7 +170,7 @@ public class ConstitutionActivity extends Activity {
         fm.submitConstitutionVote(c.nationalId, articleNum, yes, new FirebaseManager.OnDone() {
             @Override public void onSuccess() {
                 vm.setVote(articleNum, yes ? 1 : -1);
-                Toast.makeText(ConstitutionActivity.this, "✅ تم التصويت", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ConstitutionActivity.this, getString(R.string.const_voted), Toast.LENGTH_SHORT).show();
                 recreate();
             }
             @Override public void onError(String msg) {

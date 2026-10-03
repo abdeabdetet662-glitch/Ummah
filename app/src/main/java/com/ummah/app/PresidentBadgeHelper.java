@@ -46,7 +46,7 @@ public class PresidentBadgeHelper {
         tag.addView(crown);
 
         TextView text = new TextView(ctx);
-        text.setText("رئيس معتمد");
+        text.setText(R.string.president_badge);
         text.setTextColor(Color.parseColor("#1A1A1A"));
         text.setTextSize(10);
         text.setTypeface(null, Typeface.BOLD);

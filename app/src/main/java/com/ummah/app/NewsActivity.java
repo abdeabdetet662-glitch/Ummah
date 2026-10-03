@@ -110,7 +110,7 @@ public class NewsActivity extends Activity {
             card.setLayoutParams(lp);
 
             TextView author = new TextView(this);
-            author.setText("👤 " + (n.author != null ? n.author : "مجهول"));
+            author.setText("👤 " + (n.author != null ? n.author : getString(R.string.common_unknown)));
             author.setTextColor(Color.parseColor("#D4AF37"));
             author.setTextSize(14);
             author.setTypeface(null, Typeface.BOLD);

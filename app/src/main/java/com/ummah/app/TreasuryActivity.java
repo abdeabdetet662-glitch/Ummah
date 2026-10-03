@@ -83,7 +83,7 @@ public class TreasuryActivity extends Activity {
         root.addView(contributeBtn);
 
         TextView info = new TextView(this);
-        info.setText("\n\nالخزينة العامة ممولة من تبرعات المواطنين.\nتُستخدم لتمويل المشاريع العامة، ومنح المحتاجين، ومكافآت المبدعين.");
+        info.setText(R.string.treasury_info);
         info.setTextColor(Color.parseColor("#9E9E9E"));
         info.setTextSize(13);
         info.setLineSpacing(8, 1);

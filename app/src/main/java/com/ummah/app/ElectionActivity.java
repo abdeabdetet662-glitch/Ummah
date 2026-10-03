@@ -124,7 +124,7 @@ public class ElectionActivity extends Activity {
             .addOnSuccessListener(doc -> {
                 if (doc.exists()) {
                     String candidate = doc.getString("candidateName");
-                    myVoteView.setText("✅ صوّتت لـ: " + (candidate != null ? candidate : ""));
+                    myVoteView.setText(getString(R.string.election_voted_for) + (candidate != null ? candidate : ""));
                 } else {
                     myVoteView.setText(getString(R.string.elec_not_voted));
                     myVoteView.setTextColor(Color.parseColor("#9E9E9E"));
@@ -149,7 +149,7 @@ public class ElectionActivity extends Activity {
                 }
                 final int fTotal = total;
                 runOnUiThread(() -> {
-                    totalVotesView.setText("إجمالي الأصوات: " + fTotal);
+                    totalVotesView.setText(getString(R.string.election_total_votes) + fTotal);
                     renderList(list);
                 });
             });
@@ -200,7 +200,7 @@ public class ElectionActivity extends Activity {
         card.addView(rankView);
 
         TextView nameView = new TextView(this);
-        nameView.setText("👤 " + (name != null ? name : "مجهول"));
+        nameView.setText("👤 " + (name != null ? name : getString(R.string.common_unknown)));
         nameView.setTextColor(Color.WHITE);
         nameView.setTextSize(20);
         nameView.setTypeface(null, Typeface.BOLD);
@@ -267,7 +267,7 @@ public class ElectionActivity extends Activity {
                             .update("votes", com.google.firebase.firestore.FieldValue.increment(1))
                             .addOnSuccessListener(x -> {
                                 Toast.makeText(this, "صوّتت لـ " + candidateName, Toast.LENGTH_SHORT).show();
-                                myVoteView.setText("✅ صوّتت لـ: " + candidateName);
+                                myVoteView.setText(getString(R.string.election_voted_for) + candidateName);
                                 myVoteView.setTextColor(Color.parseColor("#4CAF50"));
                             });
                     });

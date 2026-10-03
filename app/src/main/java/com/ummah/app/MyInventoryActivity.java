@@ -152,7 +152,7 @@ public class MyInventoryActivity extends Activity {
                 runOnUiThread(() -> {
                     itemsContainer.removeAllViews();
                     TextView err = new TextView(MyInventoryActivity.this);
-                    err.setText("خطأ: " + msg);
+                    err.setText(getString(R.string.common_error_prefix) + msg);
                     err.setTextColor(Color.parseColor("#CF6679"));
                     err.setGravity(Gravity.CENTER);
                     itemsContainer.addView(err);
@@ -272,7 +272,7 @@ public class MyInventoryActivity extends Activity {
         String wearType = getWearType(item);
         if (wearType != null && !wearType.isEmpty()) {
             Button wearBtn = new Button(this);
-            wearBtn.setText("👕 البس");
+            wearBtn.setText(R.string.inv_wear);
             wearBtn.setTextSize(12);
             wearBtn.setTextColor(Color.parseColor("#0A0A0A"));
             wearBtn.setTypeface(null, Typeface.BOLD);

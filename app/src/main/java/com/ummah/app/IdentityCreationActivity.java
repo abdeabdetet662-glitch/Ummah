@@ -99,7 +99,7 @@ public class IdentityCreationActivity extends Activity {
         tvProgress = new TextView(this);
         tvProgress.setTextSize(14);
         tvProgress.setTextColor(GRAY);
-        tvProgress.setText("الخطوة 1 من 4");
+        tvProgress.setText(getString(R.string.id_step_of, 1, 4));
         topBox.addView(tvProgress);
 
         // Progress bar بسيط
@@ -127,7 +127,7 @@ public class IdentityCreationActivity extends Activity {
         tvStep.setTextColor(GOLD);
         tvStep.setGravity(Gravity.CENTER);
         tvStep.setPadding(40, 20, 40, 20);
-        tvStep.setText("١ • اختر بلدك");
+        tvStep.setText(R.string.id_step1);
         root.addView(tvStep);
 
         // ═══ Content (يتغير) ═══
@@ -149,7 +149,7 @@ public class IdentityCreationActivity extends Activity {
         btnBox.setPadding(30, 15, 30, 30);
 
         btnBack = new Button(this);
-        btnBack.setText("← رجوع");
+        btnBack.setText(R.string.id_back);
         btnBack.setTextSize(15);
         btnBack.setTextColor(GOLD);
         btnBack.setBackgroundColor(Color.TRANSPARENT);
@@ -160,7 +160,7 @@ public class IdentityCreationActivity extends Activity {
         btnBox.addView(btnBack);
 
         btnNext = new Button(this);
-        btnNext.setText("التالي ←");
+        btnNext.setText(R.string.welcome_next);
         btnNext.setTextSize(17);
         btnNext.setTypeface(null, Typeface.BOLD);
         btnNext.setTextColor(Color.BLACK);
@@ -185,7 +185,7 @@ public class IdentityCreationActivity extends Activity {
         currentStep = step;
         contentBox.removeAllViews();
 
-        tvProgress.setText("الخطوة " + step + " من " + TOTAL_STEPS);
+        tvProgress.setText(getString(R.string.id_step_of, step, TOTAL_STEPS));
 
         // تحديث شريط التقدم
         LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) progressFill.getLayoutParams();
@@ -196,23 +196,23 @@ public class IdentityCreationActivity extends Activity {
 
         switch (step) {
             case 1:
-                tvStep.setText("١ • اختر بلدك");
-                btnNext.setText("التالي ←");
+                tvStep.setText(R.string.id_step1);
+                btnNext.setText(R.string.welcome_next);
                 buildCountryStep();
                 break;
             case 2:
-                tvStep.setText("٢ • اختر اسمك");
-                btnNext.setText("التالي ←");
+                tvStep.setText(R.string.id_step2);
+                btnNext.setText(R.string.welcome_next);
                 buildNameStep();
                 break;
             case 3:
-                tvStep.setText("٣ • كلماتك السرية");
-                btnNext.setText("تأكيد ✓");
+                tvStep.setText(R.string.id_step3);
+                btnNext.setText(R.string.id_confirm);
                 buildSeedStep();
                 break;
             case 4:
-                tvStep.setText("٤ • مبروك!");
-                btnNext.setText("🎁 ابدأ رحلتك");
+                tvStep.setText(R.string.id_step4);
+                btnNext.setText(R.string.id_start_journey);
                 buildCelebrationStep();
                 break;
         }
@@ -224,7 +224,7 @@ public class IdentityCreationActivity extends Activity {
 
     private void buildCountryStep() {
         TextView hint = new TextView(this);
-        hint.setText("من وين راك؟ اختر بلدك:");
+        hint.setText(R.string.id_country_hint);
         hint.setTextColor(WHITE);
         hint.setTextSize(16);
         hint.setPadding(0, 0, 0, 24);
@@ -321,7 +321,7 @@ public class IdentityCreationActivity extends Activity {
         contentBox.addView(etName);
 
         TextView tip = new TextView(this);
-        tip.setText("💡 اختر اسماً يعرفوك بيه، هذا اسمك الرسمي في الدولة");
+        tip.setText(R.string.id_name_tip);
         tip.setTextColor(GRAY);
         tip.setTextSize(13);
         tip.setPadding(0, 20, 0, 0);
@@ -338,7 +338,7 @@ public class IdentityCreationActivity extends Activity {
 
         // تحذير
         TextView warning = new TextView(this);
-        warning.setText("⚠️ احفظ هذه الكلمات في مكان آمن — هي هويتك الوحيدة!");
+        warning.setText(R.string.id_seed_warning);
         warning.setTextColor(GOLD);
         warning.setTextSize(14);
         warning.setTypeface(null, Typeface.BOLD);
@@ -375,7 +375,7 @@ public class IdentityCreationActivity extends Activity {
 
         // زر نسخ
         Button btnCopy = new Button(this);
-        btnCopy.setText("📋 انسخ الكلمات");
+        btnCopy.setText(R.string.id_copy_seed);
         btnCopy.setTextColor(WHITE);
         btnCopy.setTextSize(15);
         btnCopy.setBackgroundResource(R.drawable.bg_btn_outline);
@@ -392,7 +392,7 @@ public class IdentityCreationActivity extends Activity {
 
         // تأكيد
         cbConfirm = new CheckBox(this);
-        cbConfirm.setText("✓ حفظت الكلمات في مكان آمن");
+        cbConfirm.setText(R.string.id_confirm_saved);
         cbConfirm.setTextColor(WHITE);
         cbConfirm.setTextSize(15);
         LinearLayout.LayoutParams cbLp = new LinearLayout.LayoutParams(
@@ -418,7 +418,7 @@ public class IdentityCreationActivity extends Activity {
 
         // العنوان
         TextView congrats = new TextView(this);
-        congrats.setText("مبروك يا " + userName + "!");
+        congrats.setText(getString(R.string.id_congrats, userName));
         congrats.setTextColor(GOLD);
         congrats.setTextSize(26);
         congrats.setTypeface(null, Typeface.BOLD);
@@ -441,7 +441,7 @@ public class IdentityCreationActivity extends Activity {
         idBox.setGravity(Gravity.CENTER);
 
         TextView idLabel = new TextView(this);
-        idLabel.setText("رقمك الوطني");
+        idLabel.setText(R.string.id_national_id);
         idLabel.setTextColor(GOLD);
         idLabel.setTextSize(14);
         idLabel.setGravity(Gravity.CENTER);
@@ -466,7 +466,7 @@ public class IdentityCreationActivity extends Activity {
 
         // مكافأة
         TextView reward = new TextView(this);
-        reward.setText("💰 +5 دج مكافأة ترحيب في محفظتك");
+        reward.setText(R.string.id_welcome_reward);
         reward.setTextColor(Color.parseColor("#00FF88"));
         reward.setTextSize(17);
         reward.setTypeface(null, Typeface.BOLD);

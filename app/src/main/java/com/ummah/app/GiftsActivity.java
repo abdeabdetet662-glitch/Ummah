@@ -112,14 +112,14 @@ public class GiftsActivity extends Activity {
         tabs.setLayoutParams(tlp);
 
         Button recTab = new Button(this);
-        recTab.setText("📥 استقبلت");
+        recTab.setText(R.string.gifts_tab_received);
         recTab.setTextSize(13);
         recTab.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
         recTab.setOnClickListener(v -> { currentTab = 0; loadHistory(); });
         tabs.addView(recTab);
 
         Button sentTab = new Button(this);
-        sentTab.setText("📤 أرسلت");
+        sentTab.setText(R.string.gifts_tab_sent);
         sentTab.setTextSize(13);
         sentTab.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
         sentTab.setOnClickListener(v -> { currentTab = 1; loadHistory(); });
@@ -363,7 +363,7 @@ public class GiftsActivity extends Activity {
         content.addView(nameView);
 
         TextView priceView = new TextView(this);
-        priceView.setText("السعر: " + gift.price + " Đ");
+        priceView.setText(getString(R.string.gifts_price_prefix) + gift.price + " Đ");
         priceView.setTextColor(Color.WHITE);
         priceView.setTextSize(14);
         priceView.setGravity(Gravity.CENTER);
@@ -418,7 +418,7 @@ public class GiftsActivity extends Activity {
         content.addView(emojiView);
 
         TextView msg = new TextView(this);
-        msg.setText("✅ تم إرسال " + gift.name + "!");
+        msg.setText(getString(R.string.gifts_sent_format, gift.name));
         msg.setTextColor(Color.parseColor("#FFD700"));
         msg.setTextSize(18);
         msg.setTypeface(null, Typeface.BOLD);

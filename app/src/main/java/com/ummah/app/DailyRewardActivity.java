@@ -46,7 +46,7 @@ public class DailyRewardActivity extends Activity {
         root.addView(icon);
 
         TextView title = new TextView(this);
-        title.setText("مكافأة اليوم");
+        title.setText(getString(R.string.daily_title));
         title.setTextColor(Color.parseColor("#D4AF37"));
         title.setTextSize(30);
         title.setTypeface(null, Typeface.BOLD);
@@ -55,7 +55,7 @@ public class DailyRewardActivity extends Activity {
         root.addView(title);
 
         TextView desc = new TextView(this);
-        desc.setText("احصل على 5 دينار مجاناً كل يوم");
+        desc.setText(getString(R.string.daily_subtitle));
         desc.setTextColor(Color.parseColor("#9E9E9E"));
         desc.setTextSize(14);
         desc.setGravity(Gravity.CENTER);
@@ -69,14 +69,14 @@ public class DailyRewardActivity extends Activity {
         root.addView(statusView);
 
         claimBtn = new Button(this);
-        claimBtn.setText("🎁  استلم المكافأة");
+        claimBtn.setText(getString(R.string.daily_claim));
         claimBtn.setTextSize(18);
         claimBtn.setPadding(40, 30, 40, 30);
         claimBtn.setOnClickListener(v -> claim());
         root.addView(claimBtn);
 
         TextView info = new TextView(this);
-        info.setText("\n\n⏰ المكافأة تُجدّد كل 24 ساعة.\nلا تُفوّت أي يوم!");
+        info.setText(R.string.daily_reset_info);
         info.setTextColor(Color.parseColor("#616161"));
         info.setTextSize(12);
         info.setGravity(Gravity.CENTER);
@@ -89,14 +89,14 @@ public class DailyRewardActivity extends Activity {
 
     private void updateUI() {
         if (wm.canClaimDaily()) {
-            statusView.setText("✅ المكافأة متاحة الآن!");
+            statusView.setText(getString(R.string.daily_available));
             statusView.setTextColor(Color.parseColor("#4CAF50"));
             claimBtn.setEnabled(true);
         } else {
             long ms = wm.millisUntilNextDaily();
             long h = ms / (60 * 60 * 1000);
             long m = (ms % (60 * 60 * 1000)) / (60 * 1000);
-            statusView.setText("⏳ المكافأة القادمة بعد: " + h + "س " + m + "د");
+            statusView.setText(getString(R.string.daily_next_format, h, m));
             statusView.setTextColor(Color.parseColor("#F44336"));
             claimBtn.setEnabled(false);
         }
@@ -104,7 +104,7 @@ public class DailyRewardActivity extends Activity {
 
     private void claim() {
         if (!wm.claimDaily()) {
-            Toast.makeText(this, "لا يمكنك الاستلام الآن", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.daily_cant_claim), Toast.LENGTH_SHORT).show();
             return;
         }
         Citizen c = im.getCitizen();
@@ -112,7 +112,7 @@ public class DailyRewardActivity extends Activity {
         fm.addBalance(c.nationalId, 5, new FirebaseManager.OnDone() {
             @Override public void onSuccess() {
                 wm.add(5);
-                Toast.makeText(DailyRewardActivity.this, "🎉 +5 Đ أُضيفت", Toast.LENGTH_LONG).show();
+                Toast.makeText(DailyRewardActivity.this, getString(R.string.daily_added), Toast.LENGTH_LONG).show();
                 updateUI();
             }
             @Override public void onError(String msg) {

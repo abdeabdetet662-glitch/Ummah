@@ -113,7 +113,7 @@ public class ParliamentActivity extends Activity {
         card.setLayoutParams(lp);
 
         TextView author = new TextView(this);
-        author.setText("بقلم: " + p.author);
+        author.setText(getString(R.string.parl_by) + p.author);
         author.setTextColor(Color.parseColor("#9E9E9E"));
         author.setTextSize(11);
         card.addView(author);

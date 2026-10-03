@@ -46,7 +46,7 @@ public class AvatarActivity extends Activity {
         root.addView(title);
 
         TextView sub = new TextView(this);
-        sub.setText("اسحب لتدوير • قرّب بإصبعين • بدّل الألوان");
+        sub.setText(R.string.avatar_sub);
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(12);
         sub.setGravity(Gravity.CENTER);

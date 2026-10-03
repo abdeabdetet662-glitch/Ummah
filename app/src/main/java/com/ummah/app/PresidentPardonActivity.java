@@ -42,7 +42,7 @@ public class PresidentPardonActivity extends Activity {
         root.addView(title);
 
         TextView sub = new TextView(this);
-        sub.setText("المواطنون المحظورون أو المكتومون");
+        sub.setText(R.string.pardon_sub);
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(13);
         sub.setGravity(Gravity.CENTER);
@@ -71,7 +71,7 @@ public class PresidentPardonActivity extends Activity {
 
         if (list.isEmpty()) {
             TextView empty = new TextView(this);
-            empty.setText("✅ ما فيه حتى مواطن محظور أو مكتوم");
+            empty.setText(R.string.pardon_empty);
             empty.setTextColor(Color.parseColor("#4CAF50"));
             empty.setGravity(Gravity.CENTER);
             empty.setPadding(0, 60, 0, 0);
@@ -114,7 +114,7 @@ public class PresidentPardonActivity extends Activity {
 
         if (pc.blocked) {
             TextView b = new TextView(this);
-            b.setText("🚫 محظور  ");
+            b.setText(R.string.pardon_blocked);
             b.setTextColor(Color.parseColor("#F44336"));
             b.setTextSize(12);
             badges.addView(b);
@@ -122,7 +122,7 @@ public class PresidentPardonActivity extends Activity {
 
         if (pc.muted) {
             TextView m = new TextView(this);
-            m.setText("🔇 مكتوم");
+            m.setText(R.string.pardon_muted);
             m.setTextColor(Color.parseColor("#FF9800"));
             m.setTextSize(12);
             badges.addView(m);
