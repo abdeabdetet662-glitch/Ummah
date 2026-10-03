@@ -46,6 +46,7 @@ public class NavDrawerHelper {
     public static final int ITEM_ABOUT = 203;
     public static final int ITEM_WEBSITE = 204;
     public static final int ITEM_REDEEM = 205;
+    public static final int ITEM_NOTIFICATIONS = 206;
 
     /**
      * عرض القائمة الجانبية
@@ -128,6 +129,7 @@ public class NavDrawerHelper {
             // ═══════════════════════════════════════════
             addSection(content, activity, "🎁  المكافآت");
             addItem(content, activity, "🎫", "استبدال كود", ITEM_REDEEM, listener);
+            addItem(content, activity, "🔔", "الإشعارات", ITEM_NOTIFICATIONS, listener);
 
             addSection(content, activity, "👤  حسابي");
             addItem(content, activity, "👤", "الملف الشخصي", ITEM_PROFILE, listener);

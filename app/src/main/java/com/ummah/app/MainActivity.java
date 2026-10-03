@@ -524,6 +524,13 @@ public class MainActivity extends Activity {
                     startActivity(i);
                 } catch (Exception ignored) {}
                 break;
+            case NavDrawerHelper.ITEM_NOTIFICATIONS:
+                try { 
+                    startActivity(new Intent(this, NotificationCenterActivity.class)); 
+                } catch (Exception e) {
+                    Toast.makeText(this, "تعذر فتح الإشعارات", Toast.LENGTH_SHORT).show();
+                }
+                break;
             case NavDrawerHelper.ITEM_REDEEM:
                 try { 
                     startActivity(new Intent(this, RedeemCodeActivity.class)); 

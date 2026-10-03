@@ -19,6 +19,7 @@ public class HomeTabBuilder {
 
     private final Activity act;
     private final LinearLayout root;
+    private XpManager xpManager;
     private ListenerRegistration presidentReg;
     private LinearLayout presidentTagContainer;
     private boolean isUserPresident = false;
@@ -27,6 +28,7 @@ public class HomeTabBuilder {
     public HomeTabBuilder(Activity act, LinearLayout root) {
         this.act = act;
         this.root = root;
+        this.xpManager = new XpManager(act);
     }
 
     public void build(Citizen citizen, String countryName, final OnHomeReady cb) {
@@ -289,11 +291,100 @@ public class HomeTabBuilder {
 
         card.addView(infoRow);
 
+        // ═══ XP Bar ═══
+        addXpBar(card);
+
         root.addView(card);
         AnimHelper.fadeInUp(card, 0);
     }
 
+
+    // ═══════════════════════════════════════════
+    //  XP Bar (المستوى + التقدم)
+    // ═══════════════════════════════════════════
+    private void addXpBar(LinearLayout card) {
+        if (xpManager == null) return;
+
+        int level = xpManager.getLevel();
+        int progress = xpManager.getProgressPercent();
+        int xpRemaining = xpManager.getXpRemaining();
+        String title = xpManager.getTitle();
+
+        // ═══ فاصل ═══
+        View sep = new View(act);
+        LinearLayout.LayoutParams sepLp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, 1);
+        sepLp.setMargins(0, 20, 0, 16);
+        sep.setLayoutParams(sepLp);
+        sep.setBackgroundColor(Color.parseColor("#2A3D32"));
+        card.addView(sep);
+
+        // ═══ الصف الأول: Title + Level ═══
+        LinearLayout topRow = new LinearLayout(act);
+        topRow.setOrientation(LinearLayout.HORIZONTAL);
+        topRow.setGravity(Gravity.CENTER_VERTICAL);
+
+        TextView titleView = new TextView(act);
+        titleView.setText(title);
+        titleView.setTextColor(Color.parseColor("#D4AF37"));
+        titleView.setTextSize(14);
+        titleView.setTypeface(null, Typeface.BOLD);
+        LinearLayout.LayoutParams titleLp = new LinearLayout.LayoutParams(
+                0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+        titleView.setLayoutParams(titleLp);
+        topRow.addView(titleView);
+
+        TextView levelView = new TextView(act);
+        levelView.setText("📊 " + level + "/100");
+        levelView.setTextColor(Color.WHITE);
+        levelView.setTextSize(13);
+        levelView.setTypeface(null, Typeface.BOLD);
+        topRow.addView(levelView);
+
+        card.addView(topRow);
+
+        // ═══ Progress Bar ═══
+        LinearLayout progressBg = new LinearLayout(act);
+        progressBg.setOrientation(LinearLayout.HORIZONTAL);
+        progressBg.setBackgroundColor(Color.parseColor("#1A1A1A"));
+        LinearLayout.LayoutParams bgLp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, 20);
+        bgLp.setMargins(0, 12, 0, 8);
+        progressBg.setLayoutParams(bgLp);
+        progressBg.setPadding(2, 2, 2, 2);
+
+        View progressFill = new View(act);
+        LinearLayout.LayoutParams fillLp = new LinearLayout.LayoutParams(
+                0, LinearLayout.LayoutParams.MATCH_PARENT, (float) progress / 100);
+        progressFill.setLayoutParams(fillLp);
+        // لون متدرج حسب النسبة
+        int fillColor;
+        if (progress >= 80) fillColor = Color.parseColor("#4CAF50");
+        else if (progress >= 50) fillColor = Color.parseColor("#FFC107");
+        else if (progress >= 25) fillColor = Color.parseColor("#FF9800");
+        else fillColor = Color.parseColor("#F44336");
+        progressFill.setBackgroundColor(fillColor);
+        progressBg.addView(progressFill);
+
+        // نضيفو عنصر وهمي باش ياخذ المساحة المتبقية
+        View progressRest = new View(act);
+        LinearLayout.LayoutParams restLp = new LinearLayout.LayoutParams(
+                0, LinearLayout.LayoutParams.MATCH_PARENT, (float) (100 - progress) / 100);
+        progressRest.setLayoutParams(restLp);
+        progressBg.addView(progressRest);
+
+        card.addView(progressBg);
+
+        // ═══ الصف السفلي: XP المتبقي ═══
+        TextView xpView = new TextView(act);
+        xpView.setText("💯 " + xpRemaining + " XP للمستوى " + (level + 1));
+        xpView.setTextColor(Color.parseColor("#9E9E9E"));
+        xpView.setTextSize(11);
+        card.addView(xpView);
+    }
+
     private void addInfoItem(LinearLayout parent, String emoji, String text) {
+
         LinearLayout box = new LinearLayout(act);
         box.setOrientation(LinearLayout.HORIZONTAL);
         box.setGravity(Gravity.CENTER_VERTICAL);
