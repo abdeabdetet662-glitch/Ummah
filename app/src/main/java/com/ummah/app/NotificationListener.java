@@ -121,6 +121,9 @@ public class NotificationListener {
                             // عرض الإشعار
                             int notifId = Math.abs(id.hashCode() % 10000);
                             NotificationHelper.show(ctx, fullTitle, message, type, notifId, id);
+                            
+                            // زيادة العداد
+                            incrementUnread(uid);
 
                             Log.d(TAG, "🔔 عُرض إشعار: " + fullTitle + " | " + message);
                         }
@@ -150,5 +153,39 @@ public class NotificationListener {
             reg = null;
             Log.d(TAG, "🛑 وقفنا الاستماع");
         }
+    }
+
+    
+    /** زيادة عداد unread في Firestore */
+    private void incrementUnread(String uid) {
+        if (uid == null || uid.isEmpty()) return;
+        
+        final com.google.firebase.firestore.DocumentReference ref =
+                com.google.firebase.firestore.FirebaseFirestore
+                    .getInstance()
+                    .collection("unread")
+                    .document(uid);
+        
+        ref.get().addOnSuccessListener(snap -> {
+            long current = 0;
+            if (snap.exists() && snap.getLong("notifications") != null) {
+                current = snap.getLong("notifications");
+            }
+            java.util.Map<String, Object> update = new java.util.HashMap<>();
+            update.put("notifications", current + 1);
+            ref.set(update, com.google.firebase.firestore.SetOptions.merge());
+        });
+    }
+    
+    /** تصفير عداد الإشعارات */
+    public static void clearNotifCount(String uid) {
+        if (uid == null || uid.isEmpty()) return;
+        java.util.Map<String, Object> update = new java.util.HashMap<>();
+        update.put("notifications", 0);
+        com.google.firebase.firestore.FirebaseFirestore
+            .getInstance()
+            .collection("unread")
+            .document(uid)
+            .set(update, com.google.firebase.firestore.SetOptions.merge());
     }
 }

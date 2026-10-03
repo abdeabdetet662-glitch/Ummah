@@ -21,6 +21,9 @@ import android.os.Build;
 public class MainActivity extends Activity {
 
     private NotificationListener notifListener;
+    private int unreadNotifs = 0;
+    private int unreadChat = 0;
+    private com.google.firebase.firestore.ListenerRegistration unreadReg;
 
     @Override
     protected void attachBaseContext(android.content.Context base) {
@@ -73,6 +76,45 @@ public class MainActivity extends Activity {
                 String uid = imLocal.getCitizen().nationalId;
                 if (uid != null && !uid.isEmpty()) {
                     notifListener.start(uid);
+
+            // ═══ مستمع الأرقام (unread) ═══
+            unreadReg = com.google.firebase.firestore.FirebaseFirestore
+                    .getInstance()
+                    .collection("unread")
+                    .document(uid)
+                    .addSnapshotListener((snap, e) -> {
+                        if (e != null) {
+                            android.util.Log.e("UmmahUnread", "خطأ", e);
+                            return;
+                        }
+                        if (snap == null || !snap.exists()) return;
+                        
+                        Long notifs = snap.getLong("notifications");
+                        Long chats = snap.getLong("chat");
+                        
+                        int newNotifs = notifs != null ? notifs.intValue() : 0;
+                        int newChats = chats != null ? chats.intValue() : 0;
+                        
+                        unreadNotifs = newNotifs;
+                        unreadChat = newChats;
+                        
+                        // تحديث BottomNav
+                        try {
+                            BottomNavHelper.updateChatBadge(MainActivity.this, newChats);
+                        } catch (Exception ignored) {}
+                        
+                        // تحديث App Icon Badge
+                        try {
+                            if (newNotifs > 0) {
+                                BadgeHelper.updateAppBadge(MainActivity.this, newNotifs);
+                            } else {
+                                BadgeHelper.clearAppBadge(MainActivity.this);
+                            }
+                        } catch (Exception ignored) {}
+                        
+                        android.util.Log.d("UmmahUnread",
+                            "📊 Notifs: " + newNotifs + " | Chats: " + newChats);
+                    });
                 }
             }
         } catch (Exception e) {
@@ -359,6 +401,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         if (notifListener != null) notifListener.stop();
+        if (unreadReg != null) unreadReg.remove();
 if (countReg != null) countReg.remove();
         if (balReg != null) balReg.remove();
         super.onDestroy();
@@ -507,7 +550,7 @@ if (countReg != null) countReg.remove();
     //  القائمة الجانبية (Nav Drawer)
     // ═══════════════════════════════════════
     private void openNavDrawer() {
-        NavDrawerHelper.show(this, currentCitizen, wm.getBalance(), new NavDrawerHelper.OnDrawerClick() {
+        NavDrawerHelper.show(this, currentCitizen, wm.getBalance(), unreadNotifs, unreadChat, new NavDrawerHelper.OnDrawerClick() {
             @Override
             public void onItem(int itemId, String title) {
                 handleDrawerClick(itemId, title);

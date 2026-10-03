@@ -62,4 +62,53 @@ public class BadgeHelper {
 
         return badge;
     }
+
+    
+    // ═══════════════════════════════════════════
+    //  App Icon Badge — النقطة الحمراء على الأيقونة
+    // ═══════════════════════════════════════════
+    
+    /** تحديث badge أيقونة التطبيق (Android 8+ و Samsung/Huawei/Xiaomi) */
+    public static void updateAppBadge(Context ctx, int count) {
+        try {
+            // Android 8+ (API 26+)
+            if (android.os.Build.VERSION.SDK_INT >= 26) {
+                android.app.NotificationManager nm =
+                    (android.app.NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
+                if (nm != null) {
+                    android.app.Notification.Builder builder =
+                        new android.app.Notification.Builder(ctx, "ummah_default")
+                            .setSmallIcon(R.mipmap.ic_launcher)
+                            .setContentTitle("أُمّة")
+                            .setContentText(count + " إشعار جديد")
+                            .setNumber(count)
+                            .setAutoCancel(true);
+                    
+                    if (android.os.Build.VERSION.SDK_INT >= 26) {
+                        builder.setChannelId("ummah_default");
+                    }
+                    
+                    nm.notify(999001, builder.build());
+                    
+                    // ملاحظة: إخفاء الإشعار بعد لحظة باش النقطة تبقى
+                    // (بعض الأجهزة تحسب Badge فقط مع إشعارات نشطة)
+                }
+            }
+        } catch (Exception e) {
+            android.util.Log.e("Badge", "فشل تحديث badge", e);
+        }
+    }
+    
+    /** مسح badge الأيقونة */
+    public static void clearAppBadge(Context ctx) {
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= 26) {
+                android.app.NotificationManager nm =
+                    (android.app.NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
+                if (nm != null) {
+                    nm.cancel(999001);
+                }
+            }
+        } catch (Exception ignored) {}
+    }
 }

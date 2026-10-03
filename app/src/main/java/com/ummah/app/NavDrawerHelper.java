@@ -61,6 +61,15 @@ public class NavDrawerHelper {
                             final Citizen citizen,
                             final int balance,
                             final OnDrawerClick listener) {
+        show(activity, citizen, balance, 0, 0, listener);
+    }
+    
+    public static void show(final Activity activity,
+                                final Citizen citizen,
+                                final int balance,
+                                final int notifCount,
+                                final int chatCount,
+                                final OnDrawerClick listener) {
         try {
             // ═══ Root Container ═══
             final android.widget.FrameLayout overlay = new android.widget.FrameLayout(activity);
@@ -121,7 +130,8 @@ public class NavDrawerHelper {
             // ═══════════════════════════════════════════
             addSection(content, activity, activity.getString(R.string.nav_section_community));
             addItem(content, activity, "🏆", activity.getString(R.string.nav_leaderboard), ITEM_LEADERBOARD, listener);
-            addItem(content, activity, "📰", activity.getString(R.string.nav_news), ITEM_NEWS, listener);
+            addItem(content, activity, "📰", activity.getString(R.string.nav_news), ITEM_NEWS, listener, 0);
+                  addItem(content, activity, "🔔", "الإشعارات", ITEM_NOTIFICATIONS, listener, notifCount);
             addItem(content, activity, "📊", activity.getString(R.string.nav_stats), ITEM_STATS, listener);
 
             // ═══════════════════════════════════════════
@@ -326,6 +336,13 @@ public class NavDrawerHelper {
     private static void addItem(LinearLayout parent, final Activity activity,
                                  String emoji, String title, final int itemId,
                                  final OnDrawerClick listener) {
+        addItem(parent, activity, emoji, title, itemId, listener, 0);
+    }
+    
+    /** نسخة جديدة مع Badge */
+    private static void addItem(LinearLayout parent, final Activity activity,
+                                 String emoji, String title, final int itemId,
+                                 final OnDrawerClick listener, int badgeCount) {
         LinearLayout row = new LinearLayout(activity);
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setGravity(Gravity.CENTER_VERTICAL);
@@ -354,6 +371,26 @@ public class NavDrawerHelper {
                 0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         row.addView(tvTitle);
 
+        // Badge (إذا كان > 0)
+        if (badgeCount > 0) {
+            TextView badge = new TextView(activity);
+            badge.setText(badgeCount > 99 ? "99+" : String.valueOf(badgeCount));
+            badge.setTextColor(Color.WHITE);
+            badge.setTextSize(11);
+            badge.setTypeface(null, Typeface.BOLD);
+            badge.setGravity(Gravity.CENTER);
+            badge.setBackgroundResource(R.drawable.bg_badge_red);
+            badge.setMinWidth(dp(activity, 40));
+            badge.setMinHeight(dp(activity, 40));
+            badge.setPadding(dp(activity, 8), 0, dp(activity, 8), 0);
+            LinearLayout.LayoutParams badgeLp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
+            badgeLp.setMargins(0, 0, dp(activity, 15), 0);
+            badge.setLayoutParams(badgeLp);
+            row.addView(badge);
+        }
+        
         // Arrow (سهم صغير)
         TextView arrow = new TextView(activity);
         arrow.setText("‹");
@@ -410,5 +447,10 @@ public class NavDrawerHelper {
         });
 
         parent.addView(row);
+    }
+
+    
+    private static int dp(Activity act, int dp) {
+        return (int) (dp * act.getResources().getDisplayMetrics().density);
     }
 }
