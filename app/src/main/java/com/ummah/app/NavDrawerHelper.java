@@ -45,6 +45,7 @@ public class NavDrawerHelper {
     public static final int ITEM_LOGOUT = 202;
     public static final int ITEM_ABOUT = 203;
     public static final int ITEM_WEBSITE = 204;
+    public static final int ITEM_REDEEM = 205;
 
     /**
      * عرض القائمة الجانبية
@@ -125,6 +126,9 @@ public class NavDrawerHelper {
             // ═══════════════════════════════════════════
             //  القسم الرابع: حسابي
             // ═══════════════════════════════════════════
+            addSection(content, activity, "🎁  المكافآت");
+            addItem(content, activity, "🎫", "استبدال كود", ITEM_REDEEM, listener);
+
             addSection(content, activity, "👤  حسابي");
             addItem(content, activity, "👤", "الملف الشخصي", ITEM_PROFILE, listener);
             addItem(content, activity, "⚙️", "الإعدادات", ITEM_SETTINGS, listener);
