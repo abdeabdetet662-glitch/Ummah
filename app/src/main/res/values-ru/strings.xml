@@ -55,4 +55,146 @@
     <string name="syncing">Синхронизация аккаунта...</string>
     <string name="connection_error">Ошибка соединения: %s</string>
     <string name="error">Ошибка: %s</string>
+
+    <!-- ═══ NavDrawer ═══ -->
+    <string name="nav_section_navigation">🧭  Навигация</string>
+    <string name="nav_section_economy">💰  Экономика</string>
+    <string name="nav_section_community">👥  Сообщество</string>
+    <string name="nav_section_rewards">🎁  Награды</string>
+    <string name="nav_section_account">👤  Мой аккаунт</string>
+    <string name="nav_home">Главная</string>
+    <string name="nav_city">Город Умма</string>
+    <string name="nav_parliament">Парламент</string>
+    <string name="nav_elections">Выборы</string>
+    <string name="nav_market">Общий рынок</string>
+    <string name="nav_jobs">Работа</string>
+    <string name="nav_gifts">Подарки</string>
+    <string name="nav_leaderboard">Таблица лидеров</string>
+    <string name="nav_news">Новости</string>
+    <string name="nav_stats">Статистика</string>
+    <string name="nav_profile">Мой профиль</string>
+    <string name="nav_settings">Настройки</string>
+    <string name="nav_about">О Умме</string>
+    <string name="nav_website">Официальный сайт</string>
+    <string name="nav_redeem">Активировать код</string>
+    <string name="nav_notifications">Уведомления</string>
+    <string name="nav_logout">Выход</string>
+    <string name="nav_app_version">Умма v7.0</string>
+    <string name="nav_copyright">© 2026 Умма — Алжир 🇩🇿</string>
+
+    <!-- ═══ Home Tab ═══ -->
+    <string name="home_section_quick">⚡  Быстрые действия</string>
+    <string name="home_section_life">🎯  Повседневная жизнь</string>
+    <string name="home_section_society">👥  Общество</string>
+    <string name="home_section_gov">🏛️  Правительство</string>
+    <string name="home_section_other">📌  Другое</string>
+
+    <string name="home_wallet">Мой кошелёк</string>
+    <string name="home_wallet_desc">Баланс и переводы</string>
+    <string name="home_market">Общий рынок</string>
+    <string name="home_market_desc">12 товаров доступно</string>
+    <string name="home_inventory">Моё имущество</string>
+    <string name="home_inventory_desc">Просмотр и продажа</string>
+
+    <string name="home_daily_reward">Ежедневная награда</string>
+    <string name="home_jobs">Работа</string>
+    <string name="home_life">Моя жизнь</string>
+    <string name="home_garage">Мой гараж</string>
+    <string name="home_profile">Мой профиль</string>
+    <string name="home_city">Город</string>
+    <string name="home_wheel">Колесо фортуны</string>
+    <string name="home_treasury">Казна</string>
+
+    <string name="home_chat">Чат Умма</string>
+    <string name="home_citizens">Граждане</string>
+    <string name="home_leaderboard">Таблица лидеров</string>
+    <string name="home_citizen_market">Рынок граждан</string>
+    <string name="home_gifts">Подарки</string>
+    <string name="home_stats">Статистика</string>
+
+    <string name="home_parliament">Парламент</string>
+    <string name="home_elections">Выборы</string>
+    <string name="home_constitution">Конституция</string>
+    <string name="home_court">Суд</string>
+    <string name="home_news">Новости</string>
+
+    <string name="home_account_recovery">Восстановление аккаунта</string>
+    <string name="home_secret_words">Секретные слова</string>
+
+    <!-- ═══ Stats ═══ -->
+    <string name="stat_connected">Онлайн</string>
+    <string name="stat_citizens">Граждане</string>
+    <string name="stat_balance">Баланс</string>
+    <string name="stat_level">Уровень</string>
+    <string name="stat_xp">XP</string>
+
+    <!-- ═══ Actions ═══ -->
+    <string name="action_enter">Войти</string>
+    <string name="action_buy">Купить</string>
+    <string name="action_build">Построить</string>
+    <string name="action_upgrade">Улучшить</string>
+    <string name="action_sell">Продать</string>
+    <string name="action_send">Отправить</string>
+    <string name="action_cancel">Отмена</string>
+    <string name="action_close">Закрыть</string>
+    <string name="action_confirm">Подтвердить</string>
+    <string name="action_save">Сохранить</string>
+    <string name="action_delete">Удалить</string>
+    <string name="action_edit">Изменить</string>
+    <string name="action_copy">Копировать</string>
+    <string name="action_paste">Вставить</string>
+
+    <!-- ═══ Common ═══ -->
+    <string name="common_loading">Загрузка...</string>
+    <string name="common_error">Ошибка</string>
+    <string name="common_success">Успех</string>
+    <string name="common_no_internet">Нет интернет-соединения</string>
+    <string name="common_yes">Да</string>
+    <string name="common_no">Нет</string>
+    <string name="common_ok">ОК</string>
+    <string name="common_back">Назад</string>
+    <string name="common_next">Далее</string>
+
+    <!-- ═══ Building ═══ -->
+    <string name="building_hut">Деревянная хижина</string>
+    <string name="building_house">Простой дом</string>
+    <string name="building_duplex">Дуплекс</string>
+    <string name="building_garden_house">Дом с садом</string>
+    <string name="building_apartment">Современная квартира</string>
+    <string name="building_villa">Вилла</string>
+    <string name="building_luxury_villa">Роскошная вилла</string>
+    <string name="building_palace">Дворец</string>
+    <string name="building_royal_palace">Королевский дворец</string>
+    <string name="building_shop">Магазин</string>
+    <string name="building_restaurant">Ресторан</string>
+    <string name="building_factory">Завод</string>
+    <string name="building_school">Школа</string>
+    <string name="building_hospital">Больница</string>
+    <string name="building_bank">Банк</string>
+    <string name="building_mosque">Мечеть</string>
+
+    <!-- ═══ Levels ═══ -->
+    <string name="level_new">🌱 Новый</string>
+    <string name="level_beginner">✨ Новичок</string>
+    <string name="level_active">🌟 Активный</string>
+    <string name="level_distinguished">⭐ Выдающийся</string>
+    <string name="level_bronze">🥉 Бронза</string>
+    <string name="level_silver">🥈 Серебро</string>
+    <string name="level_gold">🥇 Золото</string>
+    <string name="level_diamond">💎 Алмаз</string>
+    <string name="level_legend">👑 Легенда</string>
+
+    <string name="home_president_powers">👑  Полномочия Президента</string>
+    <string name="home_president_subtitle">Объявления • Подарки • Назначения • Указы</string>
+    <string name="home_xp_format">💯 %1$d XP для уровня %2$d</string>
+    <string name="home_level_format">📊 %1$d/100</string>
+    <string name="home_error_load">Ошибка загрузки</string>
+    <string name="home_market_desc_12">12 товаров доступно</string>
+    <string name="home_president_dashboard">Панель управления</string>
+
+    <string name="stat_balance_short">Баланс</string>
+    <string name="stat_citizens_short">Граждане</string>
+    <string name="stat_online_short">Онлайн</string>
+    <string name="footer_text">Цифровое государство Умма  •  v7.0</string>
+    <string name="home_president_dashboard_btn">Панель Президента</string>
 </resources>

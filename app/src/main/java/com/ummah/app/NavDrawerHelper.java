@@ -102,40 +102,40 @@ public class NavDrawerHelper {
             // ═══════════════════════════════════════════
             //  القسم الأول: التنقل
             // ═══════════════════════════════════════════
-            addSection(content, activity, "🧭  التنقل");
-            addItem(content, activity, "🏠", "الرئيسية", ITEM_HOME, listener);
-            addItem(content, activity, "🏙️", "مدينة أُمّة", ITEM_CITY, listener);
-            addItem(content, activity, "🏛️", "البرلمان", ITEM_PARLIAMENT, listener);
-            addItem(content, activity, "👑", "الانتخابات", ITEM_ELECTIONS, listener);
+            addSection(content, activity, activity.getString(R.string.nav_section_navigation));
+            addItem(content, activity, "🏠", activity.getString(R.string.nav_home), ITEM_HOME, listener);
+            addItem(content, activity, "🏙️", activity.getString(R.string.nav_city), ITEM_CITY, listener);
+            addItem(content, activity, "🏛️", activity.getString(R.string.nav_parliament), ITEM_PARLIAMENT, listener);
+            addItem(content, activity, "👑", activity.getString(R.string.nav_elections), ITEM_ELECTIONS, listener);
 
             // ═══════════════════════════════════════════
             //  القسم الثاني: الاقتصاد
             // ═══════════════════════════════════════════
-            addSection(content, activity, "💰  الاقتصاد");
-            addItem(content, activity, "🛒", "السوق العام", ITEM_MARKET, listener);
-            addItem(content, activity, "💼", "الوظائف", ITEM_JOBS, listener);
-            addItem(content, activity, "🎁", "الهدايا", ITEM_GIFTS, listener);
+            addSection(content, activity, activity.getString(R.string.nav_section_economy));
+            addItem(content, activity, "🛒", activity.getString(R.string.nav_market), ITEM_MARKET, listener);
+            addItem(content, activity, "💼", activity.getString(R.string.nav_jobs), ITEM_JOBS, listener);
+            addItem(content, activity, "🎁", activity.getString(R.string.nav_gifts), ITEM_GIFTS, listener);
 
             // ═══════════════════════════════════════════
             //  القسم الثالث: المجتمع
             // ═══════════════════════════════════════════
-            addSection(content, activity, "👥  المجتمع");
-            addItem(content, activity, "🏆", "المتصدرون", ITEM_LEADERBOARD, listener);
-            addItem(content, activity, "📰", "الأخبار", ITEM_NEWS, listener);
-            addItem(content, activity, "📊", "الإحصائيات", ITEM_STATS, listener);
+            addSection(content, activity, activity.getString(R.string.nav_section_community));
+            addItem(content, activity, "🏆", activity.getString(R.string.nav_leaderboard), ITEM_LEADERBOARD, listener);
+            addItem(content, activity, "📰", activity.getString(R.string.nav_news), ITEM_NEWS, listener);
+            addItem(content, activity, "📊", activity.getString(R.string.nav_stats), ITEM_STATS, listener);
 
             // ═══════════════════════════════════════════
             //  القسم الرابع: حسابي
             // ═══════════════════════════════════════════
-            addSection(content, activity, "🎁  المكافآت");
-            addItem(content, activity, "🎫", "استبدال كود", ITEM_REDEEM, listener);
-            addItem(content, activity, "🔔", "الإشعارات", ITEM_NOTIFICATIONS, listener);
+            addSection(content, activity, activity.getString(R.string.nav_section_rewards));
+            addItem(content, activity, "🎫", activity.getString(R.string.nav_redeem), ITEM_REDEEM, listener);
+            addItem(content, activity, "🔔", activity.getString(R.string.nav_notifications), ITEM_NOTIFICATIONS, listener);
 
-            addSection(content, activity, "👤  حسابي");
-            addItem(content, activity, "👤", "الملف الشخصي", ITEM_PROFILE, listener);
-            addItem(content, activity, "⚙️", "الإعدادات", ITEM_SETTINGS, listener);
-            addItem(content, activity, "📖", "عن أُمّة", ITEM_ABOUT, listener);
-            addItem(content, activity, "🌐", "الموقع الرسمي", ITEM_WEBSITE, listener);
+            addSection(content, activity, activity.getString(R.string.nav_section_account));
+            addItem(content, activity, "👤", activity.getString(R.string.nav_profile), ITEM_PROFILE, listener);
+            addItem(content, activity, "⚙️", activity.getString(R.string.nav_settings), ITEM_SETTINGS, listener);
+            addItem(content, activity, "📖", activity.getString(R.string.nav_about), ITEM_ABOUT, listener);
+            addItem(content, activity, "🌐", activity.getString(R.string.nav_website), ITEM_WEBSITE, listener);
 
             // ═══════════════════════════════════════════
             //  تسجيل الخروج
@@ -152,14 +152,14 @@ public class NavDrawerHelper {
             footer.setPadding(20, 20, 20, 40);
 
             TextView version = new TextView(activity);
-            version.setText("أُمّة v6.0");
+            version.setText(activity.getString(R.string.nav_app_version));
             version.setTextColor(Color.parseColor("#666666"));
             version.setTextSize(11);
             version.setGravity(Gravity.CENTER);
             footer.addView(version);
 
             TextView copyright = new TextView(activity);
-            copyright.setText("© 2026 أُمّة — الجزائر 🇩🇿");
+            copyright.setText(activity.getString(R.string.nav_copyright));
             copyright.setTextColor(Color.parseColor("#444444"));
             copyright.setTextSize(10);
             copyright.setGravity(Gravity.CENTER);
@@ -186,7 +186,7 @@ public class NavDrawerHelper {
             root.addView(overlay);
 
         } catch (Exception e) {
-            Toast.makeText(activity, "خطأ: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, activity.getString(R.string.common_error) + ": " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -399,14 +399,14 @@ public class NavDrawerHelper {
         row.addView(icon);
 
         TextView title = new TextView(activity);
-        title.setText("تسجيل الخروج");
+        title.setText(activity.getString(R.string.nav_logout));
         title.setTextColor(Color.parseColor("#F44336"));
         title.setTextSize(16);
         title.setTypeface(null, Typeface.BOLD);
         row.addView(title);
 
         row.setOnClickListener(v -> {
-            if (listener != null) listener.onItem(itemId, "تسجيل الخروج");
+            if (listener != null) listener.onItem(itemId, activity.getString(R.string.nav_logout));
         });
 
         parent.addView(row);

@@ -42,77 +42,77 @@ public class HomeTabBuilder {
         TextView onlineView = stats[2];
 
         // ═══ Quick Actions Title ═══
-        addSectionTitle("⚡  إجراءات سريعة");
+        addSectionTitle(act.getString(R.string.home_section_quick));
 
         // ═══ Primary (3 big cards) ═══
-        addBigFeature("💰", "محفظتي", "رصيدك وحوالاتك", WalletActivity.class, 0);
-        addBigFeature("🛒", "السوق العام", "12 منتج متوفر", MarketActivity.class, 60);
-        addBigFeature("🎒", "ممتلكاتي", "عرض وبيع الممتلكات", MyInventoryActivity.class, 120);
+        addBigFeature("💰", act.getString(R.string.home_wallet), act.getString(R.string.home_wallet_desc), WalletActivity.class, 0);
+        addBigFeature("🛒", act.getString(R.string.home_market), act.getString(R.string.home_market_desc), MarketActivity.class, 60);
+        addBigFeature("🎒", act.getString(R.string.home_inventory), act.getString(R.string.home_inventory_desc), MyInventoryActivity.class, 120);
 
         // ═══ Section: الحياة اليومية ═══
-        addSectionTitle("🎯  الحياة اليومية");
+        addSectionTitle(act.getString(R.string.home_section_life));
 
         addGridFeature(
-                new Feature("🎁", "مكافأة اليوم", DailyRewardActivity.class),
-                new Feature("💼", "الوظائف", JobsActivity.class)
+                new Feature("🎁", act.getString(R.string.home_daily_reward), DailyRewardActivity.class),
+                new Feature("💼", act.getString(R.string.home_jobs), JobsActivity.class)
         );
 
         addGridFeature(
-                new Feature("❤️", "حياتي", LifeStatsActivity.class),
-                new Feature("🚗", "مرآبي", GarageActivity.class)
+                new Feature("❤️", act.getString(R.string.home_life), LifeStatsActivity.class),
+                new Feature("🚗", act.getString(R.string.home_garage), GarageActivity.class)
         );
 
         addGridFeature(
-                new Feature("👤", "ملفي", ProfileActivity.class),
-                new Feature("🏙️", "المدينة", CityMapActivity.class)
+                new Feature("👤", act.getString(R.string.home_profile), ProfileActivity.class),
+                new Feature("🏙️", act.getString(R.string.home_city), CityMapActivity.class)
         );
 
         addGridFeature(
-                new Feature("🎡", "عجلة الحظ", WheelActivity.class),
-                new Feature("💰", "الخزينة", TreasuryActivity.class)
+                new Feature("🎡", act.getString(R.string.home_wheel), WheelActivity.class),
+                new Feature("💰", act.getString(R.string.home_treasury), TreasuryActivity.class)
         );
 
         // ═══ Section: المجتمع ═══
-        addSectionTitle("👥  المجتمع");
+        addSectionTitle(act.getString(R.string.home_section_society));
 
         addGridFeature(
-                new Feature("💬", "دردشة أُمّة", ChatActivity.class),
-                new Feature("👥", "المواطنون", CitizensActivity.class)
+                new Feature("💬", act.getString(R.string.home_chat), ChatActivity.class),
+                new Feature("👥", act.getString(R.string.home_citizens), CitizensActivity.class)
         );
 
         addGridFeature(
-                new Feature("🏆", "المتصدرون", LeaderboardActivity.class),
-                new Feature("🤝", "سوق المواطنين", CitizenMarketActivity.class)
+                new Feature("🏆", act.getString(R.string.home_leaderboard), LeaderboardActivity.class),
+                new Feature("🤝", act.getString(R.string.home_citizen_market), CitizenMarketActivity.class)
         );
 
         addGridFeature(
-                new Feature("🎁", "الهدايا", GiftsActivity.class),
-                new Feature("📊", "الإحصائيات", StatsActivity.class)
+                new Feature("🎁", act.getString(R.string.home_gifts), GiftsActivity.class),
+                new Feature("📊", act.getString(R.string.home_stats), StatsActivity.class)
         );
 
         // ═══ Section: الحكم والسياسة ═══
-        addSectionTitle("🏛️  الحكم والسياسة");
+        addSectionTitle(act.getString(R.string.home_section_gov));
 
         addGridFeature(
-                new Feature("🗳️", "البرلمان", ParliamentActivity.class),
-                new Feature("👑", "الانتخابات", ElectionActivity.class)
+                new Feature("🗳️", act.getString(R.string.home_parliament), ParliamentActivity.class),
+                new Feature("👑", act.getString(R.string.home_elections), ElectionActivity.class)
         );
 
         addGridFeature(
-                new Feature("📜", "الدستور", ConstitutionActivity.class),
-                new Feature("⚖️", "المحكمة", CourtActivity.class)
+                new Feature("📜", act.getString(R.string.home_constitution), ConstitutionActivity.class),
+                new Feature("⚖️", act.getString(R.string.home_court), CourtActivity.class)
         );
 
         addGridFeature(
-                new Feature("🏦", "الخزينة", TreasuryActivity.class),
-                new Feature("📰", "الأخبار", NewsActivity.class)
+                new Feature("🏦", act.getString(R.string.home_treasury), TreasuryActivity.class),
+                new Feature("📰", act.getString(R.string.home_news), NewsActivity.class)
         );
 
         // ═══ Section: أخرى ═══
-        addSectionTitle("📌  أخرى");
+        addSectionTitle(act.getString(R.string.home_section_other));
 
-        addSecondarySmall("🔐  استعادة الحساب", AccountRecoveryActivity.class);
-        addSecondarySmall("🔑  الكلمات السرية", null); // خاص
+        addSecondarySmall("🔐  " + act.getString(R.string.home_account_recovery), AccountRecoveryActivity.class);
+        addSecondarySmall("🔑  " + act.getString(R.string.home_secret_words), null); // خاص
 
         // ═══ Footer ═══
         addFooter();
@@ -144,7 +144,7 @@ public class HomeTabBuilder {
     private void updatePresidentDashboardButton() {
         if (isUserPresident) {
             if (presidentDashboardBtn == null) {
-                addSectionTitle("\uD83D\uDC51  صلاحيات الرئيس");
+                addSectionTitle(act.getString(R.string.home_president_powers));
 
                 presidentDashboardBtn = new LinearLayout(act);
                 presidentDashboardBtn.setOrientation(LinearLayout.HORIZONTAL);
@@ -170,14 +170,14 @@ public class HomeTabBuilder {
                         0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
 
                 TextView t1 = new TextView(act);
-                t1.setText("لوحة الرئيس");
+                t1.setText(act.getString(R.string.home_president_dashboard_btn));
                 t1.setTextColor(Color.parseColor("#FFD700"));
                 t1.setTextSize(18);
                 t1.setTypeface(null, Typeface.BOLD);
                 info.addView(t1);
 
                 TextView t2 = new TextView(act);
-                t2.setText("إعلانات \u2022 هدايا \u2022 تعيينات \u2022 مراسيم");
+                t2.setText(act.getString(R.string.home_president_subtitle));
                 t2.setTextColor(Color.parseColor("#FFFFFF"));
                 t2.setTextSize(11);
                 t2.setPadding(0, 6, 0, 0);
@@ -335,7 +335,7 @@ public class HomeTabBuilder {
         topRow.addView(titleView);
 
         TextView levelView = new TextView(act);
-        levelView.setText("📊 " + level + "/100");
+        levelView.setText(act.getString(R.string.home_level_format, level));
         levelView.setTextColor(Color.WHITE);
         levelView.setTextSize(13);
         levelView.setTypeface(null, Typeface.BOLD);
@@ -377,7 +377,7 @@ public class HomeTabBuilder {
 
         // ═══ الصف السفلي: XP المتبقي ═══
         TextView xpView = new TextView(act);
-        xpView.setText("💯 " + xpRemaining + " XP للمستوى " + (level + 1));
+        xpView.setText(act.getString(R.string.home_xp_format, xpRemaining, level + 1));
         xpView.setTextColor(Color.parseColor("#9E9E9E"));
         xpView.setTextSize(11);
         card.addView(xpView);
@@ -417,9 +417,9 @@ public class HomeTabBuilder {
         lp.setMargins(0, 0, 0, 10);
         row.setLayoutParams(lp);
 
-        TextView balance = createMiniStat(row, "💰", "الرصيد", "...", 0);
-        TextView count = createMiniStat(row, "👥", "مواطن", "...", 1);
-        TextView online = createMiniStat(row, "🟢", "متصل", "...", 2);
+        TextView balance = createMiniStat(row, "💰", act.getString(R.string.stat_balance_short), "...", 0);
+        TextView count = createMiniStat(row, "👥", act.getString(R.string.stat_citizens_short), "...", 1);
+        TextView online = createMiniStat(row, "🟢", act.getString(R.string.stat_online_short), "...", 2);
 
         root.addView(row);
         AnimHelper.fadeInUp(row, 100);
@@ -660,7 +660,7 @@ public class HomeTabBuilder {
     // ═══════════════════════════════════════
     private void addFooter() {
         TextView footer = new TextView(act);
-        footer.setText("دولة أُمّة الرقمية  •  v6.0");
+        footer.setText(act.getString(R.string.footer_text));
         footer.setTextColor(Color.parseColor("#616161"));
         footer.setTextSize(11);
         footer.setGravity(Gravity.CENTER);

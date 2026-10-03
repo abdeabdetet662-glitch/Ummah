@@ -55,4 +55,148 @@
     <string name="syncing">جاري مزامنة حسابك...</string>
     <string name="connection_error">خطأ اتصال: %s</string>
     <string name="error">خطأ: %s</string>
+
+    <!-- ═══ NavDrawer ═══ -->
+    <string name="nav_section_navigation">🧭  التنقل</string>
+    <string name="nav_section_economy">💰  الاقتصاد</string>
+    <string name="nav_section_community">👥  المجتمع</string>
+    <string name="nav_section_rewards">🎁  المكافآت</string>
+    <string name="nav_section_account">👤  حسابي</string>
+    <string name="nav_home">الرئيسية</string>
+    <string name="nav_city">مدينة أُمّة</string>
+    <string name="nav_parliament">البرلمان</string>
+    <string name="nav_elections">الانتخابات</string>
+    <string name="nav_market">السوق العام</string>
+    <string name="nav_jobs">الوظائف</string>
+    <string name="nav_gifts">الهدايا</string>
+    <string name="nav_leaderboard">المتصدرون</string>
+    <string name="nav_news">الأخبار</string>
+    <string name="nav_stats">الإحصائيات</string>
+    <string name="nav_profile">الملف الشخصي</string>
+    <string name="nav_settings">الإعدادات</string>
+    <string name="nav_about">عن أُمّة</string>
+    <string name="nav_website">الموقع الرسمي</string>
+    <string name="nav_redeem">استبدال كود</string>
+    <string name="nav_notifications">الإشعارات</string>
+    <string name="nav_logout">تسجيل الخروج</string>
+    <string name="nav_app_version">أُمّة v7.0</string>
+    <string name="nav_copyright">© 2026 أُمّة — الجزائر 🇩🇿</string>
+
+    <!-- ═══ Home Tab ═══ -->
+    <string name="home_section_quick">⚡  إجراءات سريعة</string>
+    <string name="home_section_life">🎯  الحياة اليومية</string>
+    <string name="home_section_society">👥  المجتمع</string>
+    <string name="home_section_gov">🏛️  الحكم والسياسة</string>
+    <string name="home_section_other">📌  أخرى</string>
+
+    <string name="home_wallet">محفظتي</string>
+    <string name="home_wallet_desc">رصيدك وحوالاتك</string>
+    <string name="home_market">السوق العام</string>
+    <string name="home_market_desc">12 منتج متوفر</string>
+    <string name="home_inventory">ممتلكاتي</string>
+    <string name="home_inventory_desc">عرض وبيع الممتلكات</string>
+
+    <string name="home_daily_reward">مكافأة اليوم</string>
+    <string name="home_jobs">الوظائف</string>
+    <string name="home_life">حياتي</string>
+    <string name="home_garage">مرآبي</string>
+    <string name="home_profile">ملفي</string>
+    <string name="home_city">المدينة</string>
+    <string name="home_wheel">عجلة الحظ</string>
+    <string name="home_treasury">الخزينة</string>
+
+    <string name="home_chat">دردشة أُمّة</string>
+    <string name="home_citizens">المواطنون</string>
+    <string name="home_leaderboard">المتصدرون</string>
+    <string name="home_citizen_market">سوق المواطنين</string>
+    <string name="home_gifts">الهدايا</string>
+    <string name="home_stats">الإحصائيات</string>
+
+    <string name="home_parliament">البرلمان</string>
+    <string name="home_elections">الانتخابات</string>
+    <string name="home_constitution">الدستور</string>
+    <string name="home_court">المحكمة</string>
+    <string name="home_news">الأخبار</string>
+
+    <string name="home_account_recovery">استعادة الحساب</string>
+    <string name="home_secret_words">الكلمات السرية</string>
+
+    <!-- ═══ Stats ═══ -->
+    <string name="stat_connected">متصل</string>
+    <string name="stat_citizens">مواطن</string>
+    <string name="stat_balance">الرصيد</string>
+    <string name="stat_level">المستوى</string>
+    <string name="stat_xp">XP</string>
+
+    <!-- ═══ Actions ═══ -->
+    <string name="action_enter">دخول</string>
+    <string name="action_buy">شراء</string>
+    <string name="action_build">بناء</string>
+    <string name="action_upgrade">ترقية</string>
+    <string name="action_sell">بيع</string>
+    <string name="action_send">إرسال</string>
+    <string name="action_cancel">إلغاء</string>
+    <string name="action_close">إغلاق</string>
+    <string name="action_confirm">تأكيد</string>
+    <string name="action_save">حفظ</string>
+    <string name="action_delete">حذف</string>
+    <string name="action_edit">تعديل</string>
+    <string name="action_copy">نسخ</string>
+    <string name="action_paste">لصق</string>
+
+    <!-- ═══ Common ═══ -->
+    <string name="common_loading">جاري التحميل...</string>
+    <string name="common_error">خطأ</string>
+    <string name="common_success">تم بنجاح</string>
+    <string name="common_no_internet">ماكانش اتصال بالإنترنت</string>
+    <string name="common_yes">نعم</string>
+    <string name="common_no">لا</string>
+    <string name="common_ok">حسناً</string>
+    <string name="common_back">رجوع</string>
+    <string name="common_next">التالي</string>
+
+    <!-- ═══ Building ═══ -->
+    <string name="building_hut">كوخ خشبي</string>
+    <string name="building_house">منزل بسيط</string>
+    <string name="building_duplex">دوبلكس</string>
+    <string name="building_garden_house">منزل بحديقة</string>
+    <string name="building_apartment">شقة حديثة</string>
+    <string name="building_villa">فيلا</string>
+    <string name="building_luxury_villa">فيلا فاخرة</string>
+    <string name="building_palace">قصر</string>
+    <string name="building_royal_palace">قصر ملكي</string>
+    <string name="building_shop">متجر</string>
+    <string name="building_restaurant">مطعم</string>
+    <string name="building_factory">مصنع</string>
+    <string name="building_school">مدرسة</string>
+    <string name="building_hospital">مستشفى</string>
+    <string name="building_bank">بنك</string>
+    <string name="building_mosque">مسجد</string>
+
+    <!-- ═══ Levels ═══ -->
+    <string name="level_new">🌱 جديد</string>
+    <string name="level_beginner">✨ مبتدئ</string>
+    <string name="level_active">🌟 نشيط</string>
+    <string name="level_distinguished">⭐ متميز</string>
+    <string name="level_bronze">🥉 برونزي</string>
+    <string name="level_silver">🥈 فضي</string>
+    <string name="level_gold">🥇 ذهبي</string>
+    <string name="level_diamond">💎 ماسي</string>
+    <string name="level_legend">👑 أسطورة</string>
+
+    <!-- ═══ HomeTabBuilder — نصوص إضافية ═══ -->
+    <string name="home_president_powers">👑  صلاحيات الرئيس</string>
+    <string name="home_president_subtitle">إعلانات • هدايا • تعيينات • مراسيم</string>
+    <string name="home_xp_format">💯 %1$d XP للمستوى %2$d</string>
+    <string name="home_level_format">📊 %1$d/100</string>
+    <string name="home_error_load">تعذر التحميل</string>
+    <string name="home_market_desc_12">12 منتج متوفر</string>
+    <string name="home_president_dashboard">لوحة الرئيس</string>
+
+    <!-- ═══ Mini Stats ═══ -->
+    <string name="stat_balance_short">الرصيد</string>
+    <string name="stat_citizens_short">مواطن</string>
+    <string name="stat_online_short">متصل</string>
+    <string name="footer_text">دولة أُمّة الرقمية  •  v7.0</string>
+    <string name="home_president_dashboard_btn">لوحة الرئيس</string>
 </resources>

@@ -55,4 +55,146 @@
     <string name="syncing">Syncing your account...</string>
     <string name="connection_error">Connection error: %s</string>
     <string name="error">Error: %s</string>
+
+    <!-- ═══ NavDrawer ═══ -->
+    <string name="nav_section_navigation">🧭  Navigation</string>
+    <string name="nav_section_economy">💰  Economy</string>
+    <string name="nav_section_community">👥  Community</string>
+    <string name="nav_section_rewards">🎁  Rewards</string>
+    <string name="nav_section_account">👤  My Account</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_city">Ummah City</string>
+    <string name="nav_parliament">Parliament</string>
+    <string name="nav_elections">Elections</string>
+    <string name="nav_market">Public Market</string>
+    <string name="nav_jobs">Jobs</string>
+    <string name="nav_gifts">Gifts</string>
+    <string name="nav_leaderboard">Leaderboard</string>
+    <string name="nav_news">News</string>
+    <string name="nav_stats">Statistics</string>
+    <string name="nav_profile">My Profile</string>
+    <string name="nav_settings">Settings</string>
+    <string name="nav_about">About Ummah</string>
+    <string name="nav_website">Official Website</string>
+    <string name="nav_redeem">Redeem Code</string>
+    <string name="nav_notifications">Notifications</string>
+    <string name="nav_logout">Logout</string>
+    <string name="nav_app_version">Ummah v7.0</string>
+    <string name="nav_copyright">© 2026 Ummah — Algeria 🇩🇿</string>
+
+    <!-- ═══ Home Tab ═══ -->
+    <string name="home_section_quick">⚡  Quick Actions</string>
+    <string name="home_section_life">🎯  Daily Life</string>
+    <string name="home_section_society">👥  Society</string>
+    <string name="home_section_gov">🏛️  Government</string>
+    <string name="home_section_other">📌  Other</string>
+
+    <string name="home_wallet">My Wallet</string>
+    <string name="home_wallet_desc">Balance and transfers</string>
+    <string name="home_market">Public Market</string>
+    <string name="home_market_desc">12 products available</string>
+    <string name="home_inventory">My Inventory</string>
+    <string name="home_inventory_desc">View and sell</string>
+
+    <string name="home_daily_reward">Daily Reward</string>
+    <string name="home_jobs">Jobs</string>
+    <string name="home_life">My Life</string>
+    <string name="home_garage">My Garage</string>
+    <string name="home_profile">My Profile</string>
+    <string name="home_city">The City</string>
+    <string name="home_wheel">Wheel of Fortune</string>
+    <string name="home_treasury">Treasury</string>
+
+    <string name="home_chat">Ummah Chat</string>
+    <string name="home_citizens">Citizens</string>
+    <string name="home_leaderboard">Leaderboard</string>
+    <string name="home_citizen_market">Citizen Market</string>
+    <string name="home_gifts">Gifts</string>
+    <string name="home_stats">Statistics</string>
+
+    <string name="home_parliament">Parliament</string>
+    <string name="home_elections">Elections</string>
+    <string name="home_constitution">Constitution</string>
+    <string name="home_court">Court</string>
+    <string name="home_news">News</string>
+
+    <string name="home_account_recovery">Account Recovery</string>
+    <string name="home_secret_words">Secret Words</string>
+
+    <!-- ═══ Stats ═══ -->
+    <string name="stat_connected">Online</string>
+    <string name="stat_citizens">Citizens</string>
+    <string name="stat_balance">Balance</string>
+    <string name="stat_level">Level</string>
+    <string name="stat_xp">XP</string>
+
+    <!-- ═══ Actions ═══ -->
+    <string name="action_enter">Enter</string>
+    <string name="action_buy">Buy</string>
+    <string name="action_build">Build</string>
+    <string name="action_upgrade">Upgrade</string>
+    <string name="action_sell">Sell</string>
+    <string name="action_send">Send</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_close">Close</string>
+    <string name="action_confirm">Confirm</string>
+    <string name="action_save">Save</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_copy">Copy</string>
+    <string name="action_paste">Paste</string>
+
+    <!-- ═══ Common ═══ -->
+    <string name="common_loading">Loading...</string>
+    <string name="common_error">Error</string>
+    <string name="common_success">Success</string>
+    <string name="common_no_internet">No Internet Connection</string>
+    <string name="common_yes">Yes</string>
+    <string name="common_no">No</string>
+    <string name="common_ok">OK</string>
+    <string name="common_back">Back</string>
+    <string name="common_next">Next</string>
+
+    <!-- ═══ Building ═══ -->
+    <string name="building_hut">Wooden Hut</string>
+    <string name="building_house">Simple House</string>
+    <string name="building_duplex">Duplex</string>
+    <string name="building_garden_house">House with Garden</string>
+    <string name="building_apartment">Modern Apartment</string>
+    <string name="building_villa">Villa</string>
+    <string name="building_luxury_villa">Luxury Villa</string>
+    <string name="building_palace">Palace</string>
+    <string name="building_royal_palace">Royal Palace</string>
+    <string name="building_shop">Shop</string>
+    <string name="building_restaurant">Restaurant</string>
+    <string name="building_factory">Factory</string>
+    <string name="building_school">School</string>
+    <string name="building_hospital">Hospital</string>
+    <string name="building_bank">Bank</string>
+    <string name="building_mosque">Mosque</string>
+
+    <!-- ═══ Levels ═══ -->
+    <string name="level_new">🌱 New</string>
+    <string name="level_beginner">✨ Beginner</string>
+    <string name="level_active">🌟 Active</string>
+    <string name="level_distinguished">⭐ Distinguished</string>
+    <string name="level_bronze">🥉 Bronze</string>
+    <string name="level_silver">🥈 Silver</string>
+    <string name="level_gold">🥇 Gold</string>
+    <string name="level_diamond">💎 Diamond</string>
+    <string name="level_legend">👑 Legend</string>
+
+    <string name="home_president_powers">👑  President Powers</string>
+    <string name="home_president_subtitle">Announcements • Gifts • Appointments • Decrees</string>
+    <string name="home_xp_format">💯 %1$d XP for level %2$d</string>
+    <string name="home_level_format">📊 %1$d/100</string>
+    <string name="home_error_load">Failed to load</string>
+    <string name="home_market_desc_12">12 products available</string>
+    <string name="home_president_dashboard">Dashboard</string>
+
+    <string name="stat_balance_short">Balance</string>
+    <string name="stat_citizens_short">Citizens</string>
+    <string name="stat_online_short">Online</string>
+    <string name="footer_text">Ummah Digital State  •  v7.0</string>
+    <string name="home_president_dashboard_btn">President Dashboard</string>
 </resources>
