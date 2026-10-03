@@ -14,13 +14,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.firestore.ListenerRegistration;
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
 
 public class MainActivity extends Activity {
+
+    private NotificationListener notifListener;
 
     @Override
     protected void attachBaseContext(android.content.Context base) {
         super.attachBaseContext(LocaleHelper.wrap(base));
     }
+    
+    
+
 
     private IdentityManager im;
     private FirebaseManager fm;
@@ -40,6 +48,32 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
+        
+        // ═══ نظام الإشعارات ═══
+        NotificationHelper.createChannels(this);
+        
+        // طلب إذن الإشعارات (Android 13+)
+        if (Build.VERSION.SDK_INT >= 33) {
+            if (checkSelfPermission("android.permission.POST_NOTIFICATIONS")
+                    != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(
+                    new String[]{"android.permission.POST_NOTIFICATIONS"}, 100);
+            }
+        }
+        
+        // بدء الاستماع للإشعارات
+        notifListener = new NotificationListener(this);
+        try {
+            IdentityManager imLocal = new IdentityManager(this);
+            if (imLocal.isCitizen() && imLocal.getCitizen() != null) {
+                String uid = imLocal.getCitizen().nationalId;
+                if (uid != null && !uid.isEmpty()) {
+                    notifListener.start(uid);
+                }
+            }
+        } catch (Exception e) {
+            android.util.Log.e("MainActivity", "خطأ في بدء الإشعارات", e);
+        }
         // Feature Flags — تهيئة نظام التحكم في الميزات
         try { FeatureFlags.init(this); } catch (Exception ignored) {}
 
@@ -320,9 +354,11 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
-        if (countReg != null) countReg.remove();
+        if (notifListener != null) notifListener.stop();
+if (countReg != null) countReg.remove();
         if (balReg != null) balReg.remove();
+        super.onDestroy();
+    
     }
 
     // ═══════════════════════════════════════
