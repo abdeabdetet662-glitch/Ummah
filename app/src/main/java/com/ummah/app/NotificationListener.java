@@ -46,20 +46,26 @@ public class NotificationListener {
 
         Log.d(TAG, "🎧 بدينا الاستماع لإشعارات: " + uid);
 
+        // مبسط - بدون orderBy/whereEqualTo إضافي (يتفادى composite index)
         reg = FirebaseFirestore.getInstance()
                 .collection("notifications")
                 .whereEqualTo("userId", uid)
-                .whereEqualTo("read", false)
-                .orderBy("createdAt", Query.Direction.DESCENDING)
-                .limit(20)
+                .limit(30)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot snapshots,
                                         @Nullable FirebaseFirestoreException e) {
                         if (e != null) {
-                            Log.e(TAG, "❌ خطأ في الاستماع", e);
+                            Log.e(TAG, "❌ خطأ في الاستماع: " + e.getMessage(), e);
+                            // نحاول نعرضلنا الخطأ في Toast باش المستخدم يشوفو
+                            try {
+                                android.widget.Toast.makeText(ctx,
+                                    "🔔 خطأ: " + e.getMessage(),
+                                    android.widget.Toast.LENGTH_LONG).show();
+                            } catch (Exception ignored) {}
                             return;
                         }
+                        Log.d(TAG, "📬 وصلنا snapshot: " + (snapshots != null ? snapshots.size() : 0) + " إشعار");
                         if (snapshots == null) return;
 
                         boolean isFirst = firstLoad;
