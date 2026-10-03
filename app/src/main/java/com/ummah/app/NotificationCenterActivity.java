@@ -47,6 +47,25 @@ public class NotificationCenterActivity extends Activity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
+
+        // ═══ تصفير عداد الإشعارات + إخفاء Badge ═══
+        try {
+            IdentityManager imReset = new IdentityManager(this);
+            if (imReset.isCitizen() && imReset.getCitizen() != null) {
+                String uidReset = imReset.getCitizen().nationalId;
+                if (uidReset != null && !uidReset.isEmpty()) {
+                    // 1. تصفير في Firestore
+                    NotificationListener.clearNotifCount(uidReset);
+                    
+                    // 2. إخفاء Badge أيقونة التطبيق
+                    BadgeHelper.clearAppBadge(this);
+                    
+                    android.util.Log.d("NotifCenter", "✅ تم تصفير العداد");
+                }
+            }
+        } catch (Exception e) {
+            android.util.Log.e("NotifCenter", "خطأ في التصفير", e);
+        }
         im = new IdentityManager(this);
         db = FirebaseFirestore.getInstance();
 
