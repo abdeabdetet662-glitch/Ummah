@@ -30,6 +30,11 @@ import java.util.Random;
  */
 public class IdentityCreationActivity extends Activity {
 
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.wrap(base));
+    }
+
     private int currentStep = 1;
     private static final int TOTAL_STEPS = 4;
 

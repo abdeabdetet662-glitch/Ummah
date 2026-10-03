@@ -33,6 +33,11 @@ import java.util.Locale;
  */
 public class NotificationCenterActivity extends Activity {
 
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.wrap(base));
+    }
+
     private IdentityManager im;
     private FirebaseFirestore db;
     private LinearLayout notifContainer;

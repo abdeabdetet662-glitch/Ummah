@@ -31,6 +31,11 @@ import java.util.Map;
  */
 public class RedeemCodeActivity extends Activity {
 
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.wrap(base));
+    }
+
     private IdentityManager im;
     private WalletManager wm;
     private FirebaseFirestore db;

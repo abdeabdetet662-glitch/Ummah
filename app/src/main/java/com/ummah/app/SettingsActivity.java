@@ -29,6 +29,12 @@ import android.widget.Toast;
  */
 public class SettingsActivity extends Activity {
 
+    // ═══ تطبيق اللغة ═══
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.wrap(base));
+    }
+
     private SharedPreferences prefs;
     private IdentityManager im;
     private WalletManager wm;
@@ -397,18 +403,41 @@ public class SettingsActivity extends Activity {
     // ═══════════════════════════════════════════
 
     private String getCurrentLanguage() {
-        return prefs.getString("language", "العربية");
+        String code = LocaleHelper.getLocale(this);
+        if (code != null && !code.isEmpty()) {
+            return LocaleHelper.getLanguageName(code);
+        }
+        return prefs.getString("language", "🇩🇿 العربية");
     }
 
     private void showLanguageDialog() {
         String[] languages = {"🇩🇿 العربية", "🇫🇷 Français", "🇬🇧 English", "🇷🇺 Русский"};
+        String[] codes = {"ar", "fr", "en", "ru"};
+
         new AlertDialog.Builder(this)
                 .setTitle("🌍 اختر اللغة")
                 .setItems(languages, (d, which) -> {
-                    String chosen = languages[which];
-                    prefs.edit().putString("language", chosen).apply();
-                    Toast.makeText(this, "اللغة: " + chosen, Toast.LENGTH_SHORT).show();
-                    Toast.makeText(this, "ℹ️ يحتاج إعادة تشغيل التطبيق", Toast.LENGTH_LONG).show();
+                    String code = codes[which];
+                    String name = languages[which];
+
+                    // نحفظو في التفضيلات
+                    prefs.edit().putString("language", name).apply();
+
+                    // نحفظو في LocaleHelper
+                    LocaleHelper.setLocale(this, code);
+
+                    // نعيد تشغيل الـ Activity
+                    Toast.makeText(this, "🌍 " + name, Toast.LENGTH_SHORT).show();
+
+                    // نحولو للـ MainActivity
+                    try {
+                        Intent intent = new Intent(this, MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                        finish();
+                    } catch (Exception e) {
+                        recreate();
+                    }
                 })
                 .show();
     }

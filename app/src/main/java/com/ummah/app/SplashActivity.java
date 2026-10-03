@@ -18,6 +18,11 @@ import android.widget.TextView;
 public class SplashActivity extends Activity {
 
     @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.wrap(base));
+    }
+
+    @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
         // FullscreenHelper.enable(this);  // DISABLED - crash

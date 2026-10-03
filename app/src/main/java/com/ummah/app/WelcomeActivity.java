@@ -18,6 +18,11 @@ import android.widget.TextView;
  */
 public class WelcomeActivity extends Activity {
 
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.wrap(base));
+    }
+
     private int currentPage = 0;
     private TextView tvIcon;
     private TextView tvTitle;

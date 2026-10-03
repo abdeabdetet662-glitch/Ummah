@@ -17,6 +17,11 @@ import com.google.firebase.firestore.ListenerRegistration;
 
 public class MainActivity extends Activity {
 
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.wrap(base));
+    }
+
     private IdentityManager im;
     private FirebaseManager fm;
     private WalletManager wm;
