@@ -44,7 +44,7 @@ public class LifeStatsActivity extends Activity {
         root.addView(title);
 
         TextView sub = new TextView(this);
-        sub.setText("حافظ على صحتك وسعادتك");
+        sub.setText(getString(R.string.life_subtitle));
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(13);
         sub.setGravity(Gravity.CENTER);
@@ -73,22 +73,22 @@ public class LifeStatsActivity extends Activity {
         root.addView(balCard);
 
         // شريط الجوع
-        hungerBar = addStatCard(root, "🍔", "الجوع", "#E65100");
+        hungerBar = addStatCard(root, "🍔", getString(R.string.life_hunger), "#E65100");
         hungerVal = (TextView) ((LinearLayout) ((LinearLayout) hungerBar.getParent()).getParent()).getChildAt(0);
         // نبنيو الأزرار
         addActionButton(root, "🍔  تناول وجبة (-50 Đ)", "#E65100", 50, "hunger", 30);
 
         // شريط الطاقة
-        energyBar = addStatCard(root, "⚡", "الطاقة", "#1976D2");
-        addActionButton(root, "🛏  ارتاح قليلاً (-30 Đ)", "#1976D2", 30, "energy", 25);
+        energyBar = addStatCard(root, "⚡", getString(R.string.life_energy), "#1976D2");
+        addActionButton(root, getString(R.string.life_rest), "#1976D2", 30, "energy", 25);
 
         // شريط السعادة
-        happinessBar = addStatCard(root, "😊", "السعادة", "#F9A825");
-        addActionButton(root, "🎬  اذهب للترفيه (-40 Đ)", "#F9A825", 40, "happiness", 20);
+        happinessBar = addStatCard(root, "😊", getString(R.string.life_happiness), "#F9A825");
+        addActionButton(root, getString(R.string.life_entertain), "#F9A825", 40, "happiness", 20);
 
         // شريط الصحة
-        healthBar = addStatCard(root, "❤️", "الصحة", "#C62828");
-        addActionButton(root, "💊  تناول دواء (-60 Đ)", "#C62828", 60, "health", 30);
+        healthBar = addStatCard(root, "❤️", getString(R.string.life_health), "#C62828");
+        addActionButton(root, getString(R.string.life_medicine), "#C62828", 60, "health", 30);
 
         setContentView(scroll);
 
@@ -174,7 +174,7 @@ public class LifeStatsActivity extends Activity {
     private LifeStatsManager.OnDone done() {
         return new LifeStatsManager.OnDone() {
             @Override public void onSuccess() {
-                Toast.makeText(LifeStatsActivity.this, "✅ تم!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LifeStatsActivity.this, getString(R.string.life_done), Toast.LENGTH_SHORT).show();
             }
             @Override public void onError(String msg) {
                 Toast.makeText(LifeStatsActivity.this, "❌ " + msg, Toast.LENGTH_SHORT).show();

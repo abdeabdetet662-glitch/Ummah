@@ -57,7 +57,7 @@ public class JobsActivity extends Activity {
         header.addView(icon);
 
         TextView title = new TextView(this);
-        title.setText("  الوظائف");
+        title.setText(getString(R.string.jobs_title));
         title.setTextColor(Color.parseColor("#D4AF37"));
         title.setTextSize(26);
         title.setTypeface(null, Typeface.BOLD);
@@ -66,7 +66,7 @@ public class JobsActivity extends Activity {
         root.addView(header);
 
         TextView sub = new TextView(this);
-        sub.setText("اختر وظيفة وابدأ العمل لتربح الدينار");
+        sub.setText(getString(R.string.jobs_subtitle));
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(13);
         sub.setGravity(Gravity.CENTER);
@@ -110,7 +110,7 @@ public class JobsActivity extends Activity {
             box.addView(ic);
 
             TextView t = new TextView(this);
-            t.setText("لا توجد وظائف بعد");
+            t.setText(getString(R.string.jobs_empty));
             t.setTextColor(Color.parseColor("#D4AF37"));
             t.setTextSize(16);
             t.setTypeface(null, Typeface.BOLD);
@@ -173,7 +173,7 @@ public class JobsActivity extends Activity {
 
         card.addView(info);
 
-        Button chooseBtn = UiHelper.primaryButton(this, "اختر");
+        Button chooseBtn = UiHelper.primaryButton(this, getString(R.string.jobs_choose));
         LinearLayout.LayoutParams btnLp = new LinearLayout.LayoutParams(200, LinearLayout.LayoutParams.WRAP_CONTENT);
         chooseBtn.setLayoutParams(btnLp);
         chooseBtn.setOnClickListener(v -> showChooseDialog(job));
@@ -188,13 +188,13 @@ public class JobsActivity extends Activity {
         if (me == null) return;
 
         new AlertDialog.Builder(this)
-                .setTitle("اختيار وظيفة")
+                .setTitle(getString(R.string.jobs_choose_title))
                 .setMessage("هل تريد العمل كـ:\n\n" + job.emoji + " " + job.title +
                         "\n\nالراتب: " + job.salary + " Đ / عملة" +
                         "\nالوصف: " + job.description)
                 .setPositiveButton("نعم", (d, w) -> jm.chooseJob(me.nationalId, job, new JobManager.OnDone() {
                     @Override public void onSuccess(int earned) {
-                        Toast.makeText(JobsActivity.this, "✅ تم اختيار الوظيفة!", Toast.LENGTH_LONG).show();
+                        Toast.makeText(JobsActivity.this, getString(R.string.jobs_selected), Toast.LENGTH_LONG).show();
                         startActivity(new android.content.Intent(JobsActivity.this, MyJobActivity.class));
                         finish();
                     }

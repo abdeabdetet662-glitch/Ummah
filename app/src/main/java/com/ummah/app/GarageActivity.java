@@ -52,7 +52,7 @@ public class GarageActivity extends Activity {
         root.addView(title);
 
         TextView sub = new TextView(this);
-        sub.setText("كل سياراتك ودراجاتك");
+        sub.setText(getString(R.string.garage_subtitle));
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(13);
         sub.setGravity(Gravity.CENTER);
@@ -106,7 +106,7 @@ public class GarageActivity extends Activity {
             box.addView(ic);
 
             TextView t = new TextView(this);
-            t.setText("ما عندك مركبات بعد");
+            t.setText(getString(R.string.garage_empty));
             t.setTextColor(Color.parseColor("#D4AF37"));
             t.setTextSize(18);
             t.setTypeface(null, Typeface.BOLD);
@@ -115,13 +115,13 @@ public class GarageActivity extends Activity {
             box.addView(t);
 
             TextView hint = new TextView(this);
-            hint.setText("روح للسوق واشترِ سيارة!");
+            hint.setText(getString(R.string.garage_go_market));
             hint.setTextColor(Color.parseColor("#9E9E9E"));
             hint.setTextSize(13);
             hint.setGravity(Gravity.CENTER);
             box.addView(hint);
 
-            Button goBtn = UiHelper.primaryButton(this, "🛒  افتح السوق");
+            Button goBtn = UiHelper.primaryButton(this, getString(R.string.garage_open_market));
             goBtn.setOnClickListener(v -> {
                 startActivity(new android.content.Intent(this, MarketActivity.class));
                 finish();
@@ -138,7 +138,7 @@ public class GarageActivity extends Activity {
 
         // عنوان القسم
         TextView section = new TextView(this);
-        section.setText("🚗  " + vehicles.size() + " مركبة");
+        section.setText("🚗  " + vehicles.size() + getString(R.string.garage_vehicle));
         section.setTextColor(Color.parseColor("#D4AF37"));
         section.setTextSize(15);
         section.setTypeface(null, Typeface.BOLD);
@@ -188,7 +188,7 @@ public class GarageActivity extends Activity {
 
         // العلامة
         TextView brand = new TextView(this);
-        brand.setText(item.brand + "  •  " + ("car".equals(item.type) ? "سيارة" : "دراجة"));
+        brand.setText(item.brand + "  •  " + ("car".equals(item.type) ? getString(R.string.garage_car) : getString(R.string.garage_bicycle)));
         brand.setTextColor(Color.parseColor("#9E9E9E"));
         brand.setTextSize(12);
         card.addView(brand);
@@ -237,10 +237,10 @@ public class GarageActivity extends Activity {
         box.addView(input);
 
         new AlertDialog.Builder(this)
-                .setTitle("🎨 تخصيص المركبة")
-                .setMessage("أعطِ اسمك المفضل للمركبة:")
+                .setTitle(getString(R.string.garage_customize))
+                .setMessage(getString(R.string.garage_name_hint))
                 .setView(box)
-                .setPositiveButton("حفظ", (d, w) -> {
+                .setPositiveButton(getString(R.string.garage_save), (d, w) -> {
                     String newName = input.getText().toString().trim();
                     if (newName.isEmpty()) return;
                     saveCustomName(item, newName);
@@ -260,7 +260,7 @@ public class GarageActivity extends Activity {
                 .collection("items").document(item.id)
                 .update(data)
                 .addOnSuccessListener(a -> {
-                    Toast.makeText(GarageActivity.this, "✅ تم التخصيص!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(GarageActivity.this, getString(R.string.garage_customized), Toast.LENGTH_SHORT).show();
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(GarageActivity.this, "❌ " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -274,7 +274,7 @@ public class GarageActivity extends Activity {
         int refund = (int) (item.price * 0.7);
 
         new AlertDialog.Builder(this)
-                .setTitle("بيع المركبة")
+                .setTitle(getString(R.string.garage_sell_vehicle))
                 .setMessage("هل تريد بيع:\n\n" + item.name +
                         "\n\nسعر الشراء: " + item.price + " Đ" +
                         "\nستستلم: " + refund + " Đ (70%)")
@@ -282,7 +282,7 @@ public class GarageActivity extends Activity {
                         new MarketManager.OnDone() {
                     @Override public void onSuccess() {
                         Toast.makeText(GarageActivity.this,
-                                "✅ تم البيع! +" + refund + " Đ", Toast.LENGTH_LONG).show();
+                                getString(R.string.garage_sold_plus) + refund + " Đ", Toast.LENGTH_LONG).show();
                     }
                     @Override public void onError(String msg) {
                         Toast.makeText(GarageActivity.this, "❌ " + msg, Toast.LENGTH_LONG).show();

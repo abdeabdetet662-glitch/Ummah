@@ -88,7 +88,7 @@ public class MyJobActivity extends Activity {
         root.addView(ic);
 
         TextView t = new TextView(this);
-        t.setText("ما عندك وظيفة");
+        t.setText(getString(R.string.myjob_no_job));
         t.setTextColor(Color.parseColor("#D4AF37"));
         t.setTextSize(22);
         t.setTypeface(null, Typeface.BOLD);
@@ -97,14 +97,14 @@ public class MyJobActivity extends Activity {
         root.addView(t);
 
         TextView s = new TextView(this);
-        s.setText("اختر وظيفة من القائمة وابدأ العمل");
+        s.setText(getString(R.string.myjob_subtitle));
         s.setTextColor(Color.parseColor("#9E9E9E"));
         s.setTextSize(13);
         s.setGravity(Gravity.CENTER);
         s.setPadding(0, 0, 0, 30);
         root.addView(s);
 
-        Button chooseBtn = UiHelper.primaryButton(this, "💼  اختر وظيفة");
+        Button chooseBtn = UiHelper.primaryButton(this, getString(R.string.myjob_choose));
         chooseBtn.setOnClickListener(v -> {
             startActivity(new android.content.Intent(this, JobsActivity.class));
             finish();
@@ -116,7 +116,7 @@ public class MyJobActivity extends Activity {
         root.removeAllViews();
 
         // Header
-        TextView title = UiHelper.goldTitle(this, "💼  وظيفتي", 32);
+        TextView title = UiHelper.goldTitle(this, getString(R.string.myjob_my_job), 32);
         root.addView(title);
 
         // بطاقة الوظيفة
@@ -124,7 +124,7 @@ public class MyJobActivity extends Activity {
         card.setGravity(Gravity.CENTER);
 
         TextView label = new TextView(this);
-        label.setText("الوظيفة الحالية");
+        label.setText(getString(R.string.myjob_current));
         label.setTextColor(Color.parseColor("#D4AF37"));
         label.setTextSize(13);
         label.setGravity(Gravity.CENTER);
@@ -181,7 +181,7 @@ public class MyJobActivity extends Activity {
         root.addView(cooldownView);
 
         // زر اعمل
-        workBtn = UiHelper.primaryButton(this, "⚒  اعمل الآن");
+        workBtn = UiHelper.primaryButton(this, getString(R.string.myjob_work_now));
         workBtn.setMinHeight(160);
         workBtn.setTextSize(20);
         workBtn.setOnClickListener(v -> doWork());
@@ -191,8 +191,8 @@ public class MyJobActivity extends Activity {
         Button changeBtn = UiHelper.actionButton(this, "🔄  غيّر الوظيفة", "#5D4037");
         changeBtn.setOnClickListener(v -> {
             new android.app.AlertDialog.Builder(this)
-                    .setTitle("تغيير الوظيفة")
-                    .setMessage("هل تريد ترك وظيفتك الحالية؟")
+                    .setTitle(getString(R.string.myjob_change))
+                    .setMessage(getString(R.string.myjob_leave_confirm))
                     .setPositiveButton("نعم", (d, w) -> {
                         Citizen c = im.getCitizen();
                         if (c == null) return;
@@ -233,7 +233,7 @@ public class MyJobActivity extends Activity {
         long elapsed = now - lastWorkTime;
 
         if (elapsed >= cooldownMs) {
-            cooldownView.setText("✅ يمكنك العمل الآن!");
+            cooldownView.setText(getString(R.string.myjob_can_work));
             cooldownView.setTextColor(Color.parseColor("#4CAF50"));
             workBtn.setEnabled(true);
             workBtn.setAlpha(1f);
@@ -253,21 +253,21 @@ public class MyJobActivity extends Activity {
         if (c == null) return;
 
         workBtn.setEnabled(false);
-        workBtn.setText("⏳ جاري العمل...");
+        workBtn.setText(getString(R.string.myjob_working));
 
         jm.work(c.nationalId, new JobManager.OnDone() {
             @Override public void onSuccess(int earned) {
                 runOnUiThread(() -> {
                     Toast.makeText(MyJobActivity.this,
                             "✅ ربحت " + earned + " Đ!", Toast.LENGTH_LONG).show();
-                    workBtn.setText("⚒  اعمل الآن");
+                    workBtn.setText(getString(R.string.myjob_work_now));
                     startTicker();
                 });
             }
             @Override public void onError(String msg) {
                 runOnUiThread(() -> {
                     Toast.makeText(MyJobActivity.this, "❌ " + msg, Toast.LENGTH_LONG).show();
-                    workBtn.setText("⚒  اعمل الآن");
+                    workBtn.setText(getString(R.string.myjob_work_now));
                     startTicker();
                 });
             }

@@ -63,7 +63,7 @@ public class WheelActivity extends Activity {
         root.addView(title);
 
         TextView sub = new TextView(this);
-        sub.setText("جرّب حظك واربح جوائز مميزة");
+        sub.setText(getString(R.string.wheel_subtitle));
         sub.setTextColor(Color.parseColor("#9E9E9E"));
         sub.setTextSize(13);
         sub.setGravity(Gravity.CENTER);
@@ -82,7 +82,7 @@ public class WheelActivity extends Activity {
         jackpotCard.setLayoutParams(jlp);
 
         TextView jlbl = new TextView(this);
-        jlbl.setText("💎  الجاكبوت التراكمي");
+        jlbl.setText(getString(R.string.wheel_jackpot));
         jlbl.setTextColor(Color.parseColor("#FFD700"));
         jlbl.setTextSize(12);
         jlbl.setGravity(Gravity.CENTER);
@@ -113,7 +113,7 @@ public class WheelActivity extends Activity {
         balCard.setGravity(Gravity.CENTER);
 
         TextView blbl = new TextView(this);
-        blbl.setText("💰  رصيدك");
+        blbl.setText(getString(R.string.wheel_your_balance));
         blbl.setTextColor(Color.parseColor("#9E9E9E"));
         blbl.setTextSize(12);
         blbl.setGravity(Gravity.CENTER);
@@ -140,20 +140,20 @@ public class WheelActivity extends Activity {
         root.addView(freeSpinView);
 
         // Spin Button
-        spinBtn = UiHelper.primaryButton(this, "🎰  دوّر العجلة (500 Đ)");
+        spinBtn = UiHelper.primaryButton(this, getString(R.string.wheel_spin_paid));
         spinBtn.setMinHeight(160);
         spinBtn.setTextSize(19);
         spinBtn.setOnClickListener(v -> doSpin(false));
         root.addView(spinBtn);
 
         // Free Spin Button
-        freeSpinBtn = UiHelper.actionButton(this, "🎁  دورة مجانية", "#2E7D32");
+        freeSpinBtn = UiHelper.actionButton(this, getString(R.string.wheel_free_spin), "#2E7D32");
         freeSpinBtn.setOnClickListener(v -> doSpin(true));
         root.addView(freeSpinBtn);
 
         // History
         TextView histTitle = new TextView(this);
-        histTitle.setText("📋  آخر الدورات");
+        histTitle.setText(getString(R.string.wheel_history));
         histTitle.setTextColor(Color.parseColor("#D4AF37"));
         histTitle.setTextSize(15);
         histTitle.setTypeface(null, Typeface.BOLD);
@@ -235,7 +235,7 @@ public class WheelActivity extends Activity {
 
     private void updateFreeSpinUI() {
         if (canFreeSpin) {
-            freeSpinView.setText("🎁 عندك دورة مجانية متاحة!");
+            freeSpinView.setText(getString(R.string.wheel_free_available));
             freeSpinView.setTextColor(Color.parseColor("#4CAF50"));
             freeSpinBtn.setEnabled(true);
             freeSpinBtn.setAlpha(1f);
@@ -252,19 +252,19 @@ public class WheelActivity extends Activity {
 
     private void doSpin(boolean isFree) {
         if (spinning) {
-            Toast.makeText(this, "العجلة تدور...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.wheel_spinning), Toast.LENGTH_SHORT).show();
             return;
         }
         if (segments == null || segments.isEmpty()) {
-            Toast.makeText(this, "العجلة ما تحملتش", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.wheel_load_failed), Toast.LENGTH_SHORT).show();
             return;
         }
         if (!config.active) {
-            Toast.makeText(this, "العجلة معطلة", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.wheel_disabled), Toast.LENGTH_SHORT).show();
             return;
         }
         if (isFree && !canFreeSpin) {
-            Toast.makeText(this, "الدورة المجانية ماشي متاحة", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.wheel_free_unavailable), Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -308,9 +308,9 @@ public class WheelActivity extends Activity {
         } else if ("item".equals(winner.type)) {
             message = "🎉 ربحت: " + (winner.itemName != null ? winner.itemName : winner.label) + "!";
         } else if ("jackpot".equals(winner.type)) {
-            message = "💎💎💎 ربحت الجاكبوت!";
+            message = getString(R.string.wheel_jackpot_won);
         } else if ("nothing".equals(winner.type)) {
-            message = "😢 للأسف، ما ربحتش هذي المرة.\nجرّب مرة أخرى!";
+            message = getString(R.string.wheel_lost);
         } else if ("privilege".equals(winner.type)) {
             message = "✨ ربحت: " + winner.label;
         } else {
@@ -335,7 +335,7 @@ public class WheelActivity extends Activity {
 
         if (list.isEmpty()) {
             TextView empty = new TextView(this);
-            empty.setText("ما فيه دورات بعد");
+            empty.setText(getString(R.string.wheel_no_spins));
             empty.setTextColor(Color.parseColor("#9E9E9E"));
             empty.setGravity(Gravity.CENTER);
             empty.setPadding(0, 20, 0, 0);
