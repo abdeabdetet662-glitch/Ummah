@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- الظل -->
+    <item>
+        <shape>
+            <solid android:color="#00000000"/>
+            <corners android:radius="24dp"/>
+            <stroke android:width="1dp" android:color="#30D4AF37"/>
+        </shape>
+    </item>
+    
+    <!-- الخلفية الداكنة -->
+    <item>
+        <shape>
+            <gradient
+                android:startColor="#1a0a15"
+                android:endColor="#0d0510"
+                android:angle="135"/>
+            <corners android:radius="24dp"/>
+        </shape>
+    </item>
+    
+    <!-- الحد الذهبي -->
+    <item>
+        <shape>
+            <solid android:color="#00000000"/>
+            <corners android:radius="24dp"/>
+            <stroke
+                android:width="2dp"
+                android:color="#D4AF37"/>
+        </shape>
+    </item>
+</layer-list>

@@ -628,7 +628,7 @@ if (countReg != null) countReg.remove();
                 } catch (Exception ignored) {}
                 break;
             case NavDrawerHelper.ITEM_MURDER:
-                    startActivity(new Intent(MainActivity.this, MurderMysteryLobbyActivity.class));
+                    startActivity(new Intent(MainActivity.this, MurderMysterySplashActivity.class));
                     break;
                 case NavDrawerHelper.ITEM_NOTIFICATIONS:
                 try { 

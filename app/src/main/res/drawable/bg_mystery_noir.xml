@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- الخلفية السوداء -->
+    <item>
+        <shape>
+            <gradient
+                android:startColor="#0a0510"
+                android:centerColor="#1a0a15"
+                android:endColor="#0a0510"
+                android:angle="135"
+                android:type="linear"/>
+        </shape>
+    </item>
+    
+    <!-- التوهج الذهبي العلوي -->
+    <item android:top="0dp" android:bottom="600dp">
+        <shape>
+            <gradient
+                android:startColor="#40D4AF37"
+                android:endColor="#00D4AF37"
+                android:type="radial"
+                android:gradientRadius="400dp"
+                android:centerX="0.5"
+                android:centerY="0.3"/>
+        </shape>
+    </item>
+    
+    <!-- التوهج الأحمر السفلي -->
+    <item android:top="400dp" android:bottom="0dp">
+        <shape>
+            <gradient
+                android:startColor="#30DC2626"
+                android:endColor="#00DC2626"
+                android:type="radial"
+                android:gradientRadius="350dp"
+                android:centerX="0.5"
+                android:centerY="0.7"/>
+        </shape>
+    </item>
+</layer-list>
