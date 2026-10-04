@@ -21,6 +21,7 @@ import android.os.Build;
 public class MainActivity extends Activity {
 
     private NotificationListener notifListener;
+    private StatsManager statsMgr;
     private int unreadNotifs = 0;
     private int unreadChat = 0;
     private com.google.firebase.firestore.ListenerRegistration unreadReg;
@@ -76,6 +77,17 @@ public class MainActivity extends Activity {
                 String uid = imLocal.getCitizen().nationalId;
                 if (uid != null && !uid.isEmpty()) {
                     notifListener.start(uid);
+            
+            // ═══ تسجيل الزيارة ═══
+            statsMgr = new StatsManager();
+            try {
+                int bal = 0;
+                Citizen c2 = im.getCitizen();
+                if (c2 != null) bal = c2.balance;
+                statsMgr.recordVisit(uid, bal);
+            } catch (Exception e) {
+                android.util.Log.e("Stats", "خطأ", e);
+            }
 
             // ═══ مستمع الأرقام (unread) ═══
             unreadReg = com.google.firebase.firestore.FirebaseFirestore
@@ -627,6 +639,9 @@ if (countReg != null) countReg.remove();
                     startActivity(i);
                 } catch (Exception ignored) {}
                 break;
+                case NavDrawerHelper.ITEM_STATS_PERSONAL:
+                    startActivity(new Intent(MainActivity.this, StatsActivity.class));
+                    break;
                 case NavDrawerHelper.ITEM_NOTIFICATIONS:
                 try { 
                     startActivity(new Intent(this, NotificationCenterActivity.class)); 
