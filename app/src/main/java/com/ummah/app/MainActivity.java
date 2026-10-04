@@ -82,6 +82,43 @@ public class MainActivity extends Activity {
             
             // ═══ تسجيل الزيارة ═══
             statsMgr = new StatsManager();
+
+        // ═══ FCM Token registration ═══
+        try {
+            IdentityManager imFcm = new IdentityManager(this);
+            if (imFcm.isCitizen() && imFcm.getCitizen() != null) {
+                final String uidFcm = imFcm.getCitizen().nationalId;
+                if (uidFcm != null && !uidFcm.isEmpty()) {
+                    com.google.firebase.messaging.FirebaseMessaging
+                        .getInstance()
+                        .getToken()
+                        .addOnSuccessListener(token -> {
+                            if (token != null && !token.isEmpty()) {
+                                java.util.Map<String, Object> data = new java.util.HashMap<>();
+                                data.put("token", token);
+                                data.put("updatedAt", System.currentTimeMillis());
+                                data.put("userId", uidFcm);
+
+                                com.google.firebase.firestore.FirebaseFirestore
+                                    .getInstance()
+                                    .collection("fcm_tokens")
+                                    .document(uidFcm)
+                                    .set(data, com.google.firebase.firestore.SetOptions.merge())
+                                    .addOnSuccessListener(aVoid ->
+                                        android.util.Log.d("FCM", "✅ Token محفوظ"))
+                                    .addOnFailureListener(e ->
+                                        android.util.Log.e("FCM", "❌ فشل الحفظ", e));
+
+                                android.util.Log.d("FCM", "📱 Token: " + token.substring(0, 20) + "...");
+                            }
+                        })
+                        .addOnFailureListener(e ->
+                            android.util.Log.e("FCM", "❌ فشل جلب Token", e));
+                }
+            }
+        } catch (Exception ex) {
+            android.util.Log.e("FCM", "خطأ", ex);
+        }
             try {
                 int bal = 0;
                 Citizen c2 = im.getCitizen();
