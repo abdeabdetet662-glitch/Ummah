@@ -155,5 +155,13 @@
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:hardwareAccelerated="true" />
         
+    <!-- Battle Royale Game -->
+        <activity
+            android:name=".BattleRoyaleActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:hardwareAccelerated="true" />
+        
     </application>
 </manifest>

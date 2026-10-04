@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>معركة أُمّة</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- Canvas -->
+<canvas id="game"></canvas>
+
+<!-- ═══ LOADING SCREEN ═══ -->
+<div id="loading" class="screen">
+  <div class="logo-crown">⚔️</div>
+  <div class="logo-title">معركة أُمّة</div>
+  <div class="logo-sub">Battle Royale أونلاين</div>
+  <div class="loader-bar"><span></span></div>
+  <div class="loader-status" id="loader-status">جاري الاتصال...</div>
+</div>
+
+<!-- ═══ LOBBY SCREEN ═══ -->
+<div id="lobby" class="screen hidden">
+  <div class="lobby-top">
+    <div class="lobby-player">
+      <div class="player-avatar" id="my-avatar">👤</div>
+      <div class="player-name" id="my-name">عبد الله</div>
+      <div class="player-id" id="my-id">UMM-XXXX</div>
+    </div>
+    <div class="lobby-balance">
+      <div class="balance-label">رصيدك</div>
+      <div class="balance-value" id="my-balance">0 Đ</div>
+    </div>
+  </div>
+
+  <div class="lobby-center">
+    <div class="mode-card">
+      <div class="mode-icon">⚔️</div>
+      <div class="mode-title">معركة عادية</div>
+      <div class="mode-desc">10 لاعبين • آخر واحد يقف</div>
+      <div class="mode-info">
+        <div class="mode-info-item">
+          <span class="info-label">💰 رسوم الدخول</span>
+          <span class="info-value" id="entry-fee">500 Đ</span>
+        </div>
+        <div class="mode-info-item">
+          <span class="info-label">🏆 الجائزة الكبرى</span>
+          <span class="info-value" id="prize-pool">5000 Đ</span>
+        </div>
+      </div>
+      <button class="btn-primary btn-large" id="btn-find-match" onclick="findMatch()">
+        🔍 ابحث عن مباراة
+      </button>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon">🎮</div>
+        <div class="stat-num" id="stat-games">0</div>
+        <div class="stat-label">مباريات</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🥇</div>
+        <div class="stat-num" id="stat-wins">0</div>
+        <div class="stat-label">انتصارات</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">💀</div>
+        <div class="stat-num" id="stat-kills">0</div>
+        <div class="stat-label">قتلات</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🏆</div>
+        <div class="stat-num" id="stat-rank">—</div>
+        <div class="stat-label">الترتيب</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lobby-bottom">
+    <button class="btn-secondary" onclick="showLeaderboard()">🏆 المتصدرون</button>
+    <button class="btn-secondary" onclick="showRules()">📋 القواعد</button>
+    <button class="btn-secondary" onclick="exitGame()">🚪 خروج</button>
+  </div>
+</div>
+
+<!-- ═══ MATCHMAKING SCREEN ═══ -->
+<div id="matchmaking" class="screen hidden">
+  <div class="mm-spinner">
+    <div class="mm-ring"></div>
+    <div class="mm-icon">⚔️</div>
+  </div>
+  <div class="mm-title">جاري البحث عن مباراة...</div>
+  <div class="mm-sub" id="mm-status">بانتظار اللاعبين</div>
+  <div class="mm-players-count">
+    <span id="mm-count">0</span> / 10
+  </div>
+  <div class="mm-players" id="mm-players"></div>
+  <button class="btn-danger" onclick="cancelMatchmaking()">إلغاء البحث</button>
+</div>
+
+<!-- ═══ GAME HUD ═══ -->
+<div id="hud" class="hidden">
+  <!-- Top bar -->
+  <div class="hud-top">
+    <div class="hud-players">
+      <span class="hud-icon">👥</span>
+      <span id="hud-alive">10</span> 
+      <span class="hud-dim">/ 10</span>
+    </div>
+    <div class="hud-circle-info">
+      <span class="hud-icon">🌀</span>
+      <span id="hud-phase">المرحلة 1</span>
+    </div>
+    <div class="hud-timer" id="hud-timer">--:--</div>
+  </div>
+
+  <!-- Kill feed -->
+  <div class="kill-feed" id="kill-feed"></div>
+
+  <!-- Minimap -->
+  <div class="minimap" id="minimap">
+    <div class="minimap-circle" id="minimap-circle"></div>
+    <canvas id="minimap-canvas" width="120" height="120"></canvas>
+  </div>
+
+  <!-- Bottom-left: Health + Ammo -->
+  <div class="hud-bottom-left">
+    <div class="hud-health">
+      <span class="hud-icon">❤️</span>
+      <div class="hud-bar-bg">
+        <div class="hud-bar-fill" id="health-fill" style="width:100%"></div>
+      </div>
+      <span id="health-text">100</span>
+    </div>
+    <div class="hud-ammo">
+      <span class="hud-icon" id="weapon-icon">🔫</span>
+      <span><span id="ammo-current">30</span>/<span id="ammo-max">30</span></span>
+    </div>
+  </div>
+
+  <!-- Bottom-right: Kill count -->
+  <div class="hud-bottom-right">
+    <div class="hud-kills">
+      <span class="hud-icon">💀</span>
+      <span id="hud-kills">0</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ JOYSTICK ═══ -->
+<div id="joystick" class="hidden">
+  <div class="joystick-base">
+    <div class="joystick-knob"></div>
+  </div>
+</div>
+
+<!-- ═══ ACTION BUTTONS ═══ -->
+<div id="actions" class="hidden">
+  <div class="action-btn action-shoot" id="btn-shoot">
+    <span>🔥</span>
+  </div>
+  <div class="action-btn action-reload" id="btn-reload">
+    <span>🔄</span>
+  </div>
+  <div class="action-btn action-weapon" id="btn-weapon">
+    <span id="weapon-switch-icon">🔫</span>
+  </div>
+</div>
+
+<!-- ═══ DEATH SCREEN ═══ -->
+<div id="death" class="screen hidden">
+  <div class="death-icon">💀</div>
+  <div class="death-title">لقد سقطت</div>
+  <div class="death-sub" id="death-sub">المركز #5 من 10</div>
+  <div class="death-stats" id="death-stats"></div>
+  <button class="btn-primary" onclick="backToLobby()">🔄 مباراة جديدة</button>
+</div>
+
+<!-- ═══ VICTORY SCREEN ═══ -->
+<div id="victory" class="screen hidden">
+  <div class="victory-icon">🏆</div>
+  <div class="victory-title">فوز!</div>
+  <div class="victory-sub">آخر واحد يقف</div>
+  <div class="victory-stats" id="victory-stats"></div>
+  <button class="btn-primary btn-large" onclick="backToLobby()">🎮 مباراة جديدة</button>
+</div>
+
+<!-- ═══ TOAST ═══ -->
+<div id="toast" class="toast hidden"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+<script src="js/network.js"></script>
+<script src="js/weapons.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/player.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>
