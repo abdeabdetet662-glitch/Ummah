@@ -276,8 +276,12 @@ public class MurderMysteryLobbyActivity extends Activity {
                         .putExtra("gameId", currentGame.id));
             });
         } else {
-            actionBtn.setText("⏸️ الجلسة منتهية");
-            actionBtn.setEnabled(false);
+            actionBtn.setText("🏆 شوف النتيجة");
+            actionBtn.setEnabled(true);
+            actionBtn.setOnClickListener(v -> {
+                startActivity(new Intent(this, MurderMysteryResultActivity.class)
+                        .putExtra("gameId", currentGame.id));
+            });
         }
     }
 
