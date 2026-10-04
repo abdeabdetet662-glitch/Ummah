@@ -627,6 +627,9 @@ if (countReg != null) countReg.remove();
                     startActivity(i);
                 } catch (Exception ignored) {}
                 break;
+                case NavDrawerHelper.ITEM_SPY_MISSION:
+                    startActivity(new Intent(MainActivity.this, SpyMissionActivity.class));
+                    break;
                 case NavDrawerHelper.ITEM_NOTIFICATIONS:
                 try { 
                     startActivity(new Intent(this, NotificationCenterActivity.class)); 

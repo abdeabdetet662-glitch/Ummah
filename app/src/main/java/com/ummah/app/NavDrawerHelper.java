@@ -47,6 +47,7 @@ public class NavDrawerHelper {
     public static final int ITEM_WEBSITE = 204;
     public static final int ITEM_REDEEM = 205;
     public static final int ITEM_NOTIFICATIONS = 206;
+    public static final int ITEM_SPY_MISSION = 209;
 
     /**
      * عرض القائمة الجانبية
@@ -132,6 +133,7 @@ public class NavDrawerHelper {
             addItem(content, activity, "🏆", activity.getString(R.string.nav_leaderboard), ITEM_LEADERBOARD, listener);
             addItem(content, activity, "📰", activity.getString(R.string.nav_news), ITEM_NEWS, listener, 0);
                   addItem(content, activity, "🔔", "الإشعارات", ITEM_NOTIFICATIONS, listener, notifCount);
+                addItem(content, activity, "🕵️", "عملية سرية", ITEM_SPY_MISSION, listener, 0);
                 
             addItem(content, activity, "📊", activity.getString(R.string.nav_stats), ITEM_STATS, listener);
 

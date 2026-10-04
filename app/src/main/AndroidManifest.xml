@@ -145,7 +145,15 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         
-        <!-- Murder Mystery -->
+        
+    
+        <!-- Spy Mission Game -->
+        <activity
+            android:name=".SpyMissionActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:hardwareAccelerated="true" />
         
     </application>
 </manifest>
