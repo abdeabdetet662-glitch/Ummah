@@ -630,6 +630,9 @@ if (countReg != null) countReg.remove();
                 case NavDrawerHelper.ITEM_SPY_MISSION:
                     startActivity(new Intent(MainActivity.this, SpyMissionActivity.class));
                     break;
+                case NavDrawerHelper.ITEM_HEIST:
+                    startActivity(new Intent(MainActivity.this, com.ummah.app.heist.HeistLobbyActivity.class));
+                    break;
                 case NavDrawerHelper.ITEM_NOTIFICATIONS:
                 try { 
                     startActivity(new Intent(this, NotificationCenterActivity.class)); 
