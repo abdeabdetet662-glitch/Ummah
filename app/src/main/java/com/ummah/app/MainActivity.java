@@ -630,9 +630,6 @@ if (countReg != null) countReg.remove();
                 case NavDrawerHelper.ITEM_SPY_MISSION:
                     startActivity(new Intent(MainActivity.this, SpyMissionActivity.class));
                     break;
-                case NavDrawerHelper.ITEM_BATTLE_ROYALE:
-                    startActivity(new Intent(MainActivity.this, BattleRoyaleActivity.class));
-                    break;
                 case NavDrawerHelper.ITEM_NOTIFICATIONS:
                 try { 
                     startActivity(new Intent(this, NotificationCenterActivity.class)); 
