@@ -177,6 +177,94 @@ public class MurderMysteryGameActivity extends Activity {
         cluesContainer = new LinearLayout(this);
         cluesContainer.setOrientation(LinearLayout.VERTICAL);
         content.addView(cluesContainer);
+        
+        // ═══ قسم المشتبهين ═══
+        LinearLayout suspectsHeader = new LinearLayout(this);
+        suspectsHeader.setOrientation(LinearLayout.HORIZONTAL);
+        suspectsHeader.setGravity(Gravity.CENTER_VERTICAL);
+        suspectsHeader.setPadding(0, dp(24), 0, dp(12));
+        
+        View sLineL = new View(this);
+        sLineL.setLayoutParams(new LinearLayout.LayoutParams(0, dp(1), 1f));
+        sLineL.setBackgroundColor(Color.parseColor("#30D4AF37"));
+        suspectsHeader.addView(sLineL);
+        
+        TextView sText = new TextView(this);
+        sText.setText("   🎭 المشتبهون (اضغط للاستجواب)   ");
+        sText.setTextColor(Color.parseColor("#D4AF37"));
+        sText.setTextSize(13);
+        sText.setTypeface(null, Typeface.BOLD);
+        suspectsHeader.addView(sText);
+        
+        View sLineR = new View(this);
+        sLineR.setLayoutParams(new LinearLayout.LayoutParams(0, dp(1), 1f));
+        sLineR.setBackgroundColor(Color.parseColor("#30D4AF37"));
+        suspectsHeader.addView(sLineR);
+        
+        content.addView(suspectsHeader);
+        
+        LinearLayout suspectsContainer = new LinearLayout(this);
+        suspectsContainer.setOrientation(LinearLayout.VERTICAL);
+        suspectsContainer.setId(View.generateViewId());
+        content.addView(suspectsContainer);
+        
+        // نبنيو المشتبهين
+        java.util.List<MMSuspect> suspectsList = MMSuspectsManager.buildSuspects("default");
+        for (MMSuspect s : suspectsList) {
+            LinearLayout card = new LinearLayout(this);
+            card.setOrientation(LinearLayout.HORIZONTAL);
+            card.setGravity(Gravity.CENTER_VERTICAL);
+            card.setBackgroundResource(R.drawable.bg_mafia_player);
+            card.setPadding(dp(16), dp(12), dp(16), dp(12));
+            LinearLayout.LayoutParams clp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
+            clp.setMargins(0, 0, 0, dp(8));
+            card.setLayoutParams(clp);
+            
+            TextView em = new TextView(this);
+            em.setText(s.emoji);
+            em.setTextSize(28);
+            em.setPadding(0, 0, dp(12), 0);
+            card.addView(em);
+            
+            LinearLayout sinfo = new LinearLayout(this);
+            sinfo.setOrientation(LinearLayout.VERTICAL);
+            sinfo.setLayoutParams(new LinearLayout.LayoutParams(0,
+                    LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+            
+            TextView sn = new TextView(this);
+            sn.setText(s.name);
+            sn.setTextColor(Color.WHITE);
+            sn.setTextSize(14);
+            sn.setTypeface(null, Typeface.BOLD);
+            sinfo.addView(sn);
+            
+            TextView st = new TextView(this);
+            st.setText(s.title);
+            st.setTextColor(Color.parseColor("#9E9E9E"));
+            st.setTextSize(11);
+            sinfo.addView(st);
+            
+            card.addView(sinfo);
+            
+            TextView arrow = new TextView(this);
+            arrow.setText("›");
+            arrow.setTextColor(Color.parseColor("#D4AF37"));
+            arrow.setTextSize(24);
+            card.addView(arrow);
+            
+            final String sid = s.id;
+            card.setOnClickListener(v -> {
+                startActivity(new Intent(MurderMysteryGameActivity.this, MMInterrogateActivity.class)
+                        .putExtra("suspectId", sid)
+                        .putExtra("killerId", game != null ? game.killerId : null)
+                        .putExtra("caseId", gameId));
+            });
+            
+            suspectsContainer.addView(card);
+        }
+        
 
         // ═══ Chat Section ═══
         LinearLayout chatHeader = new LinearLayout(this);

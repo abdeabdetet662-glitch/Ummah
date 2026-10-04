@@ -369,4 +369,17 @@ public class MurderMysteryManager {
             }
         );
     }
+
+    
+    // ═══ جلب المشتبهين مع القاتل محدد ═══
+    public List<MMSuspect> getSuspectsWithKiller(String caseId, String killerId) {
+        List<MMSuspect> suspects = MMSuspectsManager.buildSuspects(caseId);
+        
+        // نحدد القاتل
+        for (MMSuspect s : suspects) {
+            s.isKiller = s.id.equals(killerId);
+        }
+        
+        return suspects;
+    }
 }

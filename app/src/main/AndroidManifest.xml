@@ -158,6 +158,11 @@
             android:name=".MurderMysteryGameActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".MMInterrogateActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".MurderMysteryVoteActivity"
             android:exported="false"
