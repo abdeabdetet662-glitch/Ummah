@@ -48,19 +48,37 @@ public class MurderMysteryManager {
     // ═══ جلب الجلسة الحالية ═══
     public void getCurrentMystery(MysteryCallback cb) {
         db.collection(COLLECTION)
-            .whereIn("status", java.util.Arrays.asList("registration", "playing", "voting"))
-            .orderBy("createdAt", Query.Direction.DESCENDING)
-            .limit(1)
+            .limit(20)
             .get()
             .addOnSuccessListener(snap -> {
-                if (snap.isEmpty()) {
+                if (snap == null || snap.isEmpty()) {
                     cb.onResult(null);
-                } else {
-                    MurderMystery m = snap.getDocuments().get(0)
-                        .toObject(MurderMystery.class);
-                    if (m != null) m.id = snap.getDocuments().get(0).getId();
-                    cb.onResult(m);
+                    return;
                 }
+                
+                // نفلترو محلياً: registration | playing | voting
+                MurderMystery best = null;
+                long bestCreated = 0;
+                
+                for (com.google.firebase.firestore.DocumentSnapshot d : snap.getDocuments()) {
+                    String st = d.getString("status");
+                    if (st == null) continue;
+                    if (!st.equals("registration") && !st.equals("playing") && !st.equals("voting")) continue;
+                    
+                    Long createdAt = d.getLong("createdAt");
+                    long ct = createdAt != null ? createdAt : 0;
+                    
+                    if (best == null || ct > bestCreated) {
+                        MurderMystery m = d.toObject(MurderMystery.class);
+                        if (m != null) {
+                            m.id = d.getId();
+                            best = m;
+                            bestCreated = ct;
+                        }
+                    }
+                }
+                
+                cb.onResult(best);
             })
             .addOnFailureListener(e -> cb.onError(e.getMessage()));
     }
