@@ -143,5 +143,15 @@
             android:name=".NotificationCenterActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
+        
+        <!-- Murder Mystery -->
+        <activity
+            android:name=".MurderMysterySplashActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".MurderMysteryLobbyActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
     </application>
 </manifest>
