@@ -93,9 +93,9 @@ public class MurderMysteryManager {
                     return;
                 }
 
-                // خصم الرسوم
-                WalletManager wm = new WalletManager();
-                wm.transferToTreasury(citizen.nationalId, fee, "اشتراك جريمة", null);
+                // خصم الرسوم من رصيد المواطن مباشرة
+                db.collection("citizens").document(citizen.nationalId)
+                    .update("balance", com.google.firebase.firestore.FieldValue.increment(-fee));
 
                 // إضافة اللاعب
                 Map<String, Object> player = new HashMap<>();
@@ -298,8 +298,9 @@ public class MurderMysteryManager {
     }
 
     private void distributePrize(String gameId, String winnerId, int amount, SimpleCallback cb) {
-        WalletManager wm = new WalletManager();
-        wm.addBalance(winnerId, amount, "فوز في جريمة أُمّة", null);
-        cb.onSuccess();
+        db.collection("citizens").document(winnerId)
+            .update("balance", com.google.firebase.firestore.FieldValue.increment(amount))
+            .addOnSuccessListener(v -> cb.onSuccess())
+            .addOnFailureListener(e -> cb.onError(e.getMessage()));
     }
 }
