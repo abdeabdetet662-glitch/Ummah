@@ -90,6 +90,7 @@ public class MurderMysteryManager {
             return;
         }
 
+        // ═══ 1. نجيب الجلسة ═══
         db.collection(COLLECTION).document(gameId).get()
             .addOnSuccessListener(gameDoc -> {
                 if (!gameDoc.exists()) {
@@ -105,39 +106,68 @@ public class MurderMysteryManager {
                     return;
                 }
 
-                int fee = game.entryFee;
-                if (citizen.balance < fee) {
-                    cb.onError("ما عندكش " + fee + " Đ");
-                    return;
-                }
-
-                // خصم الرسوم من رصيد المواطن مباشرة
-                db.collection("citizens").document(citizen.nationalId)
-                    .update("balance", com.google.firebase.firestore.FieldValue.increment(-fee));
-
-                // إضافة اللاعب
-                Map<String, Object> player = new HashMap<>();
-                player.put("userId", citizen.nationalId);
-                player.put("userName", citizen.name);
-                player.put("role", "investigator"); // مؤقتاً
-                player.put("character", "مواطن");
-                player.put("characterDesc", "في انتظار القصة...");
-                player.put("avatarEmoji", "👤");
-                player.put("joinedAt", System.currentTimeMillis());
-                player.put("status", "active");
-                player.put("suspicion", 0);
-
+                // ═══ 2. نتحققو إذا مسجل من قبل ═══
                 db.collection(COLLECTION).document(gameId)
                     .collection("players").document(citizen.nationalId)
-                    .set(player)
-                    .addOnSuccessListener(v -> {
-                        // زيادة العداد
-                        db.collection(COLLECTION).document(gameId)
-                            .update("currentPlayers",
-                                com.google.firebase.firestore.FieldValue.increment(1))
-                            .addOnSuccessListener(x -> cb.onSuccess())
-                            .addOnFailureListener(e -> cb.onError(e.getMessage()));
+                    .get()
+                    .addOnSuccessListener(pDoc -> {
+                        if (pDoc.exists()) {
+                            cb.onError("مسجل من قبل");
+                            return;
+                        }
+
+                        // ═══ 3. الخصم عبر PaymentManager ═══
+                        PaymentManager.pay(
+                            citizen.nationalId,
+                            game.entryFee,
+                            PaymentManager.MM_ENTRY,
+                            "اشتراك في جريمة أُمّة",
+                            new PaymentManager.PayCallback() {
+                                @Override
+                                public void onSuccess(long newBalance) {
+                                    continueRegistration(gameId, citizen, cb);
+                                }
+
+                                @Override
+                                public void onInsufficient(long balance, long required) {
+                                    cb.onError("ما عندكش " + required + " Đ (عندك " + balance + " Đ)");
+                                }
+
+                                @Override
+                                public void onError(String error) {
+                                    cb.onError(error);
+                                }
+                            }
+                        );
                     })
+                    .addOnFailureListener(e -> cb.onError(e.getMessage()));
+            })
+            .addOnFailureListener(e -> cb.onError(e.getMessage()));
+    }
+    
+    /** إكمال التسجيل بعد خصم الرسوم */
+    private void continueRegistration(String gameId, Citizen citizen, SimpleCallback cb) {
+        // إضافة اللاعب
+        Map<String, Object> player = new HashMap<>();
+        player.put("userId", citizen.nationalId);
+        player.put("userName", citizen.name);
+        player.put("role", "investigator");
+        player.put("character", "مواطن");
+        player.put("characterDesc", "في انتظار القصة...");
+        player.put("avatarEmoji", "👤");
+        player.put("joinedAt", System.currentTimeMillis());
+        player.put("status", "active");
+        player.put("suspicion", 0);
+
+        db.collection(COLLECTION).document(gameId)
+            .collection("players").document(citizen.nationalId)
+            .set(player)
+            .addOnSuccessListener(v -> {
+                // زيادة العداد
+                db.collection(COLLECTION).document(gameId)
+                    .update("currentPlayers",
+                        com.google.firebase.firestore.FieldValue.increment(1))
+                    .addOnSuccessListener(x -> cb.onSuccess())
                     .addOnFailureListener(e -> cb.onError(e.getMessage()));
             })
             .addOnFailureListener(e -> cb.onError(e.getMessage()));
@@ -316,9 +346,27 @@ public class MurderMysteryManager {
     }
 
     private void distributePrize(String gameId, String winnerId, int amount, SimpleCallback cb) {
-        db.collection("citizens").document(winnerId)
-            .update("balance", com.google.firebase.firestore.FieldValue.increment(amount))
-            .addOnSuccessListener(v -> cb.onSuccess())
-            .addOnFailureListener(e -> cb.onError(e.getMessage()));
+        PaymentManager.addBalance(
+            winnerId,
+            amount,
+            "mm_win",
+            "فوز في جريمة أُمّة",
+            new PaymentManager.PayCallback() {
+                @Override
+                public void onSuccess(long newBalance) {
+                    cb.onSuccess();
+                }
+
+                @Override
+                public void onInsufficient(long balance, long required) {
+                    cb.onError("خطأ");
+                }
+
+                @Override
+                public void onError(String error) {
+                    cb.onError(error);
+                }
+            }
+        );
     }
 }
