@@ -873,4 +873,20 @@
     <string name="id_error_confirm">⚠️ أكد أنك حفظت الكلمات</string>
     <string name="pres_invalid_amount">مبلغ غير صحيح</string>
 
+
+    <!-- Murder Mystery -->
+    <string name="mm_title">جريمة أُمّة</string>
+    <string name="mm_subtitle">كل أسبوع... جريمة غامضة</string>
+    <string name="mm_register">🎫 سجّل الآن</string>
+    <string name="mm_registered">✅ مسجل</string>
+    <string name="mm_waiting">⏳ في انتظار باقي المحققين</string>
+    <string name="mm_playing">🔍 التحقيق جاري</string>
+    <string name="mm_vote">🗳️ صوّت الآن</string>
+    <string name="mm_ended">⏸️ انتهت الجلسة</string>
+    <string name="mm_players">المحققون</string>
+    <string name="mm_killer">🎭 القاتل</string>
+    <string name="mm_winner">🏆 الفائز</string>
+    <string name="mm_prize">💰 الجائزة</string>
+    <string name="mm_clues">الأدلة</string>
+    <string name="mm_chat">التحقيق</string>
 </resources>
