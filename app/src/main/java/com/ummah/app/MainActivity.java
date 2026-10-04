@@ -37,6 +37,8 @@ public class MainActivity extends Activity {
     private IdentityManager im;
     private FirebaseManager fm;
     private WalletManager wm;
+    private com.google.firebase.firestore.ListenerRegistration balanceReg;
+    private long realBalance = 0;
     private LinearLayout contentRoot;
     private LinearLayout bottomNav;
     private TextView countView;
@@ -144,6 +146,29 @@ public class MainActivity extends Activity {
 
         im = new IdentityManager(this);
         wm = new WalletManager(this);
+
+        // ═══ الرصيد الحقيقي من Firestore ═══
+        try {
+            IdentityManager imBal = new IdentityManager(this);
+            if (imBal.isCitizen() && imBal.getCitizen() != null) {
+                String uidBal = imBal.getCitizen().nationalId;
+                balanceReg = com.google.firebase.firestore.FirebaseFirestore
+                    .getInstance()
+                    .collection("citizens").document(uidBal)
+                    .addSnapshotListener((doc, e) -> {
+                        if (doc != null && doc.exists()) {
+                            Long bal = doc.getLong("balance");
+                            if (bal != null) {
+                                realBalance = bal;
+                                wm.setBalance((int) bal.longValue());
+                                android.util.Log.d("MainBal", "💰 " + bal);
+                            }
+                        }
+                    });
+            }
+        } catch (Exception ex) {
+            android.util.Log.e("MainBal", "خطأ", ex);
+        }
         fm = FirebaseManager.get();
 
         LinearLayout main = new LinearLayout(this);
@@ -420,6 +445,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         if (notifListener != null) notifListener.stop();
+        if (balanceReg != null) balanceReg.remove();
         if (unreadReg != null) unreadReg.remove();
 if (countReg != null) countReg.remove();
         if (balReg != null) balReg.remove();
@@ -577,7 +603,7 @@ if (countReg != null) countReg.remove();
         unreadNotifs = freshNotif;
         unreadChat = freshChat;
         
-        NavDrawerHelper.show(this, currentCitizen, wm.getBalance(), freshNotif, freshChat, new NavDrawerHelper.OnDrawerClick() {
+        NavDrawerHelper.show(this, currentCitizen, (int) realBalance, freshNotif, freshChat, new NavDrawerHelper.OnDrawerClick() {
             @Override
             public void onItem(int itemId, String title) {
                 handleDrawerClick(itemId, title);

@@ -132,18 +132,18 @@ public class NavDrawerHelper {
             addSection(content, activity, activity.getString(R.string.nav_section_community));
             addItem(content, activity, "🏆", activity.getString(R.string.nav_leaderboard), ITEM_LEADERBOARD, listener);
             addItem(content, activity, "📰", activity.getString(R.string.nav_news), ITEM_NEWS, listener, 0);
-                  addItem(content, activity, "🔔", "الإشعارات", ITEM_NOTIFICATIONS, listener, notifCount);
+                addItem(content, activity, "🔔", "الإشعارات", ITEM_NOTIFICATIONS, listener, notifCount);
                 addItem(content, activity, "📊", "إحصائياتي", ITEM_STATS_PERSONAL, listener, 0);
                 
                 
-            addItem(content, activity, "📊", activity.getString(R.string.nav_stats), ITEM_STATS, listener);
+            
 
             // ═══════════════════════════════════════════
             //  القسم الرابع: حسابي
             // ═══════════════════════════════════════════
             addSection(content, activity, activity.getString(R.string.nav_section_rewards));
             addItem(content, activity, "🎫", activity.getString(R.string.nav_redeem), ITEM_REDEEM, listener);
-            addItem(content, activity, "🔔", activity.getString(R.string.nav_notifications), ITEM_NOTIFICATIONS, listener);
+            
 
             addSection(content, activity, activity.getString(R.string.nav_section_account));
             addItem(content, activity, "👤", activity.getString(R.string.nav_profile), ITEM_PROFILE, listener);

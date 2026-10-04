@@ -16,6 +16,11 @@ public class WalletManager {
         if (!prefs.contains("balance")) prefs.edit().putInt("balance", INITIAL).apply();
     }
     public int getBalance() { return prefs.getInt("balance", INITIAL); }
+
+    /** تحديث الرصيد من Firestore */
+    public void setBalance(int amount) {
+        prefs.edit().putInt("balance", amount).apply();
+    }
     public void add(int amount) { prefs.edit().putInt("balance", getBalance() + amount).apply(); }
     public boolean spend(int amount) {
         if (getBalance() < amount) return false;
