@@ -30,6 +30,7 @@ import java.util.List;
 public class MurderMysteryLobbyActivity extends Activity {
 
     private IdentityManager im;
+    private Citizen me;
     private MurderMysteryManager manager;
     private MurderMystery currentGame;
 
@@ -41,6 +42,7 @@ public class MurderMysteryLobbyActivity extends Activity {
     private FrameLayout magnifierWrapper;
 
     private ListenerRegistration playersReg;
+    private boolean iAmRegistered = false;
     private android.os.Handler handler = new android.os.Handler();
 
     @Override
@@ -52,6 +54,7 @@ public class MurderMysteryLobbyActivity extends Activity {
     protected void onCreate(Bundle b) {
         super.onCreate(b);
         im = new IdentityManager(this);
+        me = im.getCitizen();
         manager = new MurderMysteryManager();
 
         buildUI();
@@ -258,9 +261,14 @@ public class MurderMysteryLobbyActivity extends Activity {
         playersCountView.setText("👥 " + currentGame.currentPlayers + " / " + currentGame.maxPlayers + " محقق");
 
         if (currentGame.isRegistration()) {
-            actionBtn.setText("🎫 انضم للتحقيق · " + currentGame.entryFee + " Đ");
-            actionBtn.setEnabled(true);
-            actionBtn.setOnClickListener(v -> registerNow());
+            if (iAmRegistered) {
+                actionBtn.setText("✅ أنت مسجل في التحقيق");
+                actionBtn.setEnabled(false);
+            } else {
+                actionBtn.setText("🎫 انضم للتحقيق · " + currentGame.entryFee + " Đ");
+                actionBtn.setEnabled(true);
+                actionBtn.setOnClickListener(v -> registerNow());
+            }
         } else if (currentGame.isPlaying()) {
             actionBtn.setText("🔍 ادخل للتحقيق");
             actionBtn.setEnabled(true);
@@ -325,6 +333,22 @@ public class MurderMysteryLobbyActivity extends Activity {
     }
 
     private void renderPlayers(List<MMPlayer> players) {
+        // ═══ نتحققو إذا أنا مسجل ═══
+        boolean found = false;
+        if (me != null) {
+            for (MMPlayer p : players) {
+                if (p.userId != null && p.userId.equals(me.nationalId)) {
+                    found = true;
+                    break;
+                }
+            }
+        }
+        
+        if (found != iAmRegistered) {
+            iAmRegistered = found;
+            updateUI();
+        }
+        
         playersContainer.removeAllViews();
 
         if (players.isEmpty()) return;
@@ -452,6 +476,10 @@ public class MurderMysteryLobbyActivity extends Activity {
                 runOnUiThread(() -> {
                     Toast.makeText(MurderMysteryLobbyActivity.this,
                             "✅ انضممت للتحقيق! استعد...", Toast.LENGTH_LONG).show();
+                    
+                    iAmRegistered = true;
+                    actionBtn.setText("✅ أنت مسجل في التحقيق");
+                    actionBtn.setEnabled(false);
 
                     // اهتزاز
                     android.os.Vibrator v = (android.os.Vibrator) getSystemService(VIBRATOR_SERVICE);
