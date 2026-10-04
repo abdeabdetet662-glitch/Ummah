@@ -11,9 +11,6 @@
     <color name="accent_gold_dark">#A88A2C</color>
     <color name="error_red">#CF6679</color>
     <color name="ic_launcher_background">#0B4F2C</color>
-</resources>
-
-    <!-- Heist Theme -->
     <color name="heist_dark">#0a0510</color>
     <color name="heist_dark_2">#15081a</color>
     <color name="heist_dark_3">#1e0f25</color>
@@ -25,3 +22,4 @@
     <color name="heist_green">#10B981</color>
     <color name="heist_text">#e8e8e8</color>
     <color name="heist_text_dim">#888888</color>
+</resources>
