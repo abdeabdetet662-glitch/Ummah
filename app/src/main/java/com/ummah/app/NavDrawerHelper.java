@@ -47,6 +47,7 @@ public class NavDrawerHelper {
     public static final int ITEM_WEBSITE = 204;
     public static final int ITEM_REDEEM = 205;
     public static final int ITEM_NOTIFICATIONS = 206;
+    public static final int ITEM_SUPPORT = 213;
     public static final int ITEM_STATS_PERSONAL = 212;
 
     /**
@@ -133,6 +134,7 @@ public class NavDrawerHelper {
             addItem(content, activity, "🏆", activity.getString(R.string.nav_leaderboard), ITEM_LEADERBOARD, listener);
             addItem(content, activity, "📰", activity.getString(R.string.nav_news), ITEM_NEWS, listener, 0);
                 addItem(content, activity, "🔔", "الإشعارات", ITEM_NOTIFICATIONS, listener, notifCount);
+                addItem(content, activity, "🏛️", "ديوان أُمّة", ITEM_SUPPORT, listener, 0);
                 addItem(content, activity, "📊", "إحصائياتي", ITEM_STATS_PERSONAL, listener, 0);
                 
                 

@@ -148,5 +148,10 @@
     
         <!-- Heist Game -->
         
+    <!-- Support (ديوان أُمّة) -->
+        <activity android:name=".SupportActivity" android:exported="false" android:screenOrientation="portrait" />
+        <activity android:name=".NewTicketActivity" android:exported="false" android:screenOrientation="portrait" />
+        <activity android:name=".SupportChatActivity" android:exported="false" android:screenOrientation="portrait" />
+        
     </application>
 </manifest>

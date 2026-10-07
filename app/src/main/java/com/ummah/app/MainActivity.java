@@ -724,6 +724,9 @@ if (countReg != null) countReg.remove();
                 case NavDrawerHelper.ITEM_STATS_PERSONAL:
                     startActivity(new Intent(MainActivity.this, StatsActivity.class));
                     break;
+                case NavDrawerHelper.ITEM_SUPPORT:
+                    startActivity(new Intent(MainActivity.this, SupportActivity.class));
+                    break;
                 case NavDrawerHelper.ITEM_NOTIFICATIONS:
                 try { 
                     startActivity(new Intent(this, NotificationCenterActivity.class)); 
