@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -156,7 +157,7 @@ public class NewTicketActivity extends Activity {
 
     private void addLabel(String text) {
         LinearLayout parent = (LinearLayout) ((ScrollView)
-                findViewById(android.R.id.content).getChildAt(0)).getChildAt(0);
+                ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0)).getChildAt(0);
         TextView label = new TextView(this);
         label.setText(text);
         label.setTextColor(Color.parseColor("#D4AF37"));

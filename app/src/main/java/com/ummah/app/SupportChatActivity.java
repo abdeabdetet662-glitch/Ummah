@@ -160,7 +160,14 @@ public class SupportChatActivity extends Activity {
             bubble.setOrientation(LinearLayout.VERTICAL);
             bubble.setBackgroundResource(R.drawable.bg_card);
             bubble.setPadding(dp(14), dp(10), dp(14), dp(10));
-            bubble.setMaxWidth(dp(240));
+            android.view.ViewGroup.LayoutParams bubbleLp = bubble.getLayoutParams();
+                        if (bubbleLp == null) {
+                            bubbleLp = new LinearLayout.LayoutParams(
+                                android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
+                                android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+                        }
+                        bubbleLp.width = dp(240);
+                        bubble.setLayoutParams(bubbleLp);
 
             // Name
             TextView name = new TextView(this);
