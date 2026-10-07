@@ -44,7 +44,7 @@ public class SupportActivity extends Activity {
         me = im.getCitizen();
         manager = new SupportManager();
 
-        if (me == null) { finish(); return; }
+        android.widget.Toast.makeText(this, me == null ? "me_is_null" : ("me_ok: " + me.nationalId), android.widget.Toast.LENGTH_LONG).show(); if (me == null) { finish(); return; }
         buildUI();
         loadTickets();
     }
