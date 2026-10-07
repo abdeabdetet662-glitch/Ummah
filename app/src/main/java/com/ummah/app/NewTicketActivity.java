@@ -43,12 +43,27 @@ public class NewTicketActivity extends Activity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
-        im = new IdentityManager(this);
-        me = im.getCitizen();
-        manager = new SupportManager();
-
-        if (me == null) { finish(); return; }
-        buildUI();
+        try {
+            im = new IdentityManager(this);
+            me = im.getCitizen();
+            manager = new SupportManager();
+            if (me == null) {
+                throw new RuntimeException("me is null");
+            }
+            buildUI();
+        } catch (Throwable ex) {
+            android.widget.ScrollView sv = new android.widget.ScrollView(this);
+            android.widget.TextView tv = new android.widget.TextView(this);
+            String msg = "NTK_ERR: " + ex.getClass().getSimpleName() + "\n\n";
+            msg = msg + "MSG: " + ex.getMessage() + "\n\n";
+            msg = msg + "TRACE:\n" + android.util.Log.getStackTraceString(ex);
+            tv.setText(msg);
+            tv.setTextSize(11);
+            tv.setPadding(30, 150, 30, 30);
+            tv.setTextColor(android.graphics.Color.RED);
+            sv.addView(tv);
+            setContentView(sv);
+        }
     }
 
     private void buildUI() {
