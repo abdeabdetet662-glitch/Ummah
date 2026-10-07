@@ -27,6 +27,7 @@ public class NewTicketActivity extends Activity {
     private IdentityManager im;
     private Citizen me;
     private SupportManager manager;
+    private LinearLayout root;
 
     private EditText etSubject, etMessage;
     private String selectedCategory = SupportTicket.CAT_OTHER;
@@ -75,6 +76,7 @@ public class NewTicketActivity extends Activity {
         root.setOrientation(LinearLayout.VERTICAL);
         root.setPadding(dp(20), dp(50), dp(20), dp(50));
         scroll.addView(root);
+        this.root = root;
 
         // Back
         TextView back = new TextView(this);
@@ -171,8 +173,7 @@ public class NewTicketActivity extends Activity {
     }
 
     private void addLabel(String text) {
-        LinearLayout parent = (LinearLayout) ((ScrollView)
-                ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0)).getChildAt(0);
+        LinearLayout parent = this.root;
         TextView label = new TextView(this);
         label.setText(text);
         label.setTextColor(Color.parseColor("#D4AF37"));
