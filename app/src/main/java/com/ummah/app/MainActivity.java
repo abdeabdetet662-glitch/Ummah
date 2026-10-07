@@ -110,6 +110,25 @@ public class MainActivity extends Activity {
                                         android.util.Log.e("FCM", "❌ فشل الحفظ", e));
 
                                 android.util.Log.d("FCM", "📱 Token: " + token.substring(0, 20) + "...");
+                                
+                                // ═══ Subscribe to Topics ═══
+                                com.google.firebase.messaging.FirebaseMessaging fmTopic = 
+                                    com.google.firebase.messaging.FirebaseMessaging.getInstance();
+                                
+                                // 1. كل المواطنين
+                                fmTopic.subscribeToTopic("all_citizens")
+                                    .addOnSuccessListener(aVoid ->
+                                        android.util.Log.d("FCM", "✅ all_citizens"))
+                                    .addOnFailureListener(e ->
+                                        android.util.Log.e("FCM", "❌ all_citizens", e));
+                                
+                                // 2. المستخدمين الجدد
+                                fmTopic.subscribeToTopic("new_users")
+                                    .addOnSuccessListener(aVoid ->
+                                        android.util.Log.d("FCM", "✅ new_users"));
+                                
+                                // 3. حسب الدولة (اختياري — يمكن نطوروه بعدين)
+                                // fmTopic.subscribeToTopic("country_dz");
                             }
                         })
                         .addOnFailureListener(e ->
