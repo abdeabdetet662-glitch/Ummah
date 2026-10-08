@@ -16,7 +16,7 @@ public class JobManager {
     private final FirebaseFirestore db;
 
     // ═══ الإعدادات ═══
-    public static final int DAILY_LIMIT = 3;                       // 3 مرات
+    public static final int DAILY_LIMIT = 2;                       // 2 مرات فقط
     public static final long COOLDOWN_MS = 10L * 60 * 1000;        // 10 دقائق بين كل عمل
     public static final long LOCK_DURATION_MS = 24L * 60 * 60 * 1000; // 24 ساعة قفل
 
@@ -102,7 +102,20 @@ public class JobManager {
                 }
             }
 
-            // 2️⃣ وظيفة جديدة → ننشئو من الصفر
+            // 2️⃣ نتحققو من القفل العام
+            long existingLock = 0L;
+            int existingWorks = 0;
+            if (existing.exists()) {
+                Long lu = existing.getLong("lockedUntil");
+                Long tw = existing.getLong("todayWorks");
+                existingLock = lu != null ? lu : 0L;
+                existingWorks = tw != null ? tw.intValue() : 0;
+            }
+
+            long now = System.currentTimeMillis();
+            boolean isLocked = (existingLock > 0 && now < existingLock);
+
+            // 3️⃣ وظيفة جديدة → ننشئو
             Map<String, Object> data = new HashMap<>();
             data.put("jobId", job.id);
             data.put("title", job.title);
@@ -112,9 +125,17 @@ public class JobManager {
             data.put("lastWorkTime", 0L);
             data.put("level", 1);
             data.put("xp", 0);
-            data.put("todayWorks", 0);
-            data.put("lockedUntil", 0L);
-            data.put("chosenAt", System.currentTimeMillis());
+            data.put("chosenAt", now);
+
+            // 4️⃣ إذا الحساب مقفل → نحافظ على القفل والعدّاد
+            if (isLocked) {
+                data.put("todayWorks", existingWorks);
+                data.put("lockedUntil", existingLock);
+            } else {
+                // ما مقفلش → نبدأ من صفر
+                data.put("todayWorks", 0);
+                data.put("lockedUntil", 0L);
+            }
 
             transaction.set(ref, data);
             return 0;
