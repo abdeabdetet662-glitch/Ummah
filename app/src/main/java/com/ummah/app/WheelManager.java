@@ -121,15 +121,13 @@ public class WheelManager {
         }
 
         // ═══ معالجة الجاكبوت ═══
-        boolean isJackpotSegment = "jackpot".equals(winner.type);
-        boolean canWinJackpot = false;
-        if (isJackpotSegment) {
-            canWinJackpot = config.jackpotEnabled
-                    && !config.jackpotClaimed
-                    && config.jackpotWinnerId != null
-                    && !config.jackpotWinnerId.isEmpty()
-                    && config.jackpotWinnerId.equals(nationalId);
-        }
+        final boolean isJackpotSegment = "jackpot".equals(winner.type);
+        final boolean canWinJackpot = isJackpotSegment
+                && config.jackpotEnabled
+                && !config.jackpotClaimed
+                && config.jackpotWinnerId != null
+                && !config.jackpotWinnerId.isEmpty()
+                && config.jackpotWinnerId.equals(nationalId);
 
         db.runTransaction(transaction -> {
             DocumentReference userRef = db.collection("citizens").document(nationalId);
