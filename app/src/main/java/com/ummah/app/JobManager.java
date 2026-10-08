@@ -89,22 +89,38 @@ public class JobManager {
 
     // ═══ يختار وظيفة ═══
     public void chooseJob(String userId, Job job, final OnDone cb) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("jobId", job.id);
-        data.put("title", job.title);
-        data.put("emoji", job.emoji);
-        data.put("salary", job.salary);
-        data.put("cooldownMin", job.cooldownMin);
-        data.put("lastWorkTime", 0L);
-        data.put("level", 1);
-        data.put("xp", 0);
-        data.put("todayWorks", 0);
-        data.put("lockedUntil", 0L);
-        data.put("chosenAt", System.currentTimeMillis());
+        DocumentReference ref = db.collection("users_jobs").document(userId);
 
-        db.collection("users_jobs").document(userId).set(data)
-                .addOnSuccessListener(a -> cb.onSuccess(0))
-                .addOnFailureListener(e -> cb.onError(e.getMessage()));
+        db.runTransaction(transaction -> {
+            DocumentSnapshot existing = transaction.get(ref);
+
+            // 1️⃣ إذا عندو نفس الوظيفة → ما نديرو والو
+            if (existing.exists()) {
+                String currentJobId = existing.getString("jobId");
+                if (job.id != null && job.id.equals(currentJobId)) {
+                    throw new RuntimeException("أنت بالفعل في هذه الوظيفة");
+                }
+            }
+
+            // 2️⃣ وظيفة جديدة → ننشئو من الصفر
+            Map<String, Object> data = new HashMap<>();
+            data.put("jobId", job.id);
+            data.put("title", job.title);
+            data.put("emoji", job.emoji);
+            data.put("salary", job.salary);
+            data.put("cooldownMin", job.cooldownMin);
+            data.put("lastWorkTime", 0L);
+            data.put("level", 1);
+            data.put("xp", 0);
+            data.put("todayWorks", 0);
+            data.put("lockedUntil", 0L);
+            data.put("chosenAt", System.currentTimeMillis());
+
+            transaction.set(ref, data);
+            return 0;
+        })
+        .addOnSuccessListener(r -> cb.onSuccess(0))
+        .addOnFailureListener(e -> cb.onError(e.getMessage()));
     }
 
     // ═══ يخدم → يربح ═══
