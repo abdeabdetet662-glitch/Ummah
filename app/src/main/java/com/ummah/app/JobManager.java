@@ -94,7 +94,7 @@ public class JobManager {
         db.runTransaction(transaction -> {
             DocumentSnapshot existing = transaction.get(ref);
 
-            // 1️⃣ إذا عندو نفس الوظيفة → ما نديرو والو
+            // 1️⃣ نفس الوظيفة → ما نديرو والو
             if (existing.exists()) {
                 String currentJobId = existing.getString("jobId");
                 if (job.id != null && job.id.equals(currentJobId)) {
@@ -102,39 +102,51 @@ public class JobManager {
                 }
             }
 
-            // 2️⃣ نتحققو من القفل العام
-            long existingLock = 0L;
+            long now = System.currentTimeMillis();
+
+            // 2️⃣ نقراو القيم الحالية
             int existingWorks = 0;
+            long existingLock = 0L;
             if (existing.exists()) {
-                Long lu = existing.getLong("lockedUntil");
                 Long tw = existing.getLong("todayWorks");
-                existingLock = lu != null ? lu : 0L;
+                Long lu = existing.getLong("lockedUntil");
                 existingWorks = tw != null ? tw.intValue() : 0;
+                existingLock = lu != null ? lu : 0L;
             }
 
-            long now = System.currentTimeMillis();
-            boolean isLocked = (existingLock > 0 && now < existingLock);
+            // 3️⃣ إذا مرت 24 ساعة → نصفّرو
+            if (existingLock > 0 && now >= existingLock) {
+                existingWorks = 0;
+                existingLock = 0L;
+            }
 
-            // 3️⃣ وظيفة جديدة → ننشئو
+            // 4️⃣ نبنيو البيانات الجديدة
             Map<String, Object> data = new HashMap<>();
             data.put("jobId", job.id);
             data.put("title", job.title);
             data.put("emoji", job.emoji);
             data.put("salary", job.salary);
             data.put("cooldownMin", job.cooldownMin);
-            data.put("lastWorkTime", 0L);
-            data.put("level", 1);
-            data.put("xp", 0);
             data.put("chosenAt", now);
 
-            // 4️⃣ إذا الحساب مقفل → نحافظ على القفل والعدّاد
-            if (isLocked) {
+            // 5️⃣ ✨ المهم: نحافظ على العداد طول ما فيه أعمال
+            if (existingWorks > 0 || (existingLock > 0 && now < existingLock)) {
+                // عندو أعمال ولا مقفل → نحافظ
                 data.put("todayWorks", existingWorks);
                 data.put("lockedUntil", existingLock);
+                data.put("lastWorkTime", existing.getLong("lastWorkTime") != null
+                        ? existing.getLong("lastWorkTime") : 0L);
+                data.put("level", existing.getLong("level") != null
+                        ? existing.getLong("level") : 1L);
+                data.put("xp", existing.getLong("xp") != null
+                        ? existing.getLong("xp") : 0L);
             } else {
-                // ما مقفلش → نبدأ من صفر
+                // جديد → من صفر
                 data.put("todayWorks", 0);
                 data.put("lockedUntil", 0L);
+                data.put("lastWorkTime", 0L);
+                data.put("level", 1L);
+                data.put("xp", 0L);
             }
 
             transaction.set(ref, data);
@@ -179,6 +191,7 @@ public class JobManager {
             if (lockedUntil > 0 && now >= lockedUntil) {
                 todayWorks = 0;
                 lockedUntil = 0;
+                lastWork = 0; // نصفّر الكولداون أيضاً
             }
 
             // 3️⃣ فحص الحد اليومي
