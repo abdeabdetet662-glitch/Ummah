@@ -32,6 +32,8 @@ public class WheelActivity extends Activity {
     private WheelManager.WheelConfig config = new WheelManager.WheelConfig();
     private List<WheelSegment> segments;
     private ListenerRegistration configReg, segmentsReg, balReg, historyReg;
+    private boolean blockBalance = false;
+    private int pendingBalance = -1;
     private boolean spinning = false;
     private boolean canFreeSpin = false;
     private long nextFreeAt = 0;
@@ -101,6 +103,7 @@ public class WheelActivity extends Activity {
 
         // Wheel View
         wheelView = new WheelView(this);
+        wheelView.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
         LinearLayout.LayoutParams wlp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, 700);
         wlp.setMargins(0, 8, 0, 16);
@@ -207,7 +210,11 @@ public class WheelActivity extends Activity {
             balReg = FirebaseManager.get().listenBalance(c.nationalId,
                     new FirebaseManager.BalanceListener() {
                 @Override public void onBalance(int balance) {
-                    runOnUiThread(() -> balanceView.setText(balance + " Đ"));
+                    if (blockBalance) {
+            pendingBalance = balance;
+            return;
+        }
+        runOnUiThread(() -> balanceView.setText(balance + " Đ"));
                 }
                 @Override public void onError(String m) {}
             });
@@ -272,6 +279,7 @@ public class WheelActivity extends Activity {
         if (c == null) return;
 
         spinning = true;
+        blockBalance = true;
         spinBtn.setEnabled(false);
         freeSpinBtn.setEnabled(false);
         AnimHelper.mediumHaptic(this);
@@ -295,6 +303,11 @@ public class WheelActivity extends Activity {
 
     private void onSpinFinished(WheelSegment winner) {
         spinning = false;
+        blockBalance = false;
+        if (pendingBalance >= 0) {
+            balanceView.setText(pendingBalance + " Đ");
+            pendingBalance = -1;
+        }
         spinBtn.setEnabled(true);
         freeSpinBtn.setEnabled(canFreeSpin);
 

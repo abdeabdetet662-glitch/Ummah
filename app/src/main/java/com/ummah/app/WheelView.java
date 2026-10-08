@@ -246,8 +246,7 @@ public class WheelView extends View {
         float segmentAngle = 360f / n;
 
         // المؤشر فوق = زاوية -90 (أي 270)
-        float pointerAngle = 270f;
-        float normalized = ((pointerAngle - rot) % 360f + 360f) % 360f;
+        float normalized = ((-rot) % 360f + 360f) % 360f;
         int idx = (int) (normalized / segmentAngle) % n;
         if (idx < 0) idx = 0;
         if (idx >= n) idx = n - 1;
