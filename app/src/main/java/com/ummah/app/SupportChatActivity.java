@@ -141,7 +141,13 @@ public class SupportChatActivity extends Activity {
 
     private void loadMessages() {
         msgsReg = manager.listenMessages(ticketId, messages -> {
-            runOnUiThread(() -> renderMessages(messages));
+            runOnUiThread(() -> {
+                renderMessages(messages);
+                android.widget.Toast.makeText(SupportChatActivity.this,
+                    "TICKET: " + (ticketId != null ? ticketId.substring(0, Math.min(8, ticketId.length())) : "null") 
+                    + " | MSGS: " + messages.size(),
+                    android.widget.Toast.LENGTH_LONG).show();
+            });
         });
     }
 
