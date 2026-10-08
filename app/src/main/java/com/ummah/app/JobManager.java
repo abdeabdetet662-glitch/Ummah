@@ -279,4 +279,33 @@ public class JobManager {
 
         return null;
     }
+
+    // ═══ فحص إذا يمكن يختار وظيفة ═══
+    public interface CanChooseCallback {
+        void onResult(boolean canChoose, String reason);
+    }
+
+    public void checkCanChoose(String userId, CanChooseCallback cb) {
+        db.collection("users_jobs").document(userId).get()
+            .addOnSuccessListener(doc -> {
+                if (!doc.exists()) {
+                    cb.onResult(true, null);
+                    return;
+                }
+                long now = System.currentTimeMillis();
+                Long luL = doc.getLong("lockedUntil");
+                long lockedUntil = luL != null ? luL : 0;
+
+                if (lockedUntil > 0 && now < lockedUntil) {
+                    long remaining = lockedUntil - now;
+                    long h = remaining / (60 * 60 * 1000);
+                    long m = (remaining % (60 * 60 * 1000)) / (60 * 1000);
+                    cb.onResult(false, "\u23f3 \u0627\u0646\u062a\u0638\u0631 \u062d\u062a\u0649 \u064a\u0641\u062a\u062d \u0627\u0644\u0642\u0641\u0644\n\n" +
+                            "\ud83d\udd52 \u064a\u0641\u062a\u062d \u0628\u0639\u062f: \u202A" + h + ":" + (m < 10 ? "0" : "") + m + "\u202C");
+                } else {
+                    cb.onResult(true, null);
+                }
+            })
+            .addOnFailureListener(e -> cb.onResult(true, null));
+    }
 }

@@ -187,6 +187,22 @@ public class JobsActivity extends Activity {
         final Citizen me = im.getCitizen();
         if (me == null) return;
 
+        // 🔍 نتحقق أول إذا الحساب مقفل
+        jm.checkCanChoose(me.nationalId, (canChoose, reason) -> {
+            if (!canChoose) {
+                new AlertDialog.Builder(this)
+                        .setTitle("🔒 الوظائف مقفلة")
+                        .setMessage(reason)
+                        .setPositiveButton("حسناً", null)
+                        .show();
+                return;
+            }
+            // ✅ مفتوح — نكمل
+            showChooseDialogInternal(job, me);
+        });
+    }
+
+    private void showChooseDialogInternal(final Job job, final Citizen me) {
         new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.jobs_choose_title))
                 .setMessage("هل تريد العمل كـ:\n\n" + job.emoji + " " + job.title +
