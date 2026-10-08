@@ -150,7 +150,12 @@ public class SupportChatActivity extends Activity {
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.US);
 
         for (SupportMessage m : list) {
-            boolean isMe = "admin".equals(m.senderType) == isAdmin;
+            boolean isMe;
+            if (isAdmin) {
+                isMe = "admin".equals(m.senderType);
+            } else {
+                isMe = "user".equals(m.senderType);
+            }
 
             LinearLayout row = new LinearLayout(this);
             row.setOrientation(LinearLayout.HORIZONTAL);
@@ -174,6 +179,9 @@ public class SupportChatActivity extends Activity {
             if ("admin".equals(m.senderType)) {
                 name.setText("🏛️ ديوان أُمّة");
                 name.setTextColor(Color.parseColor("#D4AF37"));
+            } else if ("bot".equals(m.senderType)) {
+                name.setText("\ud83e\udd16 \u0627\u0644\u0645\u0633\u0627\u0639\u062f \u0627\u0644\u0622\u0644\u064a");
+                name.setTextColor(Color.parseColor("#9333EA"));
             } else {
                 name.setText("👤 " + (m.senderName != null ? m.senderName : "مواطن"));
                 name.setTextColor(Color.parseColor("#3B82F6"));
@@ -219,7 +227,7 @@ public class SupportChatActivity extends Activity {
     }
 
     private void sendMessage() {
-        String text = input.getText().toString().trim();
+        final String text = input.getText().toString().trim();
         if (text.isEmpty()) return;
         input.setText("");
 
@@ -229,9 +237,38 @@ public class SupportChatActivity extends Activity {
 
         manager.sendMessage(ticketId, senderId, senderName, senderType, text,
             new SupportManager.SimpleCallback() {
-                @Override public void onSuccess(String t) {}
+                @Override public void onSuccess(String t) {
+                    if (!isAdmin) {
+                        triggerBotIfNeeded(text);
+                    }
+                }
                 @Override public void onError(String e) {}
             });
+    }
+
+    private void triggerBotIfNeeded(final String userText) {
+        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+            manager.hasAdminReplied(ticketId, adminReplied -> {
+                if (adminReplied) return;
+                manager.hasBotReplied(ticketId, botReplied -> {
+                    String reply;
+                    if (!botReplied) {
+                        String userName = me != null ? me.name : "";
+                        reply = SupportBot.getGreeting(userName)
+                              + "\n\n" + SupportBot.getResponse(userText);
+                    } else {
+                        reply = SupportBot.getResponse(userText);
+                    }
+                    manager.sendMessage(ticketId, SupportBot.BOT_ID,
+                                       SupportBot.BOT_NAME, SupportBot.BOT_TYPE,
+                                       reply,
+                        new SupportManager.SimpleCallback() {
+                            @Override public void onSuccess(String t) {}
+                            @Override public void onError(String e) {}
+                        });
+                });
+            });
+        }, 1500);
     }
 
     private int dp(int v) {

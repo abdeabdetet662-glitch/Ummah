@@ -181,4 +181,30 @@ public class SupportManager {
             })
             .addOnFailureListener(e -> cb.onError(e.getMessage()));
     }
+
+    // ═══ 8. فحص إذا الأدمن ردّ (للـ Bot) ═══
+    public interface BoolCallback {
+        void onResult(boolean value);
+    }
+
+    public void hasAdminReplied(String ticketId, BoolCallback cb) {
+        db.collection(COL).document(ticketId)
+          .collection("messages")
+          .whereEqualTo("senderType", "admin")
+          .limit(1)
+          .get()
+          .addOnSuccessListener(snap -> cb.onResult(snap != null && !snap.isEmpty()))
+          .addOnFailureListener(e -> cb.onResult(false));
+    }
+
+    // ═══ 9. فحص إذا البوت ردّ سابقاً (باش ما يعاودش) ═══
+    public void hasBotReplied(String ticketId, BoolCallback cb) {
+        db.collection(COL).document(ticketId)
+          .collection("messages")
+          .whereEqualTo("senderType", "bot")
+          .limit(1)
+          .get()
+          .addOnSuccessListener(snap -> cb.onResult(snap != null && !snap.isEmpty()))
+          .addOnFailureListener(e -> cb.onResult(false));
+    }
 }
