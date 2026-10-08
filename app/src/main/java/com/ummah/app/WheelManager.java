@@ -48,10 +48,12 @@ public class WheelManager {
         public boolean freeSpinEnabled = true;
         public long freeSpinCooldownMs = 24 * 60 * 60 * 1000L;
         public boolean jackpotEnabled = true;
-        public long jackpotAmount = 0;
+        public long jackpotAmount = 5000;
         public long jackpotMin = 100000;
         public int jackpotPercent = 1;
         public boolean active = true;
+        public String jackpotWinnerId = "";    // UID الفائز الوحيد
+        public boolean jackpotClaimed = false; // هل استلم الجاكبوت؟
     }
 
     public ListenerRegistration listenConfig(final ConfigListener l) {
@@ -70,6 +72,10 @@ public class WheelManager {
                     if (je != null) c.jackpotEnabled = je;
                     Long ja = doc.getLong("jackpotAmount");
                     if (ja != null) c.jackpotAmount = ja;
+                    String jw = doc.getString("jackpotWinnerId");
+                    if (jw != null) c.jackpotWinnerId = jw;
+                    Boolean jc = doc.getBoolean("jackpotClaimed");
+                    if (jc != null) c.jackpotClaimed = jc;
                     Long jm = doc.getLong("jackpotMin");
                     if (jm != null) c.jackpotMin = jm;
                     Long jp = doc.getLong("jackpotPercent");
@@ -112,6 +118,17 @@ public class WheelManager {
         if (winner == null) {
             l.onError("خطأ في الاختيار");
             return;
+        }
+
+        // ═══ معالجة الجاكبوت ═══
+        boolean isJackpotSegment = "jackpot".equals(winner.type);
+        boolean canWinJackpot = false;
+        if (isJackpotSegment) {
+            canWinJackpot = config.jackpotEnabled
+                    && !config.jackpotClaimed
+                    && config.jackpotWinnerId != null
+                    && !config.jackpotWinnerId.isEmpty()
+                    && config.jackpotWinnerId.equals(nationalId);
         }
 
         db.runTransaction(transaction -> {
@@ -164,11 +181,34 @@ public class WheelManager {
 
             return null;
         }).addOnSuccessListener(a -> {
-            int jackpot = 0;
-            if (config.jackpotEnabled && "jackpot".equals(winner.type)) {
-                jackpot = (int) config.jackpotAmount;
+            if (isJackpotSegment) {
+                if (canWinJackpot) {
+                    // ✅ أنت الفائز المُحدد — اربح الجاكبوت
+                    int jackpotAmount = (int) config.jackpotAmount;
+                    db.collection("citizens").document(nationalId)
+                        .update("balance", FieldValue.increment(jackpotAmount));
+                    db.collection("wheel_config").document("main")
+                        .update("jackpotClaimed", true);
+                    // نرسل الإشعار
+                    db.collection("notifications").add(java.util.Map.of(
+                        "userId", nationalId,
+                        "title", "🎉 مبروك!",
+                        "body", "ربحت الجاكبوت " + jackpotAmount + " Đ!",
+                        "type", "jackpot",
+                        "timestamp", System.currentTimeMillis()
+                    ));
+                    l.onResult(winner, jackpotAmount);
+                } else {
+                    // ❌ ليس الفائز — ياخذ 100 Đ بدل الجاكبوت
+                    db.collection("citizens").document(nationalId)
+                        .update("balance", FieldValue.increment(100));
+                    WheelSegment alt = new WheelSegment(
+                        "💚", "100 Đ", 100, "money", "#2E7D32", 20, 0);
+                    l.onResult(alt, 0);
+                }
+            } else {
+                l.onResult(winner, 0);
             }
-            l.onResult(winner, jackpot);
         }).addOnFailureListener(e -> l.onError(e.getMessage()));
     }
 
