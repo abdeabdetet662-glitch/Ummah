@@ -26,7 +26,6 @@ public class MyJobActivity extends Activity {
     private Handler handler = new Handler();
     private Runnable ticker;
 
-    // بيانات الوظيفة الحالية
     private String myJobTitle = "";
     private String myJobEmoji = "💼";
     private int mySalary = 0;
@@ -34,15 +33,11 @@ public class MyJobActivity extends Activity {
     private int myXp = 0;
     private long lastWorkTime = 0;
     private int todayWorks = 0;
-    private String todayDate = "";
+    private long lockedUntil = 0;
 
-    // عناصر الواجهة
-    private TextView titleView;
-    private TextView salaryView;
-    private TextView levelView;
-    private TextView xpView;
-    private TextView cooldownView;
     private TextView worksLeftView;
+    private TextView dotsView;
+    private TextView cooldownView;
     private Button workBtn;
 
     @Override
@@ -67,7 +62,6 @@ public class MyJobActivity extends Activity {
         scroll.addView(root);
 
         setContentView(scroll);
-
         startListener();
     }
 
@@ -78,23 +72,21 @@ public class MyJobActivity extends Activity {
         if (reg != null) reg.remove();
         reg = jm.listenMyJob(c.nationalId, new JobManager.MyJobListener() {
             @Override
-            public void onJob(String jobId, String title, int salary,
+            public void onJob(String jobId, String title, String emoji, int salary,
                               long lastWork, int level, int xp,
-                              int tw, String td) {
+                              int tw, long lu) {
                 myJobTitle = title != null ? title : "";
+                myJobEmoji = emoji != null ? emoji : "💼";
                 mySalary = salary;
                 lastWorkTime = lastWork;
                 myLevel = level;
                 myXp = xp;
                 todayWorks = tw;
-                todayDate = td != null ? td : "";
+                lockedUntil = lu;
 
                 runOnUiThread(() -> {
-                    if (jobId == null) {
-                        showNoJob();
-                    } else {
-                        showMyJob();
-                    }
+                    if (jobId == null) showNoJob();
+                    else showMyJob();
                 });
             }
 
@@ -109,7 +101,6 @@ public class MyJobActivity extends Activity {
 
     private void showNoJob() {
         root.removeAllViews();
-
         TextView ic = new TextView(this);
         ic.setText("💼");
         ic.setTextSize(80);
@@ -125,14 +116,6 @@ public class MyJobActivity extends Activity {
         t.setPadding(0, 20, 0, 10);
         root.addView(t);
 
-        TextView s = new TextView(this);
-        s.setText(getString(R.string.myjob_subtitle));
-        s.setTextColor(Color.parseColor("#9E9E9E"));
-        s.setTextSize(13);
-        s.setGravity(Gravity.CENTER);
-        s.setPadding(0, 0, 0, 30);
-        root.addView(s);
-
         Button chooseBtn = UiHelper.primaryButton(this, getString(R.string.myjob_choose));
         chooseBtn.setOnClickListener(v -> {
             startActivity(new Intent(this, JobsActivity.class));
@@ -144,11 +127,11 @@ public class MyJobActivity extends Activity {
     private void showMyJob() {
         root.removeAllViews();
 
-        // ═══ Header ═══
+        // Header
         TextView title = UiHelper.goldTitle(this, getString(R.string.myjob_my_job), 32);
         root.addView(title);
 
-        // ═══ بطاقة الوظيفة ═══
+        // بطاقة الوظيفة
         LinearLayout card = UiHelper.goldCard(this);
         card.setGravity(Gravity.CENTER);
 
@@ -159,7 +142,7 @@ public class MyJobActivity extends Activity {
         label.setGravity(Gravity.CENTER);
         card.addView(label);
 
-        titleView = new TextView(this);
+        TextView titleView = new TextView(this);
         titleView.setText(myJobEmoji + "  " + myJobTitle);
         titleView.setTextColor(Color.WHITE);
         titleView.setTextSize(28);
@@ -168,42 +151,45 @@ public class MyJobActivity extends Activity {
         titleView.setPadding(0, 14, 0, 8);
         card.addView(titleView);
 
-        salaryView = new TextView(this);
-        salaryView.setText("💰 " + mySalary + " Đ / عملة");
+        TextView salaryView = new TextView(this);
+        // \u200E = LTR mark
+        salaryView.setText("💰 \u200E" + mySalary + "\u200E Đ / عملة");
         salaryView.setTextColor(Color.parseColor("#D4AF37"));
         salaryView.setTextSize(18);
         salaryView.setTypeface(null, Typeface.BOLD);
         salaryView.setGravity(Gravity.CENTER);
+        salaryView.setTextDirection(View.TEXT_DIRECTION_LTR);
         card.addView(salaryView);
 
         root.addView(card);
 
-        // ═══ بطاقة المستوى ═══
+        // بطاقة المستوى
         LinearLayout lvlCard = UiHelper.card(this);
         lvlCard.setGravity(Gravity.CENTER);
 
-        levelView = new TextView(this);
-        levelView.setText("🏆 " + getString(R.string.job_level) + " " + myLevel);
+        TextView levelView = new TextView(this);
+        levelView.setText("🏆 المستوى: " + myLevel);
         levelView.setTextColor(Color.WHITE);
         levelView.setTextSize(18);
         levelView.setTypeface(null, Typeface.BOLD);
         levelView.setGravity(Gravity.CENTER);
         lvlCard.addView(levelView);
 
-        xpView = new TextView(this);
-        xpView.setText("XP: " + myXp + " / " + (myLevel * 100));
+        TextView xpView = new TextView(this);
+        // \u202A = LTR embedding, \u202C = pop
+        xpView.setText("\u202AXP: " + myXp + " / " + (myLevel * 100) + "\u202C");
         xpView.setTextColor(Color.parseColor("#9E9E9E"));
         xpView.setTextSize(13);
         xpView.setGravity(Gravity.CENTER);
         xpView.setPadding(0, 6, 0, 0);
+        xpView.setTextDirection(View.TEXT_DIRECTION_LTR);
         lvlCard.addView(xpView);
 
         root.addView(lvlCard);
 
-        // ═══ عدّاد الأعمال اليومي ═══
+        // بطاقة الأعمال اليوم
         LinearLayout worksCard = UiHelper.card(this);
         worksCard.setGravity(Gravity.CENTER);
-        worksCard.setPadding(20, 20, 20, 20);
 
         TextView worksTitle = new TextView(this);
         worksTitle.setText("📊 الأعمال اليوم");
@@ -213,56 +199,49 @@ public class MyJobActivity extends Activity {
         worksCard.addView(worksTitle);
 
         worksLeftView = new TextView(this);
-        worksLeftView.setTextColor(Color.WHITE);
-        worksLeftView.setTextSize(26);
+        worksLeftView.setTextSize(28);
         worksLeftView.setTypeface(null, Typeface.BOLD);
         worksLeftView.setGravity(Gravity.CENTER);
         worksLeftView.setPadding(0, 8, 0, 0);
+        worksLeftView.setTextDirection(View.TEXT_DIRECTION_LTR);
         worksCard.addView(worksLeftView);
 
-        // شريط تقدّم بصري
-        TextView dotsView = new TextView(this);
+        dotsView = new TextView(this);
         dotsView.setGravity(Gravity.CENTER);
-        dotsView.setTextSize(20);
-        dotsView.setPadding(0, 8, 0, 0);
+        dotsView.setTextSize(22);
+        dotsView.setPadding(0, 10, 0, 0);
         worksCard.addView(dotsView);
 
         root.addView(worksCard);
 
-        // ═══ حالة الكولداون ═══
+        // الكولداون / القفل
         cooldownView = new TextView(this);
-        cooldownView.setText("");
-        cooldownView.setTextColor(Color.parseColor("#FFC107"));
         cooldownView.setTextSize(16);
         cooldownView.setTypeface(null, Typeface.BOLD);
         cooldownView.setGravity(Gravity.CENTER);
         cooldownView.setPadding(0, 24, 0, 24);
         root.addView(cooldownView);
 
-        // ═══ زر اعمل ═══
-        workBtn = UiHelper.primaryButton(this, getString(R.string.myjob_work_now));
+        // زر اعمل
+        workBtn = UiHelper.primaryButton(this, "💰 اعمل الآن");
         workBtn.setMinHeight(160);
         workBtn.setTextSize(20);
         workBtn.setOnClickListener(v -> doWork());
         root.addView(workBtn);
 
-        // ═══ زر تغيير الوظيفة ═══
-        Button changeBtn = UiHelper.actionButton(this, "🔄  غيّر الوظيفة", "#5D4037");
+        // زر تغيير
+        Button changeBtn = UiHelper.actionButton(this, "🔄 غيّر الوظيفة", "#5D4037");
         changeBtn.setOnClickListener(v -> confirmChangeJob());
         root.addView(changeBtn);
 
-        // نشغّل المؤقّت
         startTicker();
-
-        // نحدّث العرض فوراً
-        refreshUI(dotsView);
     }
 
     private void confirmChangeJob() {
         new AlertDialog.Builder(this)
-                .setTitle(getString(R.string.myjob_change))
-                .setMessage(getString(R.string.myjob_leave_confirm))
-                .setPositiveButton("نعم", (d, w) -> {
+                .setTitle("🔄 تغيير الوظيفة")
+                .setMessage("هل أنت متأكد؟ راح تخسر تقدمك في الوظيفة الحالية.")
+                .setPositiveButton("نعم، غيّر", (d, w) -> {
                     Citizen c = im.getCitizen();
                     if (c == null) return;
                     jm.quitJob(c.nationalId, new JobManager.OnDone() {
@@ -283,39 +262,24 @@ public class MyJobActivity extends Activity {
         if (ticker != null) handler.removeCallbacks(ticker);
         ticker = new Runnable() {
             @Override public void run() {
-                TextView dots = null;
-                // نلقاو dots view
-                for (int i = 0; i < root.getChildCount(); i++) {
-                    View v = root.getChildAt(i);
-                    if (v instanceof LinearLayout) {
-                        LinearLayout ll = (LinearLayout) v;
-                        for (int j = 0; j < ll.getChildCount(); j++) {
-                            View c = ll.getChildAt(j);
-                            if (c instanceof TextView) {
-                                TextView tv = (TextView) c;
-                                CharSequence txt = tv.getText();
-                                if (txt != null && (txt.toString().contains("●") || txt.toString().contains("○"))) {
-                                    dots = tv;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-                refreshUI(dots);
+                refreshUI();
                 handler.postDelayed(this, 1000);
             }
         };
         handler.post(ticker);
     }
 
-    private void refreshUI(TextView dotsView) {
+    private void refreshUI() {
         if (workBtn == null || cooldownView == null) return;
 
-        // تحديث العدّاد
-        int worksLeft = JobManager.worksLeft(todayWorks, todayDate);
+        // الرصيد والحد
+        long now = System.currentTimeMillis();
+        boolean isLocked = (lockedUntil > 0 && now < lockedUntil);
+        int worksLeft = JobManager.worksLeft(todayWorks, lockedUntil);
+
+        // العمل المتبقي (LTR)
         if (worksLeftView != null) {
-            worksLeftView.setText(worksLeft + " / " + JobManager.DAILY_LIMIT);
+            worksLeftView.setText("\u202A" + worksLeft + " / " + JobManager.DAILY_LIMIT + "\u202C");
             worksLeftView.setTextColor(worksLeft > 0 ?
                     Color.parseColor("#10B981") :
                     Color.parseColor("#EF4444"));
@@ -325,8 +289,7 @@ public class MyJobActivity extends Activity {
         if (dotsView != null) {
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < JobManager.DAILY_LIMIT; i++) {
-                if (i < worksLeft) sb.append("●");
-                else sb.append("○");
+                sb.append(i < worksLeft ? "●" : "○");
                 if (i < JobManager.DAILY_LIMIT - 1) sb.append("  ");
             }
             dotsView.setText(sb.toString());
@@ -335,18 +298,34 @@ public class MyJobActivity extends Activity {
                     Color.parseColor("#6B7280"));
         }
 
-        // حالة الزر
-        String msg = JobManager.canWorkMessage(lastWorkTime, todayWorks, todayDate);
-        if (msg == null) {
-            cooldownView.setText("✅ يمكنك العمل الآن!");
-            cooldownView.setTextColor(Color.parseColor("#10B981"));
-            workBtn.setEnabled(true);
-            workBtn.setAlpha(1f);
-        } else {
-            cooldownView.setText(msg);
-            cooldownView.setTextColor(Color.parseColor("#FFC107"));
+        // الحالة
+        if (isLocked) {
+            long remaining = lockedUntil - now;
+            long h = remaining / (60 * 60 * 1000);
+            long m = (remaining % (60 * 60 * 1000)) / (60 * 1000);
+            long s = (remaining % (60 * 1000)) / 1000;
+            cooldownView.setText("🔒 مقفل — يفتح بعد \u202A" + h + ":" 
+                    + (m < 10 ? "0" : "") + m + ":" 
+                    + (s < 10 ? "0" : "") + s + "\u202C");
+            cooldownView.setTextColor(Color.parseColor("#EF4444"));
             workBtn.setEnabled(false);
-            workBtn.setAlpha(0.5f);
+            workBtn.setAlpha(0.4f);
+            workBtn.setText("🔒 مقفل 24 ساعة");
+        } else {
+            String msg = JobManager.canWorkMessage(lastWorkTime, todayWorks, lockedUntil);
+            if (msg == null) {
+                cooldownView.setText("✅ يمكنك العمل الآن!");
+                cooldownView.setTextColor(Color.parseColor("#10B981"));
+                workBtn.setEnabled(true);
+                workBtn.setAlpha(1f);
+                workBtn.setText("💰 اعمل الآن");
+            } else {
+                cooldownView.setText(msg);
+                cooldownView.setTextColor(Color.parseColor("#FFC107"));
+                workBtn.setEnabled(false);
+                workBtn.setAlpha(0.5f);
+                workBtn.setText("⏰ في انتظار...");
+            }
         }
     }
 
@@ -361,16 +340,14 @@ public class MyJobActivity extends Activity {
             @Override public void onSuccess(int earned) {
                 runOnUiThread(() -> {
                     Toast.makeText(MyJobActivity.this,
-                            "✅ ربحت " + earned + " Đ!", Toast.LENGTH_LONG).show();
-                    workBtn.setText(getString(R.string.myjob_work_now));
-                    // الـ listener راح يحدّث القيم تلقائياً
+                            "✅ ربحت \u202A" + earned + "\u202C Đ!",
+                            Toast.LENGTH_LONG).show();
                 });
             }
             @Override public void onError(String msg) {
                 runOnUiThread(() -> {
                     Toast.makeText(MyJobActivity.this, "❌ " + msg, Toast.LENGTH_LONG).show();
-                    workBtn.setText(getString(R.string.myjob_work_now));
-                    startTicker();
+                    refreshUI();
                 });
             }
         });

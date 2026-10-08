@@ -6,12 +6,9 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 public class JobManager {
@@ -19,14 +16,14 @@ public class JobManager {
     private final FirebaseFirestore db;
 
     // ═══ الإعدادات ═══
-    public static final int DAILY_LIMIT = 3;              // 3 مرات/يوم
-    public static final long COOLDOWN_MS = 10L * 60 * 1000; // 10 دقائق
+    public static final int DAILY_LIMIT = 3;                       // 3 مرات
+    public static final long COOLDOWN_MS = 10L * 60 * 1000;        // 10 دقائق بين كل عمل
+    public static final long LOCK_DURATION_MS = 24L * 60 * 60 * 1000; // 24 ساعة قفل
 
     public JobManager() {
         db = FirebaseFirestore.getInstance();
     }
 
-    // ═══ Interfaces ═══
     public interface JobsListener {
         void onJobs(List<Job> jobs);
         void onError(String msg);
@@ -37,11 +34,10 @@ public class JobManager {
         void onError(String msg);
     }
 
-    // ═══ نتيجة مفصلة ═══
     public interface MyJobListener {
-        void onJob(String jobId, String title, int salary,
+        void onJob(String jobId, String title, String emoji, int salary,
                    long lastWorkTime, int level, int xp,
-                   int todayWorks, String todayDate);
+                   int todayWorks, long lockedUntil);
         void onError(String msg);
     }
 
@@ -68,33 +64,26 @@ public class JobManager {
                 .addSnapshotListener((doc, e) -> {
                     if (e != null) { l.onError(e.getMessage()); return; }
                     if (doc == null || !doc.exists()) {
-                        l.onJob(null, null, 0, 0, 1, 0, 0, today());
+                        l.onJob(null, null, null, 0, 0, 1, 0, 0, 0);
                         return;
                     }
                     String jobId = doc.getString("jobId");
                     String title = doc.getString("title");
+                    String emoji = doc.getString("emoji");
                     Long salL = doc.getLong("salary");
                     Long lw = doc.getLong("lastWorkTime");
                     Long lvl = doc.getLong("level");
                     Long xp = doc.getLong("xp");
                     Long tw = doc.getLong("todayWorks");
-                    String td = doc.getString("todayDate");
+                    Long lu = doc.getLong("lockedUntil");
 
-                    int salary = salL != null ? salL.intValue() : 0;
-                    int todayWorks = tw != null ? tw.intValue() : 0;
-                    String todayDate = td != null ? td : today();
-
-                    // إذا التاريخ قديم — نصفّر
-                    if (!todayDate.equals(today())) {
-                        todayWorks = 0;
-                    }
-
-                    l.onJob(jobId, title, salary,
+                    l.onJob(jobId, title, emoji,
+                            salL != null ? salL.intValue() : 0,
                             lw != null ? lw : 0,
                             lvl != null ? lvl.intValue() : 1,
                             xp != null ? xp.intValue() : 0,
-                            todayWorks,
-                            todayDate);
+                            tw != null ? tw.intValue() : 0,
+                            lu != null ? lu : 0);
                 });
     }
 
@@ -106,11 +95,11 @@ public class JobManager {
         data.put("emoji", job.emoji);
         data.put("salary", job.salary);
         data.put("cooldownMin", job.cooldownMin);
-        data.put("lastWorkTime", 0);
+        data.put("lastWorkTime", 0L);
         data.put("level", 1);
         data.put("xp", 0);
         data.put("todayWorks", 0);
-        data.put("todayDate", today());
+        data.put("lockedUntil", 0L);
         data.put("chosenAt", System.currentTimeMillis());
 
         db.collection("users_jobs").document(userId).set(data)
@@ -118,7 +107,7 @@ public class JobManager {
                 .addOnFailureListener(e -> cb.onError(e.getMessage()));
     }
 
-    // ═══ يخدم → يربح راتب ═══
+    // ═══ يخدم → يربح ═══
     public void work(String userId, final OnDone cb) {
         db.runTransaction(transaction -> {
             DocumentReference jobRef = db.collection("users_jobs").document(userId);
@@ -130,40 +119,55 @@ public class JobManager {
             Long xpL = jobDoc.getLong("xp");
             Long lvlL = jobDoc.getLong("level");
             Long twL = jobDoc.getLong("todayWorks");
-            String td = jobDoc.getString("todayDate");
+            Long luL = jobDoc.getLong("lockedUntil");
 
             int salary = salaryL != null ? salaryL.intValue() : 0;
             long lastWork = lastWorkL != null ? lastWorkL : 0;
             int xp = xpL != null ? xpL.intValue() : 0;
             int level = lvlL != null ? lvlL.intValue() : 1;
             int todayWorks = twL != null ? twL.intValue() : 0;
-            String todayDate = td != null ? td : today();
+            long lockedUntil = luL != null ? luL : 0;
 
-            // 1️⃣ إذا التاريخ تبدّل → نصفّر
-            if (!todayDate.equals(today())) {
-                todayWorks = 0;
-            }
-
-            // 2️⃣ نتأكد من الحد اليومي
-            if (todayWorks >= DAILY_LIMIT) {
-                throw new RuntimeException("وصلت الحد اليومي (" + DAILY_LIMIT + " أعمال). عد غداً 🌙");
-            }
-
-            // 3️⃣ نتأكد من الكولداون (10 دقائق)
             long now = System.currentTimeMillis();
-            if (now - lastWork < COOLDOWN_MS) {
+
+            // 1️⃣ فحص القفل 24 ساعة
+            if (lockedUntil > 0 && now < lockedUntil) {
+                long remaining = lockedUntil - now;
+                long hours = remaining / (60 * 60 * 1000);
+                long minutes = (remaining % (60 * 60 * 1000)) / (60 * 1000);
+                throw new RuntimeException("🔒 مقفل — يفتح بعد " + hours + "س " + minutes + "د");
+            }
+
+            // 2️⃣ إذا مر 24 ساعة → نصفّر
+            if (lockedUntil > 0 && now >= lockedUntil) {
+                todayWorks = 0;
+                lockedUntil = 0;
+            }
+
+            // 3️⃣ فحص الحد اليومي
+            if (todayWorks >= DAILY_LIMIT) {
+                // نقفل 24 ساعة
+                long newLock = now + LOCK_DURATION_MS;
+                Map<String, Object> lockUpdate = new HashMap<>();
+                lockUpdate.put("lockedUntil", newLock);
+                transaction.update(jobRef, lockUpdate);
+                throw new RuntimeException("🔒 وصلت الحد — مقفل 24 ساعة");
+            }
+
+            // 4️⃣ فحص الكولداون
+            if (lastWork > 0 && now - lastWork < COOLDOWN_MS) {
                 long remaining = COOLDOWN_MS - (now - lastWork);
                 long sec = remaining / 1000;
                 long min = sec / 60;
                 long secRest = sec % 60;
-                throw new RuntimeException("انتظر " + min + ":" + (secRest < 10 ? "0" : "") + secRest + " ⏰");
+                throw new RuntimeException("⏰ انتظر " + min + ":" + (secRest < 10 ? "0" : "") + secRest);
             }
 
-            // 4️⃣ نزيد الرصيد
+            // 5️⃣ نزيد الرصيد
             DocumentReference userRef = db.collection("citizens").document(userId);
             transaction.update(userRef, "balance", FieldValue.increment(salary));
 
-            // 5️⃣ نزيد XP
+            // 6️⃣ نزيد XP
             xp += 10;
             int newLevel = level;
             if (xp >= level * 100) {
@@ -171,56 +175,59 @@ public class JobManager {
                 xp = 0;
             }
 
-            // 6️⃣ نحدّث
+            // 7️⃣ نحدّث
+            int newWorks = todayWorks + 1;
+            long newLocked = (newWorks >= DAILY_LIMIT) ? now + LOCK_DURATION_MS : 0;
+
             Map<String, Object> update = new HashMap<>();
             update.put("lastWorkTime", now);
             update.put("xp", xp);
             update.put("level", newLevel);
-            update.put("todayWorks", todayWorks + 1);
-            update.put("todayDate", today());
+            update.put("todayWorks", newWorks);
+            update.put("lockedUntil", newLocked);
 
             transaction.update(jobRef, update);
-
             return salary;
         }).addOnSuccessListener(r -> cb.onSuccess(r))
           .addOnFailureListener(e -> cb.onError(e.getMessage()));
     }
 
-    // ═══ يمسح الوظيفة ═══
     public void quitJob(String userId, final OnDone cb) {
         db.collection("users_jobs").document(userId).delete()
                 .addOnSuccessListener(a -> cb.onSuccess(0))
                 .addOnFailureListener(e -> cb.onError(e.getMessage()));
     }
 
-    // ═══ التاريخ الحالي ═══
-    private static String today() {
-        return new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(new Date());
+    // ═══ Helper: عدد الأعمال المتبقية ═══
+    public static int worksLeft(int todayWorks, long lockedUntil) {
+        long now = System.currentTimeMillis();
+        if (lockedUntil > 0 && now < lockedUntil) return 0;
+        return Math.max(0, DAILY_LIMIT - todayWorks);
     }
 
-    // ═══ Helper للـ Activity: هل يمكن يخدم دابا؟ ═══
-    public static String canWorkMessage(long lastWorkTime, int todayWorks, String todayDate) {
-        if (!todayDate.equals(today())) {
-            todayWorks = 0;
-        }
-        if (todayWorks >= DAILY_LIMIT) {
-            return "🌙 وصلت الحد اليومي (" + DAILY_LIMIT + "). عد غداً!";
-        }
+    // ═══ Helper: هل يمكن يخدم؟ ═══
+    public static String canWorkMessage(long lastWorkTime, int todayWorks, long lockedUntil) {
         long now = System.currentTimeMillis();
-        if (now - lastWorkTime < COOLDOWN_MS) {
+
+        if (lockedUntil > 0 && now < lockedUntil) {
+            long remaining = lockedUntil - now;
+            long h = remaining / (60 * 60 * 1000);
+            long m = (remaining % (60 * 60 * 1000)) / (60 * 1000);
+            return "🔒 مقفل — يفتح بعد " + h + "س " + m + "د";
+        }
+
+        if (todayWorks >= DAILY_LIMIT) {
+            return "🔒 وصلت الحد — مقفل 24 ساعة";
+        }
+
+        if (lastWorkTime > 0 && now - lastWorkTime < COOLDOWN_MS) {
             long remaining = COOLDOWN_MS - (now - lastWorkTime);
             long sec = remaining / 1000;
             long min = sec / 60;
             long secRest = sec % 60;
             return "⏰ انتظر " + min + ":" + (secRest < 10 ? "0" : "") + secRest;
         }
-        return null;
-    }
 
-    public static int worksLeft(int todayWorks, String todayDate) {
-        if (!todayDate.equals(today())) {
-            return DAILY_LIMIT;
-        }
-        return Math.max(0, DAILY_LIMIT - todayWorks);
+        return null;
     }
 }
