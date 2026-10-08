@@ -121,11 +121,29 @@ public class SupportManager {
             .collection("messages")
             .orderBy("createdAt", Query.Direction.ASCENDING)
             .addSnapshotListener((snap, e) -> {
-                if (e != null || snap == null) return;
+                if (e != null) {
+                    android.widget.Toast.makeText(
+                        com.ummah.app.UmmahApp.getContext(),
+                        "LISTEN_ERR: " + e.getMessage(),
+                        android.widget.Toast.LENGTH_LONG).show();
+                    return;
+                }
+                if (snap == null) return;
                 List<SupportMessage> list = new ArrayList<>();
                 for (DocumentSnapshot d : snap.getDocuments()) {
-                    SupportMessage m = d.toObject(SupportMessage.class);
-                    if (m != null) { m.id = d.getId(); list.add(m); }
+                    try {
+                        SupportMessage m = new SupportMessage();
+                        m.id = d.getId();
+                        m.senderId = d.getString("senderId");
+                        m.senderName = d.getString("senderName");
+                        m.senderType = d.getString("senderType");
+                        m.text = d.getString("text");
+                        Long ca = d.getLong("createdAt");
+                        m.createdAt = ca != null ? ca : 0L;
+                        list.add(m);
+                    } catch (Throwable ex) {
+                        android.util.Log.e("Support", "parse err: " + ex.getMessage());
+                    }
                 }
                 cb.onResult(list);
             });
