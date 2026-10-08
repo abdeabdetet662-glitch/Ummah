@@ -201,7 +201,11 @@ public class JobManager {
     // ═══ Helper: عدد الأعمال المتبقية ═══
     public static int worksLeft(int todayWorks, long lockedUntil) {
         long now = System.currentTimeMillis();
+        // مقفل الآن
         if (lockedUntil > 0 && now < lockedUntil) return 0;
+        // انتهى القفل → اصفّر
+        if (lockedUntil > 0 && now >= lockedUntil) return DAILY_LIMIT;
+        // عادي
         return Math.max(0, DAILY_LIMIT - todayWorks);
     }
 
@@ -209,17 +213,25 @@ public class JobManager {
     public static String canWorkMessage(long lastWorkTime, int todayWorks, long lockedUntil) {
         long now = System.currentTimeMillis();
 
+        // 1. مقفل الآن
         if (lockedUntil > 0 && now < lockedUntil) {
             long remaining = lockedUntil - now;
             long h = remaining / (60 * 60 * 1000);
             long m = (remaining % (60 * 60 * 1000)) / (60 * 1000);
-            return "🔒 مقفل — يفتح بعد " + h + "س " + m + "د";
+            long s = (remaining % (60 * 1000)) / 1000;
+            return "🔒 مقفل — يفتح بعد " + h + ":" 
+                    + (m < 10 ? "0" : "") + m + ":" 
+                    + (s < 10 ? "0" : "") + s;
         }
 
-        if (todayWorks >= DAILY_LIMIT) {
+        // 2. انتهى القفل → اصفّر (بس نتحقق من الكولداون من جديد)
+        if (lockedUntil > 0 && now >= lockedUntil) {
+            // ما فيهش قفل — نقدر نخدم
+        } else if (todayWorks >= DAILY_LIMIT) {
             return "🔒 وصلت الحد — مقفل 24 ساعة";
         }
 
+        // 3. كولداون 10 دقائق
         if (lastWorkTime > 0 && now - lastWorkTime < COOLDOWN_MS) {
             long remaining = COOLDOWN_MS - (now - lastWorkTime);
             long sec = remaining / 1000;
