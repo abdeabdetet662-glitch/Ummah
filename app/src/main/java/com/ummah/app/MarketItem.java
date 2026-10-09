@@ -8,6 +8,7 @@ public class MarketItem {
     public String type;
     public int price;
     public String imageUrl;
+    public String icon;      // emoji أيقونة المنتج
     public String description;
     public String rarity;
     public int stock;
