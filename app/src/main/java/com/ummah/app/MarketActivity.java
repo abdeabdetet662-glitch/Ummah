@@ -28,7 +28,7 @@ public class MarketActivity extends Activity {
     private LinearLayout itemsContainer;
     private LinearLayout tabsContainer;
     private ListenerRegistration reg;
-    private String currentCategory = "vehicle";
+    private String currentCategory = "boost";
     private SharedPreferences prefs;
 
     @Override
@@ -45,7 +45,7 @@ public class MarketActivity extends Activity {
         prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
 
         // نقراو الفئة المحفوظة
-        currentCategory = prefs.getString(KEY_CAT, "vehicle");
+        currentCategory = prefs.getString(KEY_CAT, "boost");
 
         ScrollView scroll = new ScrollView(this);
         scroll.setBackgroundResource(R.drawable.bg_screen);
@@ -105,25 +105,53 @@ public class MarketActivity extends Activity {
 
     private void buildTabs() {
         tabsContainer.removeAllViews();
-        addTab("🚗", getString(R.string.market_category_vehicles), "vehicle");
-        addTab("🏠", getString(R.string.market_category_realestate), "property");
-        addTab("📱", getString(R.string.market_category_electronics), "electronics");
-        addTab("👕", getString(R.string.market_category_clothes), "clothing");
+        tabsContainer.setOrientation(LinearLayout.VERTICAL);
+
+        String[][] cats = {
+                {"\u26a1", "\u062a\u0631\u0642\u064a\u0627\u062a", "boost"},
+                {"\ud83c\udfc6", "\u0634\u0627\u0631\u0627\u062a", "badge"},
+                {"\ud83c\udf96\ufe0f", "\u0623\u0644\u0642\u0627\u0628", "title"},
+                {"\ud83c\udfa8", "\u0623\u0641\u0627\u062a\u0627\u0631", "avatar"},
+                {"\ud83c\udfe0", "\u0645\u0646\u0627\u0632\u0644", "home"},
+                {"\ud83d\ude97", "\u0645\u0631\u0643\u0628\u0627\u062a", "vehicle"},
+                {"\ud83c\udf81", "\u0647\u062f\u0627\u064a\u0627", "gift"},
+                {"\ud83d\udc3e", "\u062d\u064a\u0648\u0627\u0646\u0627\u062a", "pet"},
+                {"\ud83c\udfb0", "\u062d\u0638", "luck"},
+                {"\ud83c\udf1f", "\u0645\u0645\u064a\u0632\u0627\u062a", "special"},
+                {"\ud83c\udf54", "\u0637\u0639\u0627\u0645", "food"},
+                {"\ud83d\udc8e", "\u0645\u062c\u0648\u0647\u0631\u0627\u062a", "jewelry"},
+        };
+
+        LinearLayout row = null;
+        for (int i = 0; i < cats.length; i++) {
+            if (i % 4 == 0) {
+                row = new LinearLayout(this);
+                row.setOrientation(LinearLayout.HORIZONTAL);
+                row.setGravity(Gravity.CENTER);
+                LinearLayout.LayoutParams rlp = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT);
+                rlp.setMargins(0, 6, 0, 6);
+                row.setLayoutParams(rlp);
+                tabsContainer.addView(row);
+            }
+            addTabToRow(row, cats[i][0], cats[i][1], cats[i][2]);
+        }
     }
 
-    private void addTab(String emoji, String label, final String category) {
+    private void addTabToRow(LinearLayout parent, String emoji, String label, final String category) {
         boolean active = category.equals(currentCategory);
 
         LinearLayout tab = new LinearLayout(this);
         tab.setOrientation(LinearLayout.VERTICAL);
         tab.setGravity(Gravity.CENTER);
-        tab.setPadding(20, 14, 20, 14);
+        tab.setPadding(8, 12, 8, 12);
         tab.setBackgroundResource(active ? R.drawable.bg_btn_gold_hero : R.drawable.bg_btn_outline);
         tab.setElevation(active ? 10f : 0f);
 
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
-        lp.setMargins(4, 0, 4, 0);
+        lp.setMargins(3, 0, 3, 0);
         tab.setLayoutParams(lp);
 
         TextView e = new TextView(this);
@@ -135,9 +163,10 @@ public class MarketActivity extends Activity {
         TextView t = new TextView(this);
         t.setText(label);
         t.setTextColor(active ? Color.parseColor("#0A0A0A") : Color.parseColor("#D4AF37"));
-        t.setTextSize(11);
+        t.setTextSize(10);
         t.setTypeface(null, Typeface.BOLD);
         t.setGravity(Gravity.CENTER);
+        t.setPadding(0, 4, 0, 0);
         tab.addView(t);
 
         tab.setOnClickListener(v -> {
@@ -148,7 +177,7 @@ public class MarketActivity extends Activity {
             loadItems(category);
         });
 
-        tabsContainer.addView(tab);
+        parent.addView(tab);
     }
 
     private void loadItems(String category) {
