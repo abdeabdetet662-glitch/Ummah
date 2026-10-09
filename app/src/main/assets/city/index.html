@@ -124,22 +124,22 @@ const WORLD_SIZE = GRID * TILE;  // إجمالي حجم العالم
 // ═══════════════════════════════════════════════════════════
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x87CEEB);
-scene.fog = new THREE.Fog(0x87CEEB, 400, 1200);
+scene.background = new THREE.Color(0x5BA3D0);
+scene.fog = new THREE.Fog(0xB8D9F0, 700, 1800);
 
 const camera = new THREE.PerspectiveCamera(
   45, window.innerWidth / window.innerHeight, 1, 3000
 );
-camera.position.set(180, 220, 180);
+camera.position.set(160, 140, 160);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.type = THREE.PCFShadowMap;
 renderer.outputEncoding = THREE.sRGBEncoding;
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.1;
+// renderer.toneMapping = THREE.ACESFilmicToneMapping;
+// renderer.toneMappingExposure = 0.85;
 document.body.appendChild(renderer.domElement);
 
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -155,13 +155,13 @@ controls.update();
 //  الإضاءة
 // ═══════════════════════════════════════════════════════════
 
-const ambient = new THREE.AmbientLight(0xffffff, 0.55);
+const ambient = new THREE.AmbientLight(0xffffff, 0.25);
 scene.add(ambient);
 
-const hemi = new THREE.HemisphereLight(0x87CEEB, 0x4A7C3F, 0.6);
+const hemi = new THREE.HemisphereLight(0xB8D9F0, 0x4A7C3F, 0.35);
 scene.add(hemi);
 
-const sun = new THREE.DirectionalLight(0xFFF4CC, 1.4);
+const sun = new THREE.DirectionalLight(0xFFE8B0, 1.2);
 sun.position.set(250, 400, 200);
 sun.castShadow = true;
 sun.shadow.mapSize.width = 2048;
@@ -183,8 +183,8 @@ const skyGeo = new THREE.SphereGeometry(2000, 32, 16);
 const skyMat = new THREE.ShaderMaterial({
   side: THREE.BackSide,
   uniforms: {
-    topColor: { value: new THREE.Color(0x2E5FB8) },
-    bottomColor: { value: new THREE.Color(0xB8D9F0) },
+    topColor: { value: new THREE.Color(0x1E4BA8) },
+    bottomColor: { value: new THREE.Color(0x9AC8E8) },
     offset: { value: 200 },
     exponent: { value: 0.7 }
   },
@@ -216,14 +216,14 @@ scene.add(sky);
 //  الأرض (عشب)
 // ═══════════════════════════════════════════════════════════
 
-const groundMat = new THREE.MeshLambertMaterial({ color: 0x6BA85A });
+const groundMat = new THREE.MeshLambertMaterial({ color: 0x5A9B4A });
 const ground = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), groundMat);
 ground.rotation.x = -Math.PI / 2;
 ground.receiveShadow = true;
 scene.add(ground);
 
 // أرضية المدينة (مربعة)
-const cityGroundMat = new THREE.MeshLambertMaterial({ color: 0x7CBF6A });
+const cityGroundMat = new THREE.MeshLambertMaterial({ color: 0x68B058 });
 const cityGround = new THREE.Mesh(new THREE.PlaneGeometry(WORLD_SIZE + 40, WORLD_SIZE + 40), cityGroundMat);
 cityGround.rotation.x = -Math.PI / 2;
 cityGround.position.y = 0.02;
@@ -234,7 +234,7 @@ scene.add(cityGround);
 //  الطرق
 // ═══════════════════════════════════════════════════════════
 
-const roadMat = new THREE.MeshLambertMaterial({ color: 0x3A3A3A });
+const roadMat = new THREE.MeshLambertMaterial({ color: 0x2A2A2A });
 const sidewalkMat = new THREE.MeshLambertMaterial({ color: 0xA8A29A });
 const lineMat = new THREE.MeshBasicMaterial({ color: 0xFFFFFF });
 
@@ -351,11 +351,15 @@ scene.add(makeFountain());
 
 const BUILDING_MATERIALS = {
   wall: {
-    white: new THREE.MeshLambertMaterial({ color: 0xE8E4DC }),
-    beige: new THREE.MeshLambertMaterial({ color: 0xD4C8B0 }),
-    cream: new THREE.MeshLambertMaterial({ color: 0xF0E8D0 }),
-    brick: new THREE.MeshLambertMaterial({ color: 0xB86848 }),
-    sand: new THREE.MeshLambertMaterial({ color: 0xE0C8A0 })
+    white: new THREE.MeshLambertMaterial({ color: 0xD8D4C8 }),
+    beige: new THREE.MeshLambertMaterial({ color: 0xC4B898 }),
+    cream: new THREE.MeshLambertMaterial({ color: 0xE8D8A8 }),
+    brick: new THREE.MeshLambertMaterial({ color: 0xA0503A }),
+    sand: new THREE.MeshLambertMaterial({ color: 0xD8B888 }),
+    tan: new THREE.MeshLambertMaterial({ color: 0xB89068 }),
+    olive: new THREE.MeshLambertMaterial({ color: 0xA8A878 }),
+    blue: new THREE.MeshLambertMaterial({ color: 0x88A8C8 }),
+    mint: new THREE.MeshLambertMaterial({ color: 0xA8C8B8 })
   },
   roof: {
     red: new THREE.MeshLambertMaterial({ color: 0x8B3A2A }),
@@ -420,7 +424,7 @@ function addWindows(parent, w, h, wallDepth, floors) {
 function makeBuilding(type, level) {
   const g = new THREE.Group();
   const wallMat = BUILDING_MATERIALS.wall[
-    ['white','beige','cream','brick','sand'][Math.floor(Math.random()*5)]
+    ['white','beige','cream','brick','sand','tan','olive','blue','mint'][Math.floor(Math.random()*9)]
   ];
 
   if (type === 'cottage') {
