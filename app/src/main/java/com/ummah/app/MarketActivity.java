@@ -255,55 +255,89 @@ public class MarketActivity extends Activity {
         lp.setMargins(0, 10, 0, 10);
         card.setLayoutParams(lp);
 
-        // صورة
-        ImageView image = new ImageView(this);
-        LinearLayout.LayoutParams imgLp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, 500);
-        image.setLayoutParams(imgLp);
-        image.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        image.setBackgroundColor(Color.parseColor("#1A1A1A"));
+        // ═══ الصورة / الأيقونة ═══
+        if (item.imageUrl != null && !item.imageUrl.isEmpty()) {
+            // صورة حقيقية
+            ImageView image = new ImageView(this);
+            LinearLayout.LayoutParams imgLp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, 500);
+            image.setLayoutParams(imgLp);
+            image.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            image.setBackgroundColor(Color.parseColor("#1A1A1A"));
 
-        com.bumptech.glide.Glide.with(this)
-                .load(item.imageUrl)
-                .placeholder(R.drawable.ic_ummah)
-                .into(image);
+            com.bumptech.glide.Glide.with(this)
+                    .load(item.imageUrl)
+                    .placeholder(R.drawable.ic_ummah)
+                    .into(image);
 
-        card.addView(image);
+            card.addView(image);
+        } else {
+            // أيقونة كبيرة + خلفية ملونة
+            LinearLayout iconBox = new LinearLayout(this);
+            iconBox.setOrientation(LinearLayout.VERTICAL);
+            iconBox.setGravity(Gravity.CENTER);
+            iconBox.setBackgroundColor(Color.parseColor("#1A1A1A"));
+            LinearLayout.LayoutParams ibLp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, 300);
+            iconBox.setLayoutParams(ibLp);
 
-        // اسم
+            TextView bigIcon = new TextView(this);
+            String emoji = (item.icon != null && !item.icon.isEmpty())
+                    ? item.icon : getCategoryEmoji(item.category);
+            bigIcon.setText(emoji);
+            bigIcon.setTextSize(120);
+            bigIcon.setGravity(Gravity.CENTER);
+            iconBox.addView(bigIcon);
+
+            card.addView(iconBox);
+        }
+
+        // ═══ اسم المنتج ═══
         TextView name = new TextView(this);
-        name.setText(item.name);
+        name.setText(item.name != null ? item.name : "منتج");
         name.setTextColor(Color.WHITE);
         name.setTextSize(20);
         name.setTypeface(null, Typeface.BOLD);
         name.setPadding(0, 20, 0, 6);
         card.addView(name);
 
-        // العلامة + الندرة
-        TextView brand = new TextView(this);
-        brand.setText(item.brand + "  •  " + getRarityLabel(item.rarity));
-        brand.setTextColor(Color.parseColor("#9E9E9E"));
-        brand.setTextSize(12);
-        card.addView(brand);
+        // ═══ العلامة + الندرة ═══
+        String brand = item.brand != null && !item.brand.isEmpty()
+                ? item.brand : getCategoryLabel(item.category);
+        String rarity = getRarityLabel(item.rarity);
+        String subline = brand;
+        if (rarity != null && !rarity.isEmpty()) {
+            subline = subline + "  •  " + rarity;
+        }
 
-        // الوصف
-        TextView desc = new TextView(this);
-        desc.setText(item.description);
-        desc.setTextColor(Color.parseColor("#CCCCCC"));
-        desc.setTextSize(13);
-        desc.setPadding(0, 10, 0, 16);
-        card.addView(desc);
+        TextView brandView = new TextView(this);
+        brandView.setText(subline);
+        brandView.setTextColor(Color.parseColor("#9E9E9E"));
+        brandView.setTextSize(12);
+        card.addView(brandView);
 
-        // السعر + زر شراء
+        // ═══ الوصف ═══
+        if (item.description != null && !item.description.isEmpty()) {
+            TextView desc = new TextView(this);
+            desc.setText(item.description);
+            desc.setTextColor(Color.parseColor("#CCCCCC"));
+            desc.setTextSize(13);
+            desc.setPadding(0, 10, 0, 16);
+            card.addView(desc);
+        }
+
+        // ═══ السعر + زر شراء ═══
         LinearLayout bottomRow = new LinearLayout(this);
         bottomRow.setOrientation(LinearLayout.HORIZONTAL);
         bottomRow.setGravity(Gravity.CENTER_VERTICAL);
+        bottomRow.setPadding(0, 16, 0, 0);
 
         TextView price = new TextView(this);
-        price.setText("💰 " + item.price + " Đ");
+        price.setText("\u200E" + item.price + " Đ \ud83d\udcb0");
         price.setTextColor(Color.parseColor("#D4AF37"));
         price.setTextSize(22);
         price.setTypeface(null, Typeface.BOLD);
+        price.setTextDirection(View.TEXT_DIRECTION_LTR);
         price.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         bottomRow.addView(price);
 
@@ -317,6 +351,47 @@ public class MarketActivity extends Activity {
         card.addView(bottomRow);
 
         return card;
+    }
+
+    private String getCategoryEmoji(String category) {
+        if (category == null) return "\ud83d\udce6";
+        switch (category) {
+            case "boost":   return "\u26a1";
+            case "badge":   return "\ud83c\udfc6";
+            case "title":   return "\ud83c\udf96\ufe0f";
+            case "avatar":  return "\ud83c\udfa8";
+            case "home":    return "\ud83c\udfe0";
+            case "vehicle": return "\ud83d\ude97";
+            case "gift":    return "\ud83c\udf81";
+            case "pet":     return "\ud83d\udc3e";
+            case "luck":    return "\ud83c\udfb0";
+            case "special": return "\ud83c\udf1f";
+            case "food":    return "\ud83c\udf54";
+            case "jewelry": return "\ud83d\udc8e";
+            case "clothes": return "\ud83d\udc55";
+            case "electronics": return "\ud83d\udcf1";
+            case "realestate":  return "\ud83c\udfe0";
+            default:        return "\ud83d\udce6";
+        }
+    }
+
+    private String getCategoryLabel(String category) {
+        if (category == null) return "";
+        switch (category) {
+            case "boost":   return "\u062a\u0631\u0642\u064a\u0629";
+            case "badge":   return "\u0634\u0627\u0631\u0629";
+            case "title":   return "\u0644\u0642\u0628";
+            case "avatar":  return "\u0623\u0641\u0627\u062a\u0627\u0631";
+            case "home":    return "\u0645\u0646\u0632\u0644";
+            case "vehicle": return "\u0645\u0631\u0643\u0628\u0629";
+            case "gift":    return "\u0647\u062f\u064a\u0629";
+            case "pet":     return "\u062d\u064a\u0648\u0627\u0646";
+            case "luck":    return "\u062d\u0638";
+            case "special": return "\u0645\u0645\u064a\u0632\u0629";
+            case "food":    return "\u0637\u0639\u0627\u0645";
+            case "jewelry": return "\u0645\u062c\u0648\u0647\u0631";
+            default:        return "";
+        }
     }
 
     private String getRarityLabel(String r) {
