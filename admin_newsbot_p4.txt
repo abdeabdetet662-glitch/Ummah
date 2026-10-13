@@ -1,0 +1,143 @@
+
+    // ═══════════════════════════════════════════
+    //  الأزرار السريعة
+    // ═══════════════════════════════════════════
+
+    private void runTest() {
+        // نضيف خبر تجريبي
+        String[] samples = {
+            "🧪 اختبار البوت: رسالة تجريبية للتأكد من عمل النظام.",
+            "🤖 مرحباً! أنا بوت أُمّة، جاهز لخدمة المواطنين.",
+            "✨ البوت يعمل بكفاءة عالية! جاهز لنشر الأخبار."
+        };
+        String content = samples[(int)(Math.random() * samples.length)];
+
+        Map<String, Object> news = new HashMap<>();
+        news.put("author", "🤖 بوت أُمّة");
+        news.put("content", content);
+        news.put("timestamp", System.currentTimeMillis());
+        news.put("isBot", true);
+        news.put("isTest", true);
+
+        db.collection("news").add(news)
+            .addOnSuccessListener(ref -> {
+                // نسجلو
+                Map<String, Object> log = new HashMap<>();
+                log.put("action", "test");
+                log.put("message", content);
+                log.put("newsId", ref.getId());
+                log.put("timestamp", System.currentTimeMillis());
+                db.collection("news_bot_logs").add(log);
+
+                Toast.makeText(this, "✅ تم نشر خبر اختباري", Toast.LENGTH_LONG).show();
+                loadAll();
+            })
+            .addOnFailureListener(e -> {
+                Toast.makeText(this, "❌ " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            });
+    }
+
+    private void triggerReports() {
+        new AlertDialog.Builder(this)
+            .setTitle("📊 فحص التقارير")
+            .setMessage("هل تريد فحص التقارير الدورية الآن؟\n(يومي/أسبوعي/شهري)")
+            .setPositiveButton("نعم", (d, w) -> {
+                Toast.makeText(this, "⏳ جاري الفحص...", Toast.LENGTH_SHORT).show();
+
+                db.collection("news_bot_config").document("main").get()
+                    .addOnSuccessListener(doc -> {
+                        if (!doc.exists()) return;
+
+                        long now = System.currentTimeMillis();
+                        Long lastDaily = doc.getLong("lastDailyReport");
+                        Long lastWeekly = doc.getLong("lastWeeklyReport");
+                        Long lastMonthly = doc.getLong("lastMonthlyReport");
+
+                        long lastD = lastDaily != null ? lastDaily : 0;
+                        long lastW = lastWeekly != null ? lastWeekly : 0;
+                        long lastM = lastMonthly != null ? lastMonthly : 0;
+
+                        int pendingCount = 0;
+                        if (now - lastD > 24L * 60 * 60 * 1000) pendingCount++;
+                        if (now - lastW > 7L * 24 * 60 * 60 * 1000) pendingCount++;
+                        if (now - lastM > 28L * 24 * 60 * 60 * 1000) pendingCount++;
+
+                        if (pendingCount > 0) {
+                            Toast.makeText(this,
+                                    "✅ " + pendingCount + " تقرير جاهز للنشر",
+                                    Toast.LENGTH_LONG).show();
+                            // نحدّثو الأوقات يدوياً (البوت الحقيقي يشتغل من التطبيق)
+                            markReportChecked();
+                        } else {
+                            Toast.makeText(this,
+                                    "✅ كل التقارير محدّثة",
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(this, "❌ " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+            })
+            .setNegativeButton("إلغاء", null)
+            .show();
+    }
+
+    private void markReportChecked() {
+        // نحدّثو وقت آخر فحص
+        Map<String, Object> upd = new HashMap<>();
+        upd.put("lastChecked", System.currentTimeMillis());
+        upd.put("updatedAt", System.currentTimeMillis());
+
+        db.collection("news_bot_config").document("main").update(upd)
+            .addOnSuccessListener(a -> {
+                Toast.makeText(this, "✅ تم التحديث", Toast.LENGTH_SHORT).show();
+                loadAll();
+            });
+    }
+
+    // ═══════════════════════════════════════════
+    //  على Refresh
+    // ═══════════════════════════════════════════
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // نعيد التحميل كل مرة
+        loadStats();
+        loadPending();
+        loadLogs();
+    }
+
+    // ═══════════════════════════════════════════
+    //  Publish Manual (نشر يدوي من الأدمن)
+    // ═══════════════════════════════════════════
+
+    public void publishManual(String content) {
+        if (content == null || content.trim().isEmpty()) {
+            Toast.makeText(this, "⚠️ المحتوى فارغ", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Map<String, Object> news = new HashMap<>();
+        news.put("author", "👑 الإدارة");
+        news.put("content", content);
+        news.put("timestamp", System.currentTimeMillis());
+        news.put("isManual", true);
+
+        db.collection("news").add(news)
+            .addOnSuccessListener(ref -> {
+                Map<String, Object> log = new HashMap<>();
+                log.put("action", "manual_publish");
+                log.put("message", content);
+                log.put("newsId", ref.getId());
+                log.put("timestamp", System.currentTimeMillis());
+                db.collection("news_bot_logs").add(log);
+
+                Toast.makeText(this, "✅ تم النشر", Toast.LENGTH_SHORT).show();
+                loadAll();
+            })
+            .addOnFailureListener(e -> {
+                Toast.makeText(this, "❌ " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            });
+    }
+}

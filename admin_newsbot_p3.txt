@@ -1,0 +1,255 @@
+
+    // ═══════════════════════════════════════════
+    //  تحميل الأخبار المعلّقة
+    // ═══════════════════════════════════════════
+
+    private void loadPending() {
+        db.collection("news_bot_pending")
+            .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
+            .limit(20)
+            .get()
+            .addOnSuccessListener(snap -> {
+                pendingContainer.removeAllViews();
+
+                if (snap.isEmpty()) {
+                    TextView empty = new TextView(this);
+                    empty.setText("✅ لا توجد أخبار معلّقة");
+                    empty.setTextColor(Color.parseColor("#10B981"));
+                    empty.setTextSize(13);
+                    empty.setGravity(Gravity.CENTER);
+                    empty.setPadding(0, dp(20), 0, dp(20));
+                    pendingContainer.addView(empty);
+                    return;
+                }
+
+                for (com.google.firebase.firestore.DocumentSnapshot doc : snap.getDocuments()) {
+                    String content = doc.getString("content");
+                    Long ts = doc.getLong("timestamp");
+                    String id = doc.getId();
+
+                    pendingContainer.addView(makePendingCard(id, content, ts));
+                }
+            })
+            .addOnFailureListener(e -> {
+                pendingContainer.removeAllViews();
+                TextView err = new TextView(this);
+                err.setText("❌ " + e.getMessage());
+                err.setTextColor(Color.parseColor("#EF4444"));
+                err.setPadding(0, dp(10), 0, dp(10));
+                pendingContainer.addView(err);
+            });
+    }
+
+    private View makePendingCard(String id, String content, Long ts) {
+        LinearLayout card = new LinearLayout(this);
+        card.setOrientation(LinearLayout.VERTICAL);
+        card.setBackgroundColor(Color.parseColor("#2A1535"));
+        card.setPadding(dp(14), dp(14), dp(14), dp(14));
+
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, -2);
+        lp.setMargins(0, dp(6), 0, dp(6));
+        card.setLayoutParams(lp);
+
+        // الوقت
+        if (ts != null) {
+            TextView time = new TextView(this);
+            time.setText("🕐 " + new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US).format(new Date(ts)));
+            time.setTextColor(Color.parseColor("#9CA3AF"));
+            time.setTextSize(10);
+            card.addView(time);
+        }
+
+        // المحتوى
+        TextView body = new TextView(this);
+        body.setText(content != null ? content : "");
+        body.setTextColor(Color.WHITE);
+        body.setTextSize(13);
+        body.setLineSpacing(0, 1.4f);
+        body.setPadding(0, dp(8), 0, dp(12));
+        card.addView(body);
+
+        // الأزرار
+        LinearLayout btns = new LinearLayout(this);
+        btns.setOrientation(LinearLayout.HORIZONTAL);
+
+        Button approve = makeButton("✅ موافقة", "#10B981");
+        approve.setLayoutParams(new LinearLayout.LayoutParams(0, dp(44), 1f));
+        approve.setOnClickListener(v -> approvePending(id));
+        btns.addView(approve);
+
+        LinearLayout.LayoutParams spacerLp = new LinearLayout.LayoutParams(dp(6), 0);
+        btns.addView(new View(this) {{ setLayoutParams(spacerLp); }});
+
+        Button reject = makeButton("❌ رفض", "#EF4444");
+        reject.setLayoutParams(new LinearLayout.LayoutParams(0, dp(44), 1f));
+        reject.setOnClickListener(v -> rejectPending(id));
+        btns.addView(reject);
+
+        card.addView(btns);
+        return card;
+    }
+
+    private void approvePending(String id) {
+        db.collection("news_bot_pending").document(id).get()
+            .addOnSuccessListener(doc -> {
+                if (!doc.exists()) return;
+                String content = doc.getString("content");
+                if (content == null || content.isEmpty()) return;
+
+                // ننشرو
+                Map<String, Object> news = new HashMap<>();
+                news.put("author", "🤖 بوت أُمّة");
+                news.put("content", content);
+                news.put("timestamp", System.currentTimeMillis());
+                news.put("isBot", true);
+                news.put("approvedBy", "admin");
+
+                db.collection("news").add(news)
+                    .addOnSuccessListener(ref -> {
+                        db.collection("news_bot_pending").document(id).delete();
+                        Toast.makeText(this, "✅ تم النشر", Toast.LENGTH_SHORT).show();
+                        loadAll();
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(this, "❌ " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+            });
+    }
+
+    private void rejectPending(String id) {
+        new AlertDialog.Builder(this)
+            .setTitle("❌ رفض الخبر")
+            .setMessage("هل أنت متأكد من رفض هذا الخبر؟")
+            .setPositiveButton("نعم", (d, w) -> {
+                db.collection("news_bot_pending").document(id).delete()
+                    .addOnSuccessListener(a -> {
+                        Toast.makeText(this, "✅ تم الرفض", Toast.LENGTH_SHORT).show();
+                        loadAll();
+                    });
+            })
+            .setNegativeButton("إلغاء", null)
+            .show();
+    }
+
+    // ═══════════════════════════════════════════
+    //  تحميل السجل
+    // ═══════════════════════════════════════════
+
+    private void loadLogs() {
+        db.collection("news_bot_logs")
+            .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
+            .limit(15)
+            .get()
+            .addOnSuccessListener(snap -> {
+                logsContainer.removeAllViews();
+
+                if (snap.isEmpty()) {
+                    TextView empty = new TextView(this);
+                    empty.setText("📭 لا توجد سجلات");
+                    empty.setTextColor(Color.parseColor("#9CA3AF"));
+                    empty.setTextSize(13);
+                    empty.setGravity(Gravity.CENTER);
+                    empty.setPadding(0, dp(20), 0, dp(20));
+                    logsContainer.addView(empty);
+                    return;
+                }
+
+                for (com.google.firebase.firestore.DocumentSnapshot doc : snap.getDocuments()) {
+                    String action = doc.getString("action");
+                    String message = doc.getString("message");
+                    Long ts = doc.getLong("timestamp");
+
+                    logsContainer.addView(makeLogRow(action, message, ts));
+                }
+            })
+            .addOnFailureListener(e -> {
+                logsContainer.removeAllViews();
+                TextView err = new TextView(this);
+                err.setText("❌ " + e.getMessage());
+                err.setTextColor(Color.parseColor("#EF4444"));
+                err.setPadding(0, dp(10), 0, dp(10));
+                logsContainer.addView(err);
+            });
+    }
+
+    private View makeLogRow(String action, String message, Long ts) {
+        LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.VERTICAL);
+        row.setBackgroundColor(Color.parseColor("#1A0F2E"));
+        row.setPadding(dp(12), dp(10), dp(12), dp(10));
+
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, -2);
+        lp.setMargins(0, dp(3), 0, dp(3));
+        row.setLayoutParams(lp);
+
+        // Header: emoji + action + time
+        LinearLayout header = new LinearLayout(this);
+        header.setOrientation(LinearLayout.HORIZONTAL);
+        header.setGravity(Gravity.CENTER_VERTICAL);
+
+        String emoji = getActionEmoji(action);
+        TextView icon = new TextView(this);
+        icon.setText(emoji);
+        icon.setTextSize(14);
+        icon.setPadding(0, 0, dp(6), 0);
+        header.addView(icon);
+
+        TextView act = new TextView(this);
+        act.setText(getActionLabel(action));
+        act.setTextColor(Color.parseColor("#D4AF37"));
+        act.setTextSize(12);
+        act.setTypeface(null, Typeface.BOLD);
+        act.setLayoutParams(new LinearLayout.LayoutParams(0, -2, 1f));
+        header.addView(act);
+
+        if (ts != null) {
+            TextView time = new TextView(this);
+            time.setText(new SimpleDateFormat("HH:mm", Locale.US).format(new Date(ts)));
+            time.setTextColor(Color.parseColor("#6B7280"));
+            time.setTextSize(10);
+            header.addView(time);
+        }
+
+        row.addView(header);
+
+        // Message
+        if (message != null && !message.isEmpty()) {
+            TextView msg = new TextView(this);
+            String preview = message.length() > 80 ? message.substring(0, 80) + "..." : message;
+            msg.setText(preview);
+            msg.setTextColor(Color.parseColor("#9CA3AF"));
+            msg.setTextSize(11);
+            msg.setPadding(0, dp(4), 0, 0);
+            row.addView(msg);
+        }
+
+        return row;
+    }
+
+    private String getActionEmoji(String action) {
+        if (action == null) return "📝";
+        switch (action) {
+            case "publish": return "📰";
+            case "init": return "🚀";
+            case "config_update": return "⚙️";
+            case "approved": return "✅";
+            case "rejected": return "❌";
+            case "pending": return "⏳";
+            case "test": return "🧪";
+            default: return "📝";
+        }
+    }
+
+    private String getActionLabel(String action) {
+        if (action == null) return "عملية";
+        switch (action) {
+            case "publish": return "نشر خبر";
+            case "init": return "تهيئة";
+            case "config_update": return "تحديث الإعدادات";
+            case "approved": return "موافقة";
+            case "rejected": return "رفض";
+            case "pending": return "بانتظار الموافقة";
+            case "test": return "اختبار";
+            default: return action;
+        }
+    }

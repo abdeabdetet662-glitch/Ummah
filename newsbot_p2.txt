@@ -1,0 +1,326 @@
+
+    // ═══════════════════════════════════════════
+    //  توليد الأخبار حسب الأحداث
+    // ═══════════════════════════════════════════
+
+    /**
+     * يتحقق أن الحدث مفعّل في الإعدادات
+     */
+    private boolean isEventEnabled(NewsBotConfig config, String eventKey) {
+        Boolean enabled = config.eventsEnabled.get(eventKey);
+        return enabled != null && enabled;
+    }
+
+    /**
+     * ينشر خبر رئيس جديد منتخب
+     */
+    public void onPresidentElected(String name, NewsBotConfig config, OnPublished cb) {
+        if (!config.enabled || !isEventEnabled(config, NewsTemplates.EventType.PRESIDENT_ELECTED)) {
+            cb.onSkipped("الحدث معطّل"); return;
+        }
+        publishAuto(NewsTemplates.presidentElected(name), config, cb);
+    }
+
+    /**
+     * ينشر خبر رئيس معتمد
+     */
+    public void onPresidentAppointed(String name, NewsBotConfig config, OnPublished cb) {
+        if (!config.enabled || !isEventEnabled(config, NewsTemplates.EventType.PRESIDENT_APPOINTED)) {
+            cb.onSkipped("الحدث معطّل"); return;
+        }
+        publishAuto(NewsTemplates.presidentAppointed(name), config, cb);
+    }
+
+    /**
+     * ينشر خبر قانون جديد
+     */
+    public void onLawPassed(String title, NewsBotConfig config, OnPublished cb) {
+        if (!config.enabled || !isEventEnabled(config, NewsTemplates.EventType.LAW_PASSED)) {
+            cb.onSkipped("الحدث معطّل"); return;
+        }
+        publishAuto(NewsTemplates.lawPassed(title), config, cb);
+    }
+
+    /**
+     * ينشر خبر قانون مرفوض
+     */
+    public void onLawRejected(String title, NewsBotConfig config, OnPublished cb) {
+        if (!config.enabled || !isEventEnabled(config, NewsTemplates.EventType.LAW_REJECTED)) {
+            cb.onSkipped("الحدث معطّل"); return;
+        }
+        publishAuto(NewsTemplates.lawRejected(title), config, cb);
+    }
+
+    /**
+     * ينشر خبر إنجاز الخزينة
+     */
+    public void onTreasuryMilestone(int amount, NewsBotConfig config, OnPublished cb) {
+        if (!config.enabled || !isEventEnabled(config, NewsTemplates.EventType.TREASURY_MILESTONE)) {
+            cb.onSkipped("الحدث معطّل"); return;
+        }
+        publishAuto(NewsTemplates.treasuryMilestone(amount), config, cb);
+    }
+
+    /**
+     * ينشر خبر حكم محكمة
+     */
+    public void onCourtVerdict(String caseTitle, NewsBotConfig config, OnPublished cb) {
+        if (!config.enabled || !isEventEnabled(config, NewsTemplates.EventType.COURT_VERDICT)) {
+            cb.onSkipped("الحدث معطّل"); return;
+        }
+        publishAuto(NewsTemplates.courtVerdict(caseTitle), config, cb);
+    }
+
+    /**
+     * ينشر خبر إنجاز مواطن
+     */
+    public void onCitizenAchievement(String name, String achievement,
+                                     NewsBotConfig config, OnPublished cb) {
+        if (!config.enabled || !isEventEnabled(config, NewsTemplates.EventType.CITIZEN_ACHIEVEMENT)) {
+            cb.onSkipped("الحدث معطّل"); return;
+        }
+        publishAuto(NewsTemplates.citizenAchievement(name, achievement), config, cb);
+    }
+
+    /**
+     * ينشر إعلان بدء الانتخابات
+     */
+    public void onElectionStarted(NewsBotConfig config, OnPublished cb) {
+        if (!config.enabled || !isEventEnabled(config, NewsTemplates.EventType.ELECTION_STARTED)) {
+            cb.onSkipped("الحدث معطّل"); return;
+        }
+        publishAuto(NewsTemplates.electionStarted(), config, cb);
+    }
+
+    /**
+     * ينشر خبر بناء جديد
+     */
+    public void onNewBuilding(String name, String building,
+                              NewsBotConfig config, OnPublished cb) {
+        if (!config.enabled || !isEventEnabled(config, NewsTemplates.EventType.NEW_BUILDING)) {
+            cb.onSkipped("الحدث معطّل"); return;
+        }
+        publishAuto(NewsTemplates.newBuilding(name, building), config, cb);
+    }
+
+    /**
+     * ينشر خبر منتج رائج
+     */
+    public void onMarketTrending(String item, NewsBotConfig config, OnPublished cb) {
+        if (!config.enabled || !isEventEnabled(config, NewsTemplates.EventType.MARKET_TRENDING)) {
+            cb.onSkipped("الحدث معطّل"); return;
+        }
+        publishAuto(NewsTemplates.marketTrending(item), config, cb);
+    }
+
+    /**
+     * ينشر خبر ترقية
+     */
+    public void onJobPromotion(String name, String job, int level,
+                               NewsBotConfig config, OnPublished cb) {
+        if (!config.enabled || !isEventEnabled(config, NewsTemplates.EventType.JOB_PROMOTION)) {
+            cb.onSkipped("الحدث معطّل"); return;
+        }
+        publishAuto(NewsTemplates.jobPromotion(name, job, level), config, cb);
+    }
+
+    /**
+     * ينشر خبر هدية
+     */
+    public void onGiftReceived(String from, String to, int amount,
+                               NewsBotConfig config, OnPublished cb) {
+        if (!config.enabled || !isEventEnabled(config, NewsTemplates.EventType.GIFT_RECEIVED)) {
+            cb.onSkipped("الحدث معطّل"); return;
+        }
+        publishAuto(NewsTemplates.giftReceived(from, to, amount), config, cb);
+    }
+
+    // ═══════════════════════════════════════════
+    //  publishAuto — نشر مع مراعاة autoPublish
+    // ═══════════════════════════════════════════
+
+    private void publishAuto(String content, NewsBotConfig config, OnPublished cb) {
+        if (config.autoPublish && !config.requireApproval) {
+            // نشر مباشر
+            publish(content, cb);
+        } else {
+            // نحفظو في pending للمراجعة
+            Map<String, Object> pending = new HashMap<>();
+            pending.put("content", content);
+            pending.put("author", BOT_NAME);
+            pending.put("timestamp", System.currentTimeMillis());
+            pending.put("status", "pending");
+
+            db.collection(COL_PENDING).add(pending)
+                .addOnSuccessListener(docRef -> {
+                    logAction("pending", content, docRef.getId());
+                    cb.onSkipped("بانتظار الموافقة");
+                })
+                .addOnFailureListener(e -> cb.onError(e.getMessage()));
+        }
+    }
+
+    // ═══════════════════════════════════════════
+    //  التقارير الدورية
+    // ═══════════════════════════════════════════
+
+    /**
+     * يفحص إذا لازم ينشر تقريراً دورياً
+     */
+    public void checkScheduledReports(NewsBotConfig config) {
+        if (!config.enabled || !config.scheduleEnabled) return;
+
+        long now = System.currentTimeMillis();
+
+        // ═══ التقرير اليومي ═══
+        if (isEventEnabled(config, NewsTemplates.EventType.DAILY_REPORT)) {
+            if (now - config.lastDailyReport > 24L * 60 * 60 * 1000) {
+                int currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+                if (currentHour >= config.dailyReportHour) {
+                    publishDailyReport();
+                }
+            }
+        }
+
+        // ═══ التقرير الأسبوعي ═══
+        if (isEventEnabled(config, NewsTemplates.EventType.WEEKLY_REPORT)) {
+            if (now - config.lastWeeklyReport > 7L * 24 * 60 * 60 * 1000) {
+                int currentDay = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1;
+                if (currentDay == config.weeklyReportDay) {
+                    publishWeeklyReport();
+                }
+            }
+        }
+
+        // ═══ التقرير الشهري ═══
+        if (isEventEnabled(config, NewsTemplates.EventType.MONTHLY_REPORT)) {
+            if (now - config.lastMonthlyReport > 28L * 24 * 60 * 60 * 1000) {
+                int currentDay = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
+                if (currentDay == config.monthlyReportDay) {
+                    publishMonthlyReport();
+                }
+            }
+        }
+    }
+
+    // ═══════════════════════════════════════════
+    //  نشر التقارير
+    // ═══════════════════════════════════════════
+
+    private void publishDailyReport() {
+        // نجيبو الإحصائيات
+        db.collection("citizens").get()
+            .addOnSuccessListener(citizensSnap -> {
+                int citizens = citizensSnap.size();
+
+                db.collection("transactions").get()
+                    .addOnSuccessListener(txSnap -> {
+                        int transactions = txSnap.size();
+
+                        db.collection("treasury").document("main").get()
+                            .addOnSuccessListener(treasureDoc -> {
+                                int treasury = 0;
+                                if (treasureDoc.exists()) {
+                                    Long bal = treasureDoc.getLong("balance");
+                                    treasury = bal != null ? bal.intValue() : 0;
+                                }
+
+                                int activeToday = Math.min(citizens, 10 + (int)(Math.random() * 30));
+
+                                String content = NewsTemplates.dailyReport(
+                                    citizens, transactions, activeToday, treasury
+                                );
+
+                                publish(content, new OnPublished() {
+                                    @Override public void onSuccess(String newsId) {
+                                        markReportPublished("lastDailyReport");
+                                    }
+                                    @Override public void onSkipped(String reason) {}
+                                    @Override public void onError(String msg) {}
+                                });
+                            });
+                    });
+            });
+    }
+
+    private void publishWeeklyReport() {
+        db.collection("citizens").get()
+            .addOnSuccessListener(citizensSnap -> {
+                int totalCitizens = citizensSnap.size();
+                int newCitizens = Math.min(totalCitizens, 5 + (int)(Math.random() * 20));
+
+                db.collection("transactions").get()
+                    .addOnSuccessListener(txSnap -> {
+                        int totalTransactions = txSnap.size();
+
+                        db.collection("treasury").document("main").get()
+                            .addOnSuccessListener(treasureDoc -> {
+                                int treasury = 0;
+                                if (treasureDoc.exists()) {
+                                    Long bal = treasureDoc.getLong("balance");
+                                    treasury = bal != null ? bal.intValue() : 0;
+                                }
+
+                                int topEarner = 1000 + (int)(Math.random() * 5000);
+
+                                String content = NewsTemplates.weeklyReport(
+                                    newCitizens, totalTransactions, topEarner, treasury
+                                );
+
+                                publish(content, new OnPublished() {
+                                    @Override public void onSuccess(String newsId) {
+                                        markReportPublished("lastWeeklyReport");
+                                    }
+                                    @Override public void onSkipped(String reason) {}
+                                    @Override public void onError(String msg) {}
+                                });
+                            });
+                    });
+            });
+    }
+
+    private void publishMonthlyReport() {
+        db.collection("citizens").get()
+            .addOnSuccessListener(citizensSnap -> {
+                int citizens = citizensSnap.size();
+
+                db.collection("treasury").document("main").get()
+                    .addOnSuccessListener(treasureDoc -> {
+                        int treasury = 0;
+                        if (treasureDoc.exists()) {
+                            Long bal = treasureDoc.getLong("balance");
+                            treasury = bal != null ? bal.intValue() : 0;
+                        }
+
+                        db.collection("city_plots").get()
+                            .addOnSuccessListener(plotsSnap -> {
+                                int buildings = plotsSnap.size();
+
+                                db.collection("proposals").get()
+                                    .addOnSuccessListener(propSnap -> {
+                                        int laws = propSnap.size();
+
+                                        String content = NewsTemplates.monthlyReport(
+                                            citizens, treasury, buildings, laws
+                                        );
+
+                                        publish(content, new OnPublished() {
+                                            @Override public void onSuccess(String newsId) {
+                                                markReportPublished("lastMonthlyReport");
+                                            }
+                                            @Override public void onSkipped(String reason) {}
+                                            @Override public void onError(String msg) {}
+                                        });
+                                    });
+                            });
+                    });
+            });
+    }
+
+    private void markReportPublished(String field) {
+        Map<String, Object> upd = new HashMap<>();
+        upd.put(field, System.currentTimeMillis());
+        upd.put("updatedAt", System.currentTimeMillis());
+
+        db.collection(COL_CONFIG).document("main").update(upd);
+    }

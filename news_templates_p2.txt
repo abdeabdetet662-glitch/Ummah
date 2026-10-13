@@ -1,0 +1,165 @@
+
+    // ═══════════════════════════════════════════
+    //  7. إنجاز مواطن
+    // ═══════════════════════════════════════════
+
+    public static String citizenAchievement(String name, String achievement) {
+        String[] templates = {
+            "🏆 إنجاز مواطن:\n\n" + name + " حقق إنجازاً رائعاً: " + achievement + "\n\n🎉 مبروك!",
+            "⭐ نجم أُمّة:\n\n" + name + " يتألق بإنجازه: " + achievement + "\n\n💫 فخر لأمتنا.",
+            "🎖️ تكريم:\n\n" + name + " يستحق التقدير على: " + achievement + "\n\n👏 أحسنت!",
+            "🌟 خبر سار:\n\n" + name + " " + achievement + "\n\n🎊 إنجاز يستحق الاحتفال."
+        };
+        return pick(templates);
+    }
+
+    // ═══════════════════════════════════════════
+    //  8. بدء الانتخابات
+    // ═══════════════════════════════════════════
+
+    public static String electionStarted() {
+        String[] templates = {
+            "🗳️ انتخابات أُمّة بدأت!\n\nصوتك يبني المستقبل. شارك الآن واختر رئيسك.\n\n⭐ كل صوت مهم!",
+            "📢 إعلان انتخابي:\n\nفُتح باب التصويت لانتخابات الرئاسة.\n\n🎯 صوتك أمانة، لا تتهاون!",
+            "🇩🇿 ديمقراطية أُمّة:\n\nالانتخابات الرئاسية انطلقت!\n\n✨ صوتك يغيّر التاريخ.",
+            "🎊 وقت التصويت:\n\nانتخابات أُمّة بدأت رسمياً.\n\n💫 كن جزءاً من القرار!"
+        };
+        return pick(templates);
+    }
+
+    // ═══════════════════════════════════════════
+    //  9. بناء جديد
+    // ═══════════════════════════════════════════
+
+    public static String newBuilding(String name, String building) {
+        String[] templates = {
+            "🏗️ بناء جديد:\n\n" + name + " شيّد " + building + " في المدينة!\n\n🏙️ مدينتنا تتوسع.",
+            "🏙️ إنجاز معماري:\n\n" + name + " أضاف " + building + " لمدينة أُمّة.\n\n✨ مبروك!",
+            "🏛️ مشروع جديد:\n\n" + name + " بنى " + building + " في قلب المدينة.\n\n🎉 تطور عمراني.",
+            "🏢 خبر عمراني:\n\n" + name + " أعلن عن بناء " + building + ".\n\n🌟 خطوة جديدة في نمو المدينة."
+        };
+        return pick(templates);
+    }
+
+    // ═══════════════════════════════════════════
+    //  10. منتج رائج في السوق
+    // ═══════════════════════════════════════════
+
+    public static String marketTrending(String item) {
+        String[] templates = {
+            "🔥 منتج رائج:\n\n«" + item + "» يتصدر السوق!\n\n📈 مبيعات قياسية.",
+            "🛒 سوق أُمّة:\n\n«" + item + "» هو الأكثر طلباً هذا الأسبوع.\n\n💰 عرض مغري!",
+            "📈 اتجاهات السوق:\n\n«" + item + "» يستحوذ على اهتمام المواطنين.\n\n🌟 انضم للتجربة!",
+            "🎯 رائج اليوم:\n\n«" + item + "» يحقق مبيعات كبيرة.\n\n💎 لا تفوّت الفرصة!"
+        };
+        return pick(templates);
+    }
+
+    // ═══════════════════════════════════════════
+    //  11. ترقية في الوظيفة
+    // ═══════════════════════════════════════════
+
+    public static String jobPromotion(String name, String job, int level) {
+        String[] templates = {
+            "📈 ترقية:\n\n" + name + " ترقّى إلى المستوى " + level + " في " + job + "!\n\n🎉 مبروك!",
+            "🎖️ نجاح مهني:\n\n" + name + " وصل للمستوى " + level + " كـ" + job + ".\n\n⭐ أحسنت!",
+            "🏆 إنجاز وظيفي:\n\n" + name + " حقق المستوى " + level + " في " + job + ".\n\n💼 تقدم رائع.",
+            "🌟 ترقية مستحقة:\n\n" + name + " أصبح في المستوى " + level + " كـ" + job + ".\n\n👏 نتمنى له الأفضل."
+        };
+        return pick(templates);
+    }
+
+    // ═══════════════════════════════════════════
+    //  12. هدية
+    // ═══════════════════════════════════════════
+
+    public static String giftReceived(String from, String to, int amount) {
+        String[] templates = {
+            "🎁 هدية:\n\n" + from + " أهدى " + to + " " + amount + " دينار!\n\n💝 كرم يستحق التقدير.",
+            "💖 كرم:\n\n" + from + " قدّم هدية بقيمة " + amount + " Đ لـ" + to + ".\n\n🌟 روح التعاون.",
+            "🎉 هدية:\n\n" + to + " استلم " + amount + " Đ من " + from + ".\n\n💫 مبروك!"
+        };
+        return pick(templates);
+    }
+
+    // ═══════════════════════════════════════════
+    //  13. التقرير اليومي
+    // ═══════════════════════════════════════════
+
+    public static String dailyReport(int citizens, int transactions, int activeToday, int treasury) {
+        String[] templates = {
+            "📊 التقرير اليومي لأُمّة\n\n" +
+            "👥 المواطنون: " + citizens + "\n" +
+            "📈 المعاملات: " + transactions + "\n" +
+            "🔥 النشطون اليوم: " + activeToday + "\n" +
+            "💰 الخزينة: " + String.format("%,d", treasury) + " Đ\n\n" +
+            "🌙 صحيفة الأمة اليومية",
+
+            "🗓️ تقرير اليوم\n\n" +
+            "📌 عدد المواطنين: " + citizens + "\n" +
+            "💳 معاملات اليوم: " + transactions + "\n" +
+            "⭐ نشاط اليوم: " + activeToday + " مواطن\n" +
+            "🏦 رصيد الخزينة: " + String.format("%,d", treasury) + " Đ\n\n" +
+            "✨ إلى الغد!",
+
+            "📰 ملخص اليوم في أُمّة\n\n" +
+            "• " + citizens + " مواطن مسجّل\n" +
+            "• " + transactions + " معاملة\n" +
+            "• " + activeToday + " نشط اليوم\n" +
+            "• خزينة: " + String.format("%,d", treasury) + " Đ\n\n" +
+            "🌟 يوم حافل!"
+        };
+        return pick(templates);
+    }
+
+    // ═══════════════════════════════════════════
+    //  14. التقرير الأسبوعي
+    // ═══════════════════════════════════════════
+
+    public static String weeklyReport(int newCitizens, int totalTransactions, int topEarner, int totalTreasury) {
+        String[] templates = {
+            "📊 التقرير الأسبوعي لأُمّة\n\n" +
+            "👥 مواطنون جدد: " + newCitizens + "\n" +
+            "💳 المعاملات: " + totalTransactions + "\n" +
+            "🏆 الأكثر ربحاً: " + topEarner + " Đ\n" +
+            "💰 الخزينة: " + String.format("%,d", totalTreasury) + " Đ\n\n" +
+            "🌟 أسبوع من النجاحات!",
+
+            "🗓️ ملخص الأسبوع\n\n" +
+            "📈 نمو: " + newCitizens + " مواطن جديد\n" +
+            "💼 نشاط: " + totalTransactions + " معاملة\n" +
+            "👑 الأكثر: " + topEarner + " Đ\n" +
+            "🏦 خزينة: " + String.format("%,d", totalTreasury) + " Đ\n\n" +
+            "✨ إلى أسبوع أفضل!"
+        };
+        return pick(templates);
+    }
+
+    // ═══════════════════════════════════════════
+    //  15. التقرير الشهري
+    // ═══════════════════════════════════════════
+
+    public static String monthlyReport(int citizens, int treasury, int buildings, int laws) {
+        String[] templates = {
+            "📊 التقرير الشهري لأُمّة\n\n" +
+            "👥 المواطنون: " + citizens + "\n" +
+            "💰 الخزينة: " + String.format("%,d", treasury) + " Đ\n" +
+            "🏛️ المباني: " + buildings + "\n" +
+            "⚖️ القوانين: " + laws + "\n\n" +
+            "🎉 شهر من الإنجازات!",
+
+            "🗓️ حصيلة الشهر\n\n" +
+            "• " + citizens + " مواطن\n" +
+            "• " + String.format("%,d", treasury) + " Đ خزينة\n" +
+            "• " + buildings + " مبنى\n" +
+            "• " + laws + " قانون\n\n" +
+            "🌟 أُمّة تتقدم!"
+        };
+        return pick(templates);
+    }
+
+    // ═══════════════════════════════════════════
+    //  Helper
+    // ═══════════════════════════════════════════
+
+}
