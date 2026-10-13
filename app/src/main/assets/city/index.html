@@ -297,6 +297,18 @@
 
 <div id="hint">🕹️ اسحب Joystick للحركة • 📷 CamControl للكاميرا • ✋ للتفاعل</div>
 
+<script>
+window.onerror = function(msg, url, line, col, err) {
+    var loading = document.getElementById('loading');
+    if (loading) {
+        loading.innerHTML = '<div style="color:#F44336;font-size:11px;max-width:90vw;word-wrap:break-word;text-align:left;direction:ltr;padding:20px;background:#000;border-radius:12px;">' +
+            '<b>❌ ERROR:</b><br>' + msg + '<br><br>' +
+            '<b>at line:</b> ' + line + ':' + col + '<br><br>' +
+            '<b>url:</b> ' + (url || '').substring(0, 150) +
+            '</div>';
+    }
+};
+</script>
 <script src="../avatar/libs/three.min.js"></script>
 <script>
 // ═══════════════════════════════════════════════════════════
