@@ -160,6 +160,31 @@ public class CityMapActivity extends Activity {
         public void onPlotClick(String plotJson) {
             runOnUiThread(() -> handlePlotClick(plotJson));
         }
+
+        // ✨ جديد: فتح Activity من المدينة
+        @JavascriptInterface
+        public void openActivity(String name) {
+            runOnUiThread(() -> {
+                try {
+                    Class<?> clazz = Class.forName("com.ummah.app." + name);
+                    android.content.Intent intent = new android.content.Intent(CityMapActivity.this, clazz);
+                    startActivity(intent);
+                } catch (ClassNotFoundException e) {
+                    Toast.makeText(CityMapActivity.this,
+                            "⚠️ " + name + " غير متاح", Toast.LENGTH_SHORT).show();
+                } catch (Exception e) {
+                    Toast.makeText(CityMapActivity.this,
+                            "❌ " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+        // ✨ جديد: عرض معلومات عن مبنى
+        @JavascriptInterface
+        public void showToast(String message) {
+            runOnUiThread(() -> Toast.makeText(CityMapActivity.this,
+                    message, Toast.LENGTH_SHORT).show());
+        }
     }
 
     private void handlePlotClick(String plotJson) {
