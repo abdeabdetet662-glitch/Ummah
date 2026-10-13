@@ -152,6 +152,9 @@ public class TreasuryActivity extends Activity {
                             });
                         }
                         Toast.makeText(TreasuryActivity.this, getString(R.string.treasury_thanks), Toast.LENGTH_LONG).show();
+
+                        // ═══ 🤖 فحص إنجاز الخزينة ═══
+                        checkTreasuryMilestone();
                     }
                     @Override public void onError(String msg) {
                         wm.add(finalAmount);
@@ -161,6 +164,40 @@ public class TreasuryActivity extends Activity {
             })
             .setNegativeButton("إلغاء", null)
             .show();
+    }
+
+    // ═══ 🤖 فحص إنجاز الخزينة (1M/5M/10M/50M/100M) ═══
+    private void checkTreasuryMilestone() {
+        fm.listenTreasury(new FirebaseManager.BalanceListener() {
+            @Override public void onBalance(int balance) {
+                int[] milestones = {100000, 500000, 1000000, 5000000, 10000000, 50000000, 100000000};
+                for (int m : milestones) {
+                    if (balance >= m && balance < m * 1.1) {
+                        // نشر الخبر
+                        publishTreasuryNews(m);
+                        break;
+                    }
+                }
+            }
+            @Override public void onError(String m) {}
+        });
+    }
+
+    private void publishTreasuryNews(final int amount) {
+        final NewsBotManager bot = new NewsBotManager(this);
+        bot.loadConfig(new NewsBotManager.ConfigListener() {
+            @Override
+            public void onConfig(NewsBotManager.NewsBotConfig config) {
+                bot.onTreasuryMilestone(amount, config, new NewsBotManager.OnPublished() {
+                    @Override public void onSuccess(String id) {
+                        android.util.Log.d("NewsBot", "✅ Treasury news published: " + id);
+                    }
+                    @Override public void onSkipped(String reason) {}
+                    @Override public void onError(String msg) {}
+                });
+            }
+            @Override public void onError(String msg) {}
+        });
     }
 
     @Override

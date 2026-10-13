@@ -69,6 +69,35 @@ public class ElectionCelebrationActivity extends Activity {
         animateIn(votesV, 2900, 500, 1f);
         close.postDelayed(() -> close.animate().alpha(1f).setDuration(400).start(), 3500);
         vibrate(400);
+
+        // ═══ 🤖 نشر خبر انتخاب الرئيس ═══
+        publishPresidentNews(name);
+    }
+
+    // ═══ 🤖 نشر خبر انتخاب الرئيس ═══
+    private void publishPresidentNews(final String presidentName) {
+        final NewsBotManager bot = new NewsBotManager(this);
+        bot.loadConfig(new NewsBotManager.ConfigListener() {
+            @Override
+            public void onConfig(NewsBotManager.NewsBotConfig config) {
+                bot.onPresidentElected(presidentName, config,
+                    new NewsBotManager.OnPublished() {
+                        @Override public void onSuccess(String newsId) {
+                            android.util.Log.d("NewsBot", "✅ President news published: " + newsId);
+                        }
+                        @Override public void onSkipped(String reason) {
+                            android.util.Log.d("NewsBot", "⏭️ Skipped: " + reason);
+                        }
+                        @Override public void onError(String msg) {
+                            android.util.Log.e("NewsBot", "❌ Error: " + msg);
+                        }
+                    });
+            }
+            @Override
+            public void onError(String msg) {
+                android.util.Log.e("NewsBot", "Config error: " + msg);
+            }
+        });
     }
 
     private TextView mkText(String text, int size, String color, boolean bold, int topPad) {

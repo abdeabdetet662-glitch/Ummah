@@ -30,6 +30,25 @@ public class MainActivity extends Activity {
     protected void attachBaseContext(android.content.Context base) {
         super.attachBaseContext(LocaleHelper.wrap(base));
     }
+
+    // ═══ 🤖 فحص تقارير بوت الأخبار ═══
+    private void checkNewsBotReports() {
+        try {
+            final NewsBotManager bot = new NewsBotManager(this);
+            bot.loadConfig(new NewsBotManager.ConfigListener() {
+                @Override
+                public void onConfig(NewsBotManager.NewsBotConfig config) {
+                    bot.checkScheduledReports(config);
+                }
+                @Override
+                public void onError(String msg) {
+                    android.util.Log.e("NewsBot", "MainActivity config error: " + msg);
+                }
+            });
+        } catch (Exception e) {
+            android.util.Log.e("NewsBot", "checkNewsBotReports error", e);
+        }
+    }
     
     
 
@@ -69,6 +88,9 @@ public class MainActivity extends Activity {
         
         // بدء الاستماع للإشعارات
         notifListener = new NotificationListener(this);
+
+        // ═══ 🤖 فحص تقارير بوت الأخبار ═══
+        checkNewsBotReports();
         
         
         
