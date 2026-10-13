@@ -31,6 +31,7 @@ public class NavDrawerHelper {
 
     // IDs للعناصر
     public static final int ITEM_HOME = 100;
+    public static final int ITEM_OFFICE = 220;
     public static final int ITEM_CITY = 101;
     public static final int ITEM_PARLIAMENT = 102;
     public static final int ITEM_ELECTIONS = 103;
@@ -116,6 +117,7 @@ public class NavDrawerHelper {
             addSection(content, activity, activity.getString(R.string.nav_section_navigation));
             addItem(content, activity, "🏠", activity.getString(R.string.nav_home), ITEM_HOME, listener);
             addItem(content, activity, "🏙️", activity.getString(R.string.nav_city), ITEM_CITY, listener);
+                addItem(content, activity, "🏢", "مكتب أُمّة", ITEM_OFFICE, listener, 0);
             addItem(content, activity, "🏛️", activity.getString(R.string.nav_parliament), ITEM_PARLIAMENT, listener);
             addItem(content, activity, "👑", activity.getString(R.string.nav_elections), ITEM_ELECTIONS, listener);
 

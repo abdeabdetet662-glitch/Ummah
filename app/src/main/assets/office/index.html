@@ -1,0 +1,1731 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>مكتب أُمّة</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #C8E0F0; font-family: sans-serif; }
+  canvas { display: block; touch-action: none; }
+
+  #loading {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    color: #D4AF37; font-size: 15px; text-align: center; z-index: 100;
+    background: rgba(255,255,255,0.95); padding: 30px 40px; border-radius: 20px;
+    border: 2px solid #D4AF37; box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  }
+  .spinner {
+    border: 4px solid rgba(212, 175, 55, 0.2); border-top: 4px solid #D4AF37;
+    border-radius: 50%; width: 50px; height: 50px;
+    animation: spin 1s linear infinite; margin: 0 auto 20px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* العنوان أعلى يمين */
+  #title {
+    position: absolute; top: 24px; right: 24px; z-index: 50;
+    color: #1A1A1A; font-size: 13px; letter-spacing: 2px;
+    font-weight: 600; text-transform: uppercase;
+    background: rgba(255,255,255,0.85);
+    padding: 8px 16px; border-radius: 6px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0,0,0,0.08);
+  }
+  #title .gold { color: #D4AF37; }
+
+  /* البطاقة على يسار */
+  #infoCard {
+    position: absolute; top: 90px; left: 24px; z-index: 50;
+    background: rgba(255,255,255,0.92);
+    padding: 20px 22px; border-radius: 14px;
+    max-width: 220px;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(0,0,0,0.06);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+  }
+  #infoCard h1 {
+    color: #1A1A1A; font-size: 20px; margin-bottom: 8px;
+    font-weight: 600; line-height: 1.2;
+  }
+  #infoCard p {
+    color: #6B7280; font-size: 12px; line-height: 1.5;
+  }
+
+  /* القائمة الجانبية */
+  #roomsList {
+    position: absolute; top: 220px; left: 24px; z-index: 50;
+    display: flex; flex-direction: column; gap: 2px;
+    background: rgba(255,255,255,0.85);
+    border-radius: 12px; padding: 8px;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(0,0,0,0.06);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    max-width: 220px;
+  }
+  .room-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 14px; border-radius: 8px;
+    cursor: pointer; transition: all 0.2s;
+    font-size: 13px; color: #4A5568;
+    font-weight: 500;
+  }
+  .room-item:active { transform: scale(0.98); }
+  .room-item.active {
+    background: #D4AF37; color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(212,175,55,0.3);
+  }
+  .room-num {
+    font-size: 11px; color: #A0AEC0;
+    font-weight: 600; min-width: 20px;
+    font-family: monospace;
+  }
+  .room-item.active .room-num { color: rgba(255,255,255,0.8); }
+  .room-name { flex: 1; }
+
+  /* الشريط السفلي */
+  #bottomBar {
+    position: absolute; bottom: 24px; left: 50%;
+    transform: translateX(-50%); z-index: 50;
+    display: flex; gap: 4px; align-items: center;
+    background: rgba(255,255,255,0.92);
+    padding: 6px; border-radius: 14px;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(0,0,0,0.06);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    max-width: calc(100vw - 48px);
+    overflow-x: auto;
+  }
+  #bottomBar::-webkit-scrollbar { display: none; }
+  .bar-btn {
+    padding: 10px 16px; border-radius: 8px;
+    font-size: 12px; color: #4A5568;
+    background: transparent; border: none;
+    cursor: pointer; white-space: nowrap;
+    font-weight: 500; transition: all 0.2s;
+    font-family: inherit;
+  }
+  .bar-btn:active { transform: scale(0.96); }
+  .bar-btn.active {
+    background: #1A1A1A; color: #FFFFFF;
+  }
+  .bar-separator {
+    width: 1px; height: 20px;
+    background: rgba(0,0,0,0.1);
+    margin: 0 4px;
+  }
+
+  /* Toast */
+  .toast {
+    position: absolute; top: 90px; left: 50%;
+    transform: translateX(-50%);
+    background: #1A1A1A; color: #FFFFFF;
+    padding: 14px 26px; border-radius: 12px;
+    font-size: 14px; z-index: 300; display: none;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    max-width: 85%;
+  }
+  .toast.show { display: block; animation: toastIn 0.3s ease-out; }
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+
+  /* علامة YOU */
+  #youLabel {
+    position: absolute;
+    background: #10B981; color: #FFFFFF;
+    padding: 4px 10px; border-radius: 10px;
+    font-size: 10px; font-weight: bold;
+    pointer-events: none; z-index: 30;
+    transform: translate(-50%, -50%);
+    opacity: 0; transition: opacity 0.2s;
+    white-space: nowrap;
+  }
+  #youLabel::after {
+    content: '';
+    position: absolute; left: 50%; bottom: -5px;
+    transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #10B981;
+  }
+  #youLabel.show { opacity: 1; }
+
+  /* لوحة التفاعل */
+  #interactPanel {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5); z-index: 200;
+    display: none; align-items: flex-end;
+    backdrop-filter: blur(4px);
+  }
+  #interactPanel.show { display: flex; }
+  #interactPanel .panel {
+    width: 100%; background: #FFFFFF;
+    border-top-left-radius: 24px; border-top-right-radius: 24px;
+    padding: 24px 22px 40px;
+    animation: slideUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  #interactPanel h3 { color: #1A1A1A; font-size: 20px; margin-bottom: 8px; }
+  #interactPanel p { color: #6B7280; font-size: 13px; margin-bottom: 20px; line-height: 1.5; }
+  #interactPanel .btns { display: flex; gap: 10px; }
+  #interactPanel button {
+    flex: 1; padding: 15px; border: none; border-radius: 12px;
+    font-size: 14px; font-weight: bold; font-family: inherit; cursor: pointer;
+    transition: transform 0.15s;
+  }
+  #interactPanel button:active { transform: scale(0.96); }
+  #interactPanel .btn-open {
+    background: #D4AF37; color: #FFFFFF;
+  }
+  #interactPanel .btn-close {
+    background: #F3F4F6; color: #4A5568;
+  }
+</style>
+</head>
+<body>
+<div id="loading"><div class="spinner"></div><div>🏢 جاري تحميل مكتب أُمّة...</div></div>
+
+<div id="title">🏢 <span class="gold">أُمّة</span> · THE OFFICE</div>
+
+<div id="infoCard">
+  <h1>استكشف المكتب.</h1>
+  <p>اختر غرفة لتتجول فيها، أو خذ جولة كاملة.</p>
+</div>
+
+<div id="roomsList"></div>
+
+<div id="bottomBar">
+  <button class="bar-btn active" onclick="changeView('move')">🕹️ حركة</button>
+  <div class="bar-separator"></div>
+  <button class="bar-btn" onclick="changeView('football')">⚽ الملعب</button>
+  <button class="bar-btn" onclick="changeView('full')">🔍 كامل</button>
+  <button class="bar-btn" onclick="changeView('neighbourhood')">🏘️ الحي</button>
+  <div class="bar-separator"></div>
+  <button class="bar-btn" onclick="takeTour()">🎬 جولة</button>
+</div>
+
+<div id="youLabel">YOU</div>
+
+<div id="interactPanel">
+  <div class="panel">
+    <h3 id="iTitle">📍 مكان</h3>
+    <p id="iDesc"></p>
+    <div class="btns">
+      <button class="btn-close" onclick="closeInteract()">إغلاق</button>
+      <button class="btn-open" onclick="openActivity()">🚪 ادخل</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="../avatar/libs/three.min.js"></script>
+<script src="../avatar/libs/OrbitControls.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════════
+//  الإعدادات العامة
+// ═══════════════════════════════════════════════════════════
+
+const ROOM_SIZE = 60;         // حجم كل غرفة
+const ROOM_GAP = 5;            // الفراغ بين الغرف
+const BUILDING_W = 5 * (ROOM_SIZE + ROOM_GAP);
+const BUILDING_D = 3 * (ROOM_SIZE + ROOM_GAP);
+
+// ═══════════════════════════════════════════════════════════
+//  Scene + Camera + Renderer
+// ═══════════════════════════════════════════════════════════
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xC8E0F0);
+scene.fog = new THREE.Fog(0xC8E0F0, 500, 1500);
+
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 3000);
+camera.position.set(-150, 120, 200);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputEncoding = THREE.sRGBEncoding;
+document.body.appendChild(renderer.domElement);
+
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.06;
+controls.minDistance = 30;
+controls.maxDistance = 800;
+controls.maxPolarAngle = Math.PI / 2.1;
+controls.target.set(0, 10, 0);
+
+// ═══════════════════════════════════════════════════════════
+//  الإضاءة — نهارية نظيفة
+// ═══════════════════════════════════════════════════════════
+
+const ambient = new THREE.AmbientLight(0xffffff, 0.55);
+scene.add(ambient);
+
+const hemi = new THREE.HemisphereLight(0xE8F4FF, 0xA8B090, 0.5);
+scene.add(hemi);
+
+const sun = new THREE.DirectionalLight(0xFFFFFF, 1.0);
+sun.position.set(200, 400, 150);
+sun.castShadow = true;
+sun.shadow.mapSize.width = 2048;
+sun.shadow.mapSize.height = 2048;
+sun.shadow.camera.near = 50;
+sun.shadow.camera.far = 1200;
+sun.shadow.camera.left = -300;
+sun.shadow.camera.right = 300;
+sun.shadow.camera.top = 300;
+sun.shadow.camera.bottom = -300;
+sun.shadow.bias = -0.0004;
+scene.add(sun);
+
+// ═══════════════════════════════════════════════════════════
+//  الأرضيات والأرصفة الخارجية
+// ═══════════════════════════════════════════════════════════
+
+// الأرض الخضراء الخارجية
+const grassMat = new THREE.MeshLambertMaterial({ color: 0x8FBF6E });
+const grass = new THREE.Mesh(new THREE.PlaneGeometry(2000, 2000), grassMat);
+grass.rotation.x = -Math.PI / 2;
+grass.receiveShadow = true;
+scene.add(grass);
+
+// الرصيف الخارجي (المدخل)
+const paveMat = new THREE.MeshLambertMaterial({ color: 0xE0DDD2 });
+const pave = new THREE.Mesh(new THREE.BoxGeometry(300, 0.4, 60), paveMat);
+pave.position.set(0, 0.2, BUILDING_D / 2 + 40);
+pave.receiveShadow = true;
+scene.add(pave);
+
+// خطوط الرصيف الرمادية
+const linePaveMat = new THREE.MeshLambertMaterial({ color: 0x8B8B85 });
+for (let i = -3; i <= 3; i++) {
+  const line = new THREE.Mesh(new THREE.BoxGeometry(2, 0.42, 60), linePaveMat);
+  line.position.set(i * 40, 0.21, BUILDING_D / 2 + 40);
+  scene.add(line);
+}
+
+// ملعب كرة القدم (على الجنوب)
+const pitchMat = new THREE.MeshLambertMaterial({ color: 0x6BBF5A });
+const pitch = new THREE.Mesh(new THREE.BoxGeometry(240, 0.3, 140), pitchMat);
+pitch.position.set(0, 0.15, BUILDING_D / 2 + 130);
+pitch.receiveShadow = true;
+scene.add(pitch);
+
+// خطوط الملعب
+const pitchLineMat = new THREE.MeshBasicMaterial({ color: 0xFFFFFF });
+const centerLine = new THREE.Mesh(new THREE.BoxGeometry(240, 0.32, 0.6), pitchLineMat);
+centerLine.position.set(0, 0.16, BUILDING_D / 2 + 130);
+scene.add(centerLine);
+
+// دائرة المنتصف
+const centerCircle = new THREE.Mesh(
+  new THREE.RingGeometry(15, 16, 32),
+  pitchLineMat
+);
+centerCircle.rotation.x = -Math.PI / 2;
+centerCircle.position.set(0, 0.17, BUILDING_D / 2 + 130);
+scene.add(centerCircle);
+
+// مرميين
+const goalMat = new THREE.MeshLambertMaterial({ color: 0xFFFFFF });
+for (let side of [-1, 1]) {
+  for (let i = 0; i < 3; i++) {
+    const post = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 8, 8), goalMat);
+    post.position.set(side * 110 + (i - 1) * 6, 4, BUILDING_D / 2 + 130 + side * 65);
+    if (i === 1) post.position.y = 4; // لا فرق
+    scene.add(post);
+  }
+  // العارضة الأفقية
+  const bar = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 12, 8), goalMat);
+  bar.rotation.z = Math.PI / 2;
+  bar.position.set(side * 110, 8, BUILDING_D / 2 + 130 + side * 65);
+  scene.add(bar);
+}
+
+// سياج حول الملعب
+const fenceMat = new THREE.MeshLambertMaterial({ color: 0xD8D8D0 });
+for (let i = 0; i < 20; i++) {
+  for (let z of [-70, 70]) {
+    const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 5, 6), fenceMat);
+    pole.position.set((i - 10) * 12, 2.5, BUILDING_D / 2 + 130 + z);
+    scene.add(pole);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  المباني السياقية (خارج المكتب)
+// ═══════════════════════════════════════════════════════════
+
+const buildingWallColors = [0xE8E4DC, 0xD4C8B0, 0xE0D8C8, 0xE8F0F8, 0xD8E4F0];
+const buildingRoofColors = [0x5A6B7A, 0x7A6B5A, 0x4A5A6A];
+
+function makeContextBuilding(w, h, d) {
+  const g = new THREE.Group();
+  const wallMat = new THREE.MeshLambertMaterial({
+    color: buildingWallColors[Math.floor(Math.random() * buildingWallColors.length)]
+  });
+  const roofMat = new THREE.MeshLambertMaterial({
+    color: buildingRoofColors[Math.floor(Math.random() * buildingRoofColors.length)]
+  });
+
+  const box = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), wallMat);
+  box.position.y = h / 2;
+  box.castShadow = true; box.receiveShadow = true;
+  g.add(box);
+
+  const roof = new THREE.Mesh(new THREE.BoxGeometry(w + 0.5, 0.8, d + 0.5), roofMat);
+  roof.position.y = h + 0.4;
+  roof.castShadow = true;
+  g.add(roof);
+
+  // نوافذ
+  const windowMat = new THREE.MeshLambertMaterial({
+    color: 0x80C0E0, emissive: 0x2A5A7A, emissiveIntensity: 0.3
+  });
+  const colsX = Math.floor(w / 5);
+  const colsZ = Math.floor(d / 5);
+  const rows = Math.floor(h / 5);
+
+  for (let r = 0; r < rows; r++) {
+    const y = 2.5 + r * 5;
+    for (let c = 0; c < colsX; c++) {
+      const x = -w / 2 + 3 + c * 5;
+      const win1 = new THREE.Mesh(new THREE.BoxGeometry(2, 2.2, 0.1), windowMat);
+      win1.position.set(x, y, d / 2 + 0.05);
+      g.add(win1);
+      const win2 = win1.clone();
+      win2.position.z = -d / 2 - 0.05;
+      g.add(win2);
+    }
+    for (let c = 0; c < colsZ; c++) {
+      const z = -d / 2 + 3 + c * 5;
+      const win1 = new THREE.Mesh(new THREE.BoxGeometry(0.1, 2.2, 2), windowMat);
+      win1.position.set(w / 2 + 0.05, y, z);
+      g.add(win1);
+      const win2 = win1.clone();
+      win2.position.x = -w / 2 - 0.05;
+      g.add(win2);
+    }
+  }
+
+  return g;
+}
+
+// مباني سياقية خلف المكتب (للخلفية)
+for (let i = 0; i < 8; i++) {
+  const w = 20 + Math.random() * 15;
+  const h = 15 + Math.random() * 20;
+  const d = 20 + Math.random() * 15;
+  const b = makeContextBuilding(w, h, d);
+  b.position.set(
+    (i - 3.5) * 50 + (Math.random() - 0.5) * 20,
+    0,
+    -BUILDING_D / 2 - 100 - Math.random() * 80
+  );
+  b.rotation.y = (Math.random() - 0.5) * 0.3;
+  scene.add(b);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  مبنى المكتب — الهيكل الخارجي
+// ═══════════════════════════════════════════════════════════
+
+const officeGroup = new THREE.Group();
+scene.add(officeGroup);
+
+// ═══ الإعدادات ═══
+const ROOM = 60;
+const WALL_H = 20;
+const WALL_T = 1;
+const ROOMS_X = 5;   // 5 أعمدة
+const ROOMS_Z = 3;   // 3 صفوف
+
+// ═══ المواد ═══
+const floorMat = new THREE.MeshLambertMaterial({ color: 0xE8E4D8 });
+const wallMat = new THREE.MeshLambertMaterial({ color: 0xF5F2EC });
+const wallOuterMat = new THREE.MeshLambertMaterial({ color: 0xFFFFFF });
+const glassMat = new THREE.MeshLambertMaterial({
+  color: 0x88C8E8, transparent: true, opacity: 0.45,
+  emissive: 0x2A5A7A, emissiveIntensity: 0.15
+});
+const roofMat = new THREE.MeshLambertMaterial({ color: 0xD8D4C8 });
+
+// ═══ الأرضية الإجمالية ═══
+const totalW = ROOMS_X * ROOM + (ROOMS_X - 1) * WALL_T;
+const totalD = ROOMS_Z * ROOM + (ROOMS_Z - 1) * WALL_T;
+
+const floor = new THREE.Mesh(
+  new THREE.BoxGeometry(totalW + 4, 0.6, totalD + 4),
+  floorMat
+);
+floor.position.y = -0.3;
+floor.receiveShadow = true;
+officeGroup.add(floor);
+
+// ═══ البلاط على الأرضية ═══
+const tileMat = new THREE.MeshLambertMaterial({ color: 0xDCD8CC });
+for (let x = 0; x < ROOMS_X; x++) {
+  for (let z = 0; z < ROOMS_Z; z++) {
+    const tx = -totalW / 2 + ROOM / 2 + x * (ROOM + WALL_T);
+    const tz = -totalD / 2 + ROOM / 2 + z * (ROOM + WALL_T);
+
+    // نرسم مربعات صغيرة داخل كل غرفة (تأثير بلاط)
+    const tilesPerSide = 4;
+    const tileSize = ROOM / tilesPerSide - 0.5;
+    for (let i = 0; i < tilesPerSide; i++) {
+      for (let j = 0; j < tilesPerSide; j++) {
+        const tile = new THREE.Mesh(
+          new THREE.BoxGeometry(tileSize, 0.05, tileSize),
+          (i + j) % 2 === 0 ? tileMat : floorMat
+        );
+        tile.position.set(
+          tx - ROOM / 2 + tileSize / 2 + i * (tileSize + 0.5) + 0.25,
+          0.05,
+          tz - ROOM / 2 + tileSize / 2 + j * (tileSize + 0.5) + 0.25
+        );
+        tile.receiveShadow = true;
+        officeGroup.add(tile);
+      }
+    }
+  }
+}
+
+// ═══ الجدران الداخلية بين الغرف ═══
+for (let x = 0; x < ROOMS_X - 1; x++) {
+  for (let z = 0; z < ROOMS_Z; z++) {
+    const wall = new THREE.Mesh(
+      new THREE.BoxGeometry(WALL_T, WALL_H, ROOM),
+      wallMat
+    );
+    wall.position.set(
+      -totalW / 2 + ROOM + x * (ROOM + WALL_T) + WALL_T / 2,
+      WALL_H / 2,
+      -totalD / 2 + ROOM / 2 + z * (ROOM + WALL_T)
+    );
+    wall.castShadow = true;
+    wall.receiveShadow = true;
+    officeGroup.add(wall);
+  }
+}
+
+// ═══ الجدران بين الصفوف ═══
+for (let z = 0; z < ROOMS_Z - 1; z++) {
+  for (let x = 0; x < ROOMS_X; x++) {
+    const wall = new THREE.Mesh(
+      new THREE.BoxGeometry(ROOM, WALL_H, WALL_T),
+      wallMat
+    );
+    wall.position.set(
+      -totalW / 2 + ROOM / 2 + x * (ROOM + WALL_T),
+      WALL_H / 2,
+      -totalD / 2 + ROOM + z * (ROOM + WALL_T) + WALL_T / 2
+    );
+    wall.castShadow = true;
+    wall.receiveShadow = true;
+    officeGroup.add(wall);
+  }
+}
+
+// ═══ الجدار الخارجي — الشمال (بزجاج) ═══
+for (let x = 0; x < ROOMS_X; x++) {
+  const cx = -totalW / 2 + ROOM / 2 + x * (ROOM + WALL_T);
+  // زجاج
+  const glass = new THREE.Mesh(
+    new THREE.BoxGeometry(ROOM - 6, WALL_H - 4, 0.3),
+    glassMat
+  );
+  glass.position.set(cx, WALL_H / 2, -totalD / 2 - 0.15);
+  officeGroup.add(glass);
+
+  // إطار الزجاج
+  const frameMat = new THREE.MeshLambertMaterial({ color: 0x1A1A1A });
+  const frameTop = new THREE.Mesh(new THREE.BoxGeometry(ROOM - 5, 0.4, 0.4), frameMat);
+  frameTop.position.set(cx, WALL_H - 2, -totalD / 2 - 0.15);
+  officeGroup.add(frameTop);
+  const frameBot = frameTop.clone();
+  frameBot.position.y = 2;
+  officeGroup.add(frameBot);
+
+  const frameL = new THREE.Mesh(new THREE.BoxGeometry(0.4, WALL_H - 4, 0.4), frameMat);
+  frameL.position.set(cx - (ROOM - 6) / 2, WALL_H / 2, -totalD / 2 - 0.15);
+  officeGroup.add(frameL);
+  const frameR = frameL.clone();
+  frameR.position.x = cx + (ROOM - 6) / 2;
+  officeGroup.add(frameR);
+}
+
+// ═══ الجدار الجنوبي — المدخل ═══
+for (let x = 0; x < ROOMS_X; x++) {
+  const cx = -totalW / 2 + ROOM / 2 + x * (ROOM + WALL_T);
+  // زجاج للنوافذ
+  const glass = new THREE.Mesh(
+    new THREE.BoxGeometry(ROOM - 6, WALL_H - 4, 0.3),
+    glassMat
+  );
+  glass.position.set(cx, WALL_H / 2, totalD / 2 + 0.15);
+  officeGroup.add(glass);
+}
+
+// ═══ الجدران الجانبية (شرق + غرب) ═══
+for (let z = 0; z < ROOMS_Z; z++) {
+  const cz = -totalD / 2 + ROOM / 2 + z * (ROOM + WALL_T);
+
+  const wallW = new THREE.Mesh(
+    new THREE.BoxGeometry(0.3, WALL_H, ROOM),
+    wallOuterMat
+  );
+  wallW.position.set(-totalW / 2 - 0.15, WALL_H / 2, cz);
+  wallW.castShadow = true;
+  officeGroup.add(wallW);
+
+  const wallE = wallW.clone();
+  wallE.position.x = totalW / 2 + 0.15;
+  officeGroup.add(wallE);
+}
+
+// ═══ السقف ═══
+const roof = new THREE.Mesh(
+  new THREE.BoxGeometry(totalW + 6, 0.8, totalD + 6),
+  roofMat
+);
+roof.position.y = WALL_H + 0.4;
+roof.castShadow = true;
+officeGroup.add(roof);
+
+// ═══ باب المدخل الرئيسي ═══
+const doorMat = new THREE.MeshLambertMaterial({ color: 0x8B6F47 });
+const door = new THREE.Mesh(new THREE.BoxGeometry(8, 14, 0.4), doorMat);
+door.position.set(0, 7, totalD / 2 + 0.25);
+officeGroup.add(door);
+
+// مقبض
+const handleMat = new THREE.MeshLambertMaterial({ color: 0xD4AF37 });
+const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 1.2, 8), handleMat);
+handle.position.set(2, 7, totalD / 2 + 0.5);
+handle.rotation.x = Math.PI / 2;
+officeGroup.add(handle);
+
+// ═══ لافتة فوق الباب ═══
+const signMat = new THREE.MeshLambertMaterial({ color: 0x1A1A1A });
+const sign = new THREE.Mesh(new THREE.BoxGeometry(20, 3, 0.3), signMat);
+sign.position.set(0, 16, totalD / 2 + 0.3);
+officeGroup.add(sign);
+
+// ═══ شريط ذهبي فوق اللافتة ═══
+const stripeMat = new THREE.MeshLambertMaterial({ color: 0xD4AF37 });
+const stripe = new THREE.Mesh(new THREE.BoxGeometry(20, 0.3, 0.35), stripeMat);
+stripe.position.set(0, 17.7, totalD / 2 + 0.32);
+officeGroup.add(stripe);
+
+// ═══ منحدر المدخل ═══
+const rampMat = new THREE.MeshLambertMaterial({ color: 0xD8D4C8 });
+const ramp = new THREE.Mesh(new THREE.BoxGeometry(20, 1, 8), rampMat);
+ramp.position.set(0, 0.2, totalD / 2 + 4);
+ramp.receiveShadow = true;
+officeGroup.add(ramp);
+
+// ═══ درابزين المدخل ═══
+const railMat = new THREE.MeshLambertMaterial({ color: 0x8B8B85 });
+for (let side of [-1, 1]) {
+  const rail = new THREE.Mesh(new THREE.BoxGeometry(0.4, 1.2, 8), railMat);
+  rail.position.set(side * 10, 1, totalD / 2 + 4);
+  officeGroup.add(rail);
+}
+
+// ═══ الأشجار حول المبنى ═══
+const trunkMat2 = new THREE.MeshLambertMaterial({ color: 0x5D4037 });
+const leafMat2 = new THREE.MeshLambertMaterial({ color: 0x4A8B3A });
+
+function makeOutsideTree(x, z) {
+  const g = new THREE.Group();
+
+  const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.7, 4, 6), trunkMat2);
+  trunk.position.y = 2;
+  trunk.castShadow = true;
+  g.add(trunk);
+
+  const leaves = new THREE.Mesh(new THREE.SphereGeometry(3, 10, 8), leafMat2);
+  leaves.position.y = 5.5;
+  leaves.castShadow = true;
+  g.add(leaves);
+
+  g.position.set(x, 0, z);
+  return g;
+}
+
+// أشجار حول المبنى
+for (let i = 0; i < 6; i++) {
+  officeGroup.add(makeOutsideTree(-120 + i * 48, -totalD / 2 - 50));
+  officeGroup.add(makeOutsideTree(-120 + i * 48, totalD / 2 + 50));
+}
+
+// شجيرات
+const bushMat = new THREE.MeshLambertMaterial({ color: 0x5A9B4A });
+for (let i = 0; i < 8; i++) {
+  const bush = new THREE.Mesh(new THREE.SphereGeometry(2, 8, 6), bushMat);
+  bush.position.set(-totalW / 2 + 10 + i * (totalW - 20) / 8, 1, totalD / 2 + 12);
+  bush.castShadow = true;
+  officeGroup.add(bush);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  الأثاث الداخلي — مكتبي حديث
+// ═══════════════════════════════════════════════════════════
+
+// المواد
+const deskWoodMat = new THREE.MeshLambertMaterial({ color: 0x9B7B5A });
+const deskTopMat = new THREE.MeshLambertMaterial({ color: 0xE8DCC8 });
+const chairMat = new THREE.MeshLambertMaterial({ color: 0x4A7A5A });
+const chairOrangeMat = new THREE.MeshLambertMaterial({ color: 0xE07A3A });
+const chairDarkMat = new THREE.MeshLambertMaterial({ color: 0x2A2A2A });
+const screenMat = new THREE.MeshLambertMaterial({
+  color: 0x1A3A5A, emissive: 0x4A8AC0, emissiveIntensity: 0.7
+});
+const screenBodyMat = new THREE.MeshLambertMaterial({ color: 0x1A1A1A });
+const plantPotMat = new THREE.MeshLambertMaterial({ color: 0xA85A3A });
+const plantLeafMat = new THREE.MeshLambertMaterial({ color: 0x4A8B3A });
+const glassWallMat = new THREE.MeshLambertMaterial({
+  color: 0x88C8E8, transparent: true, opacity: 0.25,
+  emissive: 0x2A5A7A, emissiveIntensity: 0.1
+});
+const glassFrameMat = new THREE.MeshLambertMaterial({ color: 0x1A1A1A });
+const boardMat = new THREE.MeshLambertMaterial({ color: 0xB89068 });
+const sofaMat = new THREE.MeshLambertMaterial({ color: 0x3A7A4A });
+const carpetMat = new THREE.MeshLambertMaterial({ color: 0xC8B8A0 });
+
+// ═══ مكتب ═══
+function makeDesk() {
+  const g = new THREE.Group();
+
+  // السطح
+  const top = new THREE.Mesh(new THREE.BoxGeometry(10, 0.4, 5), deskTopMat);
+  top.position.y = 3;
+  top.castShadow = true;
+  top.receiveShadow = true;
+  g.add(top);
+
+  // الأرجل
+  for (let x of [-4.5, 4.5]) {
+    for (let z of [-2, 2]) {
+      const leg = new THREE.Mesh(new THREE.BoxGeometry(0.4, 3, 0.4), deskWoodMat);
+      leg.position.set(x, 1.5, z);
+      leg.castShadow = true;
+      g.add(leg);
+    }
+  }
+
+  // حاسوب
+  const monitor = new THREE.Mesh(new THREE.BoxGeometry(4, 2.6, 0.2), screenBodyMat);
+  monitor.position.set(0, 4.5, -0.5);
+  monitor.castShadow = true;
+  g.add(monitor);
+
+  const screen = new THREE.Mesh(new THREE.BoxGeometry(3.6, 2.2, 0.05), screenMat);
+  screen.position.set(0, 4.5, -0.38);
+  g.add(screen);
+
+  // ستاند الشاشة
+  const stand = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 1.5, 8), screenBodyMat);
+  stand.position.set(0, 3.9, -0.5);
+  g.add(stand);
+
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, 0.15, 12), screenBodyMat);
+  base.position.set(0, 3.2, -0.5);
+  g.add(base);
+
+  // لوحة مفاتيح
+  const keyboard = new THREE.Mesh(new THREE.BoxGeometry(3.5, 0.15, 1.2), screenBodyMat);
+  keyboard.position.set(0, 3.25, 1);
+  g.add(keyboard);
+
+  // كوب قهوة
+  const cup = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.4, 0.4, 0.8, 12),
+    new THREE.MeshLambertMaterial({ color: 0xFFFFFF })
+  );
+  cup.position.set(3.5, 3.6, 1);
+  g.add(cup);
+
+  return g;
+}
+
+// ═══ كرسي مكتب ═══
+function makeOfficeChair(colorMat) {
+  const g = new THREE.Group();
+
+  // المقعد
+  const seat = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.5, 2.5), colorMat);
+  seat.position.y = 1.8;
+  seat.castShadow = true;
+  g.add(seat);
+
+  // الظهر
+  const back = new THREE.Mesh(new THREE.BoxGeometry(2.5, 3, 0.4), colorMat);
+  back.position.set(0, 3.3, -1.05);
+  back.castShadow = true;
+  g.add(back);
+
+  // الأرجل (نجمة)
+  const legMat = new THREE.MeshLambertMaterial({ color: 0x1A1A1A });
+  for (let i = 0; i < 5; i++) {
+    const angle = (i / 5) * Math.PI * 2;
+    const leg = new THREE.Mesh(new THREE.BoxGeometry(0.2, 1.8, 0.2), legMat);
+    leg.position.set(Math.cos(angle) * 1.2, 0.9, Math.sin(angle) * 1.2);
+    leg.rotation.y = angle;
+    leg.rotation.x = 0.3;
+    g.add(leg);
+  }
+
+  // العجلات
+  for (let i = 0; i < 5; i++) {
+    const angle = (i / 5) * Math.PI * 2;
+    const wheel = new THREE.Mesh(
+      new THREE.SphereGeometry(0.25, 8, 6),
+      legMat
+    );
+    wheel.position.set(Math.cos(angle) * 2, 0.25, Math.sin(angle) * 2);
+    g.add(wheel);
+  }
+
+  return g;
+}
+
+// ═══ نبتة ═══
+function makePlant(variant) {
+  const g = new THREE.Group();
+
+  // الأصيص
+  const pot = new THREE.Mesh(
+    new THREE.CylinderGeometry(1.2, 0.9, 2, 12),
+    plantPotMat
+  );
+  pot.position.y = 1;
+  pot.castShadow = true;
+  g.add(pot);
+
+  // التربة
+  const soil = new THREE.Mesh(
+    new THREE.CylinderGeometry(1.1, 1.1, 0.2, 12),
+    new THREE.MeshLambertMaterial({ color: 0x3A2A1A })
+  );
+  soil.position.y = 2;
+  g.add(soil);
+
+  if (variant === 'big') {
+    // نخلة داخلية
+    const trunk = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.15, 0.2, 6, 6),
+      new THREE.MeshLambertMaterial({ color: 0x6A5A3A })
+    );
+    trunk.position.y = 5;
+    trunk.castShadow = true;
+    g.add(trunk);
+
+    for (let i = 0; i < 6; i++) {
+      const angle = (i / 6) * Math.PI * 2;
+      const leaf = new THREE.Mesh(
+        new THREE.ConeGeometry(0.8, 4, 4),
+        plantLeafMat
+      );
+      leaf.position.y = 8;
+      leaf.rotation.z = Math.PI / 2.5;
+      leaf.rotation.y = angle;
+      leaf.position.x = Math.cos(angle) * 1.5;
+      leaf.position.z = Math.sin(angle) * 1.5;
+      leaf.castShadow = true;
+      g.add(leaf);
+    }
+  } else if (variant === 'cactus') {
+    const cactus = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.6, 0.6, 3, 12),
+      plantLeafMat
+    );
+    cactus.position.y = 3.5;
+    cactus.castShadow = true;
+    g.add(cactus);
+
+    const arm1 = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 2, 8), plantLeafMat);
+    arm1.position.set(0.7, 3, 0);
+    arm1.rotation.z = -0.5;
+    arm1.castShadow = true;
+    g.add(arm1);
+  } else {
+    // نبات عادي
+    const leaves1 = new THREE.Mesh(new THREE.SphereGeometry(1.5, 8, 6), plantLeafMat);
+    leaves1.position.y = 3.5;
+    leaves1.castShadow = true;
+    g.add(leaves1);
+
+    const leaves2 = new THREE.Mesh(new THREE.SphereGeometry(1.2, 8, 6), plantLeafMat);
+    leaves2.position.set(0.6, 4.2, 0.3);
+    leaves2.castShadow = true;
+    g.add(leaves2);
+  }
+
+  return g;
+}
+
+// ═══ فاصل زجاجي ═══
+function makeGlassDivider(width, height) {
+  const g = new THREE.Group();
+
+  // الزجاج
+  const glass = new THREE.Mesh(
+    new THREE.BoxGeometry(width - 0.6, height - 0.6, 0.15),
+    glassWallMat
+  );
+  glass.position.y = height / 2;
+  g.add(glass);
+
+  // الإطار
+  const frameTop = new THREE.Mesh(
+    new THREE.BoxGeometry(width, 0.4, 0.3),
+    glassFrameMat
+  );
+  frameTop.position.y = height;
+  frameTop.castShadow = true;
+  g.add(frameTop);
+
+  const frameBot = frameTop.clone();
+  frameBot.position.y = 0.2;
+  g.add(frameBot);
+
+  for (let x of [-width / 2 + 0.2, 0, width / 2 - 0.2]) {
+    const frameV = new THREE.Mesh(
+      new THREE.BoxGeometry(0.3, height, 0.3),
+      glassFrameMat
+    );
+    frameV.position.set(x, height / 2, 0);
+    frameV.castShadow = true;
+    g.add(frameV);
+  }
+
+  return g;
+}
+
+// ═══ لوحة إعلانات خشبية ═══
+function makeNoticeBoard() {
+  const g = new THREE.Group();
+
+  const board = new THREE.Mesh(
+    new THREE.BoxGeometry(8, 6, 0.4),
+    boardMat
+  );
+  board.position.y = 8;
+  board.castShadow = true;
+  g.add(board);
+
+  // إطار
+  const frameMat = new THREE.MeshLambertMaterial({ color: 0x5A3A28 });
+  const frameTop = new THREE.Mesh(new THREE.BoxGeometry(8.4, 0.4, 0.5), frameMat);
+  frameTop.position.set(0, 11.2, 0);
+  g.add(frameTop);
+  const frameBot = frameTop.clone();
+  frameBot.position.y = 4.8;
+  g.add(frameBot);
+
+  // أوراق ملونة
+  const paperColors = [0xFFFFFF, 0xFFF8DC, 0xFFE4B5, 0xE0F0FF];
+  for (let i = 0; i < 5; i++) {
+    const paper = new THREE.Mesh(
+      new THREE.BoxGeometry(1.2, 1.6, 0.05),
+      new THREE.MeshLambertMaterial({
+        color: paperColors[i % paperColors.length]
+      })
+    );
+    paper.position.set(-3 + i * 1.5, 8 + (i % 2 === 0 ? 1 : -1), 0.25);
+    paper.rotation.z = (Math.random() - 0.5) * 0.2;
+    g.add(paper);
+  }
+
+  return g;
+}
+
+// ═══ كنبة ═══
+function makeSofa() {
+  const g = new THREE.Group();
+
+  // المقعد
+  const seat = new THREE.Mesh(new THREE.BoxGeometry(8, 1, 3), sofaMat);
+  seat.position.y = 1.5;
+  seat.castShadow = true; seat.receiveShadow = true;
+  g.add(seat);
+
+  // الظهر
+  const back = new THREE.Mesh(new THREE.BoxGeometry(8, 3, 1), sofaMat);
+  back.position.set(0, 3, -1);
+  back.castShadow = true;
+  g.add(back);
+
+  // المساند
+  for (let x of [-3.5, 3.5]) {
+    const arm = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 3), sofaMat);
+    arm.position.set(x, 2, 0);
+    arm.castShadow = true;
+    g.add(arm);
+  }
+
+  return g;
+}
+
+// ═══ طاولة اجتماعات ═══
+function makeMeetingTable() {
+  const g = new THREE.Group();
+
+  const top = new THREE.Mesh(new THREE.BoxGeometry(20, 0.5, 8), deskTopMat);
+  top.position.y = 3.5;
+  top.castShadow = true;
+  top.receiveShadow = true;
+  g.add(top);
+
+  for (let x of [-8, 0, 8]) {
+    for (let z of [-3, 3]) {
+      const leg = new THREE.Mesh(new THREE.BoxGeometry(0.5, 3.5, 0.5), deskWoodMat);
+      leg.position.set(x, 1.75, z);
+      leg.castShadow = true;
+      g.add(leg);
+    }
+  }
+
+  return g;
+}
+
+// ═══ شاشة عرض ═══
+function makeDisplayScreen() {
+  const g = new THREE.Group();
+
+  const screen = new THREE.Mesh(
+    new THREE.BoxGeometry(10, 6, 0.3),
+    new THREE.MeshLambertMaterial({
+      color: 0x1A3A5A, emissive: 0x4A8AC0, emissiveIntensity: 0.5
+    })
+  );
+  screen.position.y = 10;
+  screen.castShadow = true;
+  g.add(screen);
+
+  // حامل
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 7, 8), screenBodyMat);
+  pole.position.y = 3.5;
+  g.add(pole);
+
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.5, 0.3, 12), screenBodyMat);
+  base.position.y = 0.15;
+  g.add(base);
+
+  return g;
+}
+
+// ═══ خزانة كتب ═══
+function makeBookshelf() {
+  const g = new THREE.Group();
+
+  const frame = new THREE.Mesh(new THREE.BoxGeometry(8, 12, 2), boardMat);
+  frame.position.y = 6;
+  frame.castShadow = true;
+  g.add(frame);
+
+  // كتب ملونة
+  const bookColors = [0xE53935, 0x1E88E5, 0x43A047, 0xFDD835, 0x8E24AA, 0xFB8C00];
+  for (let shelf = 0; shelf < 4; shelf++) {
+    const y = 3 + shelf * 2.5;
+    for (let i = 0; i < 6; i++) {
+      const book = new THREE.Mesh(
+        new THREE.BoxGeometry(0.5, 1.8, 1.5),
+        new THREE.MeshLambertMaterial({
+          color: bookColors[(i + shelf) % bookColors.length]
+        })
+      );
+      book.position.set(-3 + i * 1.1, y, 0);
+      g.add(book);
+    }
+  }
+
+  return g;
+}
+
+// ═══ سجادة ═══
+function makeCarpet(width, depth, color) {
+  const mat = new THREE.MeshLambertMaterial({ color });
+  const carpet = new THREE.Mesh(new THREE.BoxGeometry(width, 0.1, depth), mat);
+  carpet.position.y = 0.1;
+  carpet.receiveShadow = true;
+  return carpet;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  7 غرف أُمّة — الترتيب في المبنى
+// ═══════════════════════════════════════════════════════════
+
+// ترتيب الغرف في الشبكة (5 أعمدة × 3 صفوف)
+const roomGrid = [
+  // الصف الأول (الأمامي - المدخل)
+  { id: 'parliament', num: '01', name: 'البرلمان', icon: '🏛️', activity: 'ParliamentActivity', gridX: 0, gridZ: 2, color: 0xE8DCC8 },
+  { id: 'court',      num: '02', name: 'المحكمة',   icon: '⚖️', activity: 'CourtActivity',       gridX: 1, gridZ: 2, color: 0xF0E8D0 },
+  { id: 'treasury',   num: '03', name: 'الخزينة',   icon: '🏦', activity: 'TreasuryActivity',     gridX: 2, gridZ: 2, color: 0xE8D8A8 },
+  { id: 'president',  num: '04', name: 'الرئاسة',   icon: '🏢', activity: 'PresidentDashboardActivity', gridX: 3, gridZ: 2, color: 0xD8E4F0 },
+  { id: 'market',     num: '05', name: 'السوق',     icon: '🛒', activity: 'MarketActivity',       gridX: 4, gridZ: 2, color: 0xF0E8B8 },
+  // الصف الثاني (الأوسط)
+  { id: 'news',       num: '06', name: 'الأخبار',   icon: '📰', activity: 'NewsActivity',         gridX: 1, gridZ: 1, color: 0xE8E8F0 },
+  { id: 'rewards',    num: '07', name: 'الجوائز',   icon: '🎖️', activity: 'LeaderboardActivity', gridX: 3, gridZ: 1, color: 0xF0E0C8 },
+];
+
+// نبني كل غرفة
+const roomObjects = [];
+
+for (const room of roomGrid) {
+  const roomGroup = new THREE.Group();
+
+  // إحداثيات مركز الغرفة
+  const cx = -totalW / 2 + ROOM / 2 + room.gridX * (ROOM + WALL_T);
+  const cz = -totalD / 2 + ROOM / 2 + room.gridZ * (ROOM + WALL_T);
+
+  roomGroup.position.set(cx, 0, cz);
+  roomGroup.userData = room;
+
+  // ═══ سجادة الغرفة ═══
+  const carpet = makeCarpet(ROOM - 8, ROOM - 8, room.color);
+  carpet.position.y = 0.12;
+  roomGroup.add(carpet);
+
+  // ═══ التصميم حسب نوع الغرفة ═══
+
+  if (room.id === 'parliament') {
+    // منصة + 5 كراسي
+    const podium = new THREE.Mesh(
+      new THREE.BoxGeometry(15, 3, 10),
+      new THREE.MeshLambertMaterial({ color: 0xD4C8B0 })
+    );
+    podium.position.set(0, 1.5, -15);
+    podium.castShadow = true;
+    roomGroup.add(podium);
+
+    // كرسي رئيس البرلمان
+    const chair = makeOfficeChair(chairDarkMat);
+    chair.position.set(0, 0, -14);
+    chair.rotation.y = Math.PI;
+    roomGroup.add(chair);
+
+    // 4 كراسي أمامه
+    for (let i = 0; i < 4; i++) {
+      const c = makeOfficeChair(chairOrangeMat);
+      c.position.set((i - 1.5) * 10, 0, 5);
+      roomGroup.add(c);
+    }
+
+    // شاشة عرض
+    const screen = makeDisplayScreen();
+    screen.position.set(0, 0, 22);
+    screen.rotation.y = Math.PI;
+    roomGroup.add(screen);
+  }
+  else if (room.id === 'court') {
+    // منصة القاضي
+    const bench = new THREE.Mesh(
+      new THREE.BoxGeometry(18, 5, 5),
+      new THREE.MeshLambertMaterial({ color: 0x8B6F47 })
+    );
+    bench.position.set(0, 2.5, -18);
+    bench.castShadow = true;
+    roomGroup.add(bench);
+
+    // كرسي القاضي
+    const judgeChair = makeOfficeChair(chairDarkMat);
+    judgeChair.position.set(0, 0, -20);
+    roomGroup.add(judgeChair);
+
+    // منصة الشاهد (وسط)
+    const witness = new THREE.Mesh(
+      new THREE.BoxGeometry(4, 4, 3),
+      new THREE.MeshLambertMaterial({ color: 0x9B7B5A })
+    );
+    witness.position.set(0, 2, 0);
+    witness.castShadow = true;
+    roomGroup.add(witness);
+
+    // مقاعد الجمهور
+    for (let r = 0; r < 3; r++) {
+      for (let i = 0; i < 5; i++) {
+        const seat = makeOfficeChair(chairOrangeMat);
+        seat.position.set((i - 2) * 8, 0, 12 + r * 8);
+        roomGroup.add(seat);
+      }
+    }
+  }
+  else if (room.id === 'treasury') {
+    // خزنة كبيرة ذهبية
+    const vault = new THREE.Mesh(
+      new THREE.BoxGeometry(12, 12, 4),
+      new THREE.MeshLambertMaterial({ color: 0xD4AF37 })
+    );
+    vault.position.set(0, 6, -18);
+    vault.castShadow = true;
+    roomGroup.add(vault);
+
+    // دائرة ذهبية على الخزنة
+    const dial = new THREE.Mesh(
+      new THREE.CylinderGeometry(2, 2, 0.5, 16),
+      new THREE.MeshLambertMaterial({ color: 0xA08020 })
+    );
+    dial.rotation.x = Math.PI / 2;
+    dial.position.set(0, 6, -15.8);
+    roomGroup.add(dial);
+
+    // مكتب
+    const desk = makeDesk();
+    desk.position.set(0, 0, 10);
+    desk.rotation.y = Math.PI;
+    roomGroup.add(desk);
+
+    // كرسي
+    const chair = makeOfficeChair(chairDarkMat);
+    chair.position.set(0, 0, 15);
+    roomGroup.add(chair);
+
+    // سجادة ذهبية
+    const goldCarpet = makeCarpet(20, 15, 0xE8D8A8);
+    goldCarpet.position.set(0, 0.15, 0);
+    roomGroup.add(goldCarpet);
+  }
+  else if (room.id === 'president') {
+    // مكتب فاخر
+    const deskTop = new THREE.Mesh(
+      new THREE.BoxGeometry(14, 0.6, 6),
+      new THREE.MeshLambertMaterial({ color: 0x8B6F47 })
+    );
+    deskTop.position.set(0, 3.5, -10);
+    deskTop.castShadow = true;
+    roomGroup.add(deskTop);
+
+    // كرسي الرئاسة (فخم)
+    const throne = new THREE.Mesh(
+      new THREE.BoxGeometry(3, 4, 3),
+      new THREE.MeshLambertMaterial({ color: 0x8B3A2A })
+    );
+    throne.position.set(0, 2, -14);
+    throne.castShadow = true;
+    roomGroup.add(throne);
+
+    // مسند الظهر العالي
+    const backRest = new THREE.Mesh(
+      new THREE.BoxGeometry(3, 6, 0.5),
+      new THREE.MeshLambertMaterial({ color: 0x8B3A2A })
+    );
+    backRest.position.set(0, 5, -15.5);
+    backRest.castShadow = true;
+    roomGroup.add(backRest);
+
+    // لوحة على الجدار
+    const portrait = new THREE.Mesh(
+      new THREE.BoxGeometry(8, 10, 0.3),
+      new THREE.MeshLambertMaterial({ color: 0xD4AF37 })
+    );
+    portrait.position.set(0, 11, -27);
+    roomGroup.add(portrait);
+
+    // كراسي للزوار
+    for (let i = 0; i < 2; i++) {
+      const chair = makeOfficeChair(chairDarkMat);
+      chair.position.set((i - 0.5) * 8, 0, 5);
+      chair.rotation.y = Math.PI;
+      roomGroup.add(chair);
+    }
+  }
+  else if (room.id === 'market') {
+    // 4 أرفف عرض
+    for (let i = 0; i < 4; i++) {
+      const shelf = new THREE.Mesh(
+        new THREE.BoxGeometry(6, 10, 1.5),
+        new THREE.MeshLambertMaterial({ color: 0xA88A5A })
+      );
+      shelf.position.set((i - 1.5) * 12, 5, -15);
+      shelf.castShadow = true;
+      roomGroup.add(shelf);
+
+      // منتجات ملونة على الرف
+      for (let s = 0; s < 3; s++) {
+        for (let j = 0; j < 3; j++) {
+          const item = new THREE.Mesh(
+            new THREE.BoxGeometry(1.2, 1.2, 1),
+            new THREE.MeshLambertMaterial({
+              color: [0xE53935, 0x1E88E5, 0x43A047, 0xFDD835, 0x8E24AA, 0xFB8C00][(i + s + j) % 6]
+            })
+          );
+          item.position.set(
+            (i - 1.5) * 12 + (j - 1) * 1.5,
+            3 + s * 3,
+            -14.3
+          );
+          roomGroup.add(item);
+        }
+      }
+    }
+
+    // مكتب الكاشير
+    const cashier = makeDesk();
+    cashier.position.set(0, 0, 12);
+    cashier.rotation.y = Math.PI;
+    roomGroup.add(cashier);
+  }
+  else if (room.id === 'news') {
+    // طاولة اجتماعات
+    const table = makeMeetingTable();
+    table.position.set(0, 0, 0);
+    roomGroup.add(table);
+
+    // 6 كراسي حول الطاولة
+    for (let i = 0; i < 3; i++) {
+      const chair1 = makeOfficeChair(chairMat);
+      chair1.position.set((i - 1) * 6, 0, -6);
+      chair1.rotation.y = Math.PI;
+      roomGroup.add(chair1);
+
+      const chair2 = makeOfficeChair(chairOrangeMat);
+      chair2.position.set((i - 1) * 6, 0, 6);
+      roomGroup.add(chair2);
+    }
+
+    // شاشة عرض
+    const screen = makeDisplayScreen();
+    screen.position.set(0, 0, 22);
+    screen.rotation.y = Math.PI;
+    roomGroup.add(screen);
+
+    // لوحة إعلانات
+    const board = makeNoticeBoard();
+    board.position.set(-22, 0, 0);
+    board.rotation.y = Math.PI / 2;
+    roomGroup.add(board);
+  }
+  else if (room.id === 'rewards') {
+    // رفوف الجوائز
+    for (let i = 0; i < 3; i++) {
+      const shelf = makeBookshelf();
+      shelf.position.set((i - 1) * 15, 0, -20);
+      roomGroup.add(shelf);
+    }
+
+    // منصة الكأس الذهبي في الوسط
+    const pedestal = new THREE.Mesh(
+      new THREE.CylinderGeometry(3, 4, 5, 12),
+      new THREE.MeshLambertMaterial({ color: 0xD8D4C8 })
+    );
+    pedestal.position.set(0, 2.5, 5);
+    pedestal.castShadow = true;
+    roomGroup.add(pedestal);
+
+    // الكأس
+    const cup = new THREE.Mesh(
+      new THREE.CylinderGeometry(2, 1.5, 4, 16),
+      new THREE.MeshLambertMaterial({ color: 0xD4AF37 })
+    );
+    cup.position.set(0, 7, 5);
+    cup.castShadow = true;
+    roomGroup.add(cup);
+
+    // مقابض الكأس
+    for (let side of [-1, 1]) {
+      const handle = new THREE.Mesh(
+        new THREE.TorusGeometry(1, 0.3, 8, 16),
+        new THREE.MeshLambertMaterial({ color: 0xD4AF37 })
+      );
+      handle.position.set(side * 2.2, 7, 5);
+      handle.rotation.y = Math.PI / 2;
+      roomGroup.add(handle);
+    }
+
+    // نبتات حول الكأس
+    for (let i = 0; i < 4; i++) {
+      const angle = (i / 4) * Math.PI * 2;
+      const plant = makePlant('small');
+      plant.position.set(Math.cos(angle) * 12, 0, 5 + Math.sin(angle) * 12);
+      roomGroup.add(plant);
+    }
+  }
+
+  // ═══ الفواصل الزجاجية ═══
+  // فاصل أمامي (الجنوب)
+  const dividerFront = makeGlassDivider(ROOM - 4, 8);
+  dividerFront.position.set(0, 0, ROOM / 2 - 0.5);
+  roomGroup.add(dividerFront);
+
+  // ═══ عناصر ثابتة في كل غرفة ═══
+  // نبتة في زاوية
+  const cornerPlant = makePlant('small');
+  cornerPlant.position.set(-ROOM / 2 + 4, 0, -ROOM / 2 + 4);
+  roomGroup.add(cornerPlant);
+
+  // لوحة على الجدار
+  const wallArt = new THREE.Mesh(
+    new THREE.BoxGeometry(6, 4, 0.2),
+    new THREE.MeshLambertMaterial({ color: 0xE8D8A8 })
+  );
+  wallArt.position.set(ROOM / 2 - 4, 12, -ROOM / 2 + 0.15);
+  roomGroup.add(wallArt);
+
+  officeGroup.add(roomGroup);
+  roomObjects.push(roomGroup);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  قائمة الغرف الجانبية
+// ═══════════════════════════════════════════════════════════
+
+const roomsListEl = document.getElementById('roomsList');
+
+for (const room of roomGrid) {
+  const item = document.createElement('div');
+  item.className = 'room-item';
+  item.dataset.roomId = room.id;
+  item.innerHTML = `
+    <span class="room-num">${room.num}</span>
+    <span class="room-name">${room.icon} ${room.name}</span>
+  `;
+  item.onclick = () => focusRoom(room);
+  roomsListEl.appendChild(item);
+}
+
+let activeRoomId = null;
+
+function focusRoom(room) {
+  // نلغّي التحديد القديم
+  document.querySelectorAll('.room-item').forEach(el => el.classList.remove('active'));
+  const el = document.querySelector(`.room-item[data-room-id="${room.id}"]`);
+  if (el) el.classList.add('active');
+
+  activeRoomId = room.id;
+
+  // نروحو للغرفة
+  const cx = -totalW / 2 + ROOM / 2 + room.gridX * (ROOM + WALL_T);
+  const cz = -totalD / 2 + ROOM / 2 + room.gridZ * (ROOM + WALL_T);
+
+  animateCamera(
+    new THREE.Vector3(cx, 40, cz + 80),
+    new THREE.Vector3(cx, 5, cz),
+    800
+  );
+
+  showToast(`${room.icon} ${room.name}`);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  التنقل السلس
+// ═══════════════════════════════════════════════════════════
+
+let camAnim = null;
+
+function animateCamera(targetPos, targetLook, duration) {
+  if (camAnim) camAnim.cancelled = true;
+
+  const startPos = camera.position.clone();
+  const startLook = controls.target.clone();
+  const startTime = performance.now();
+
+  camAnim = { cancelled: false };
+
+  const anim = camAnim;
+
+  function step() {
+    if (anim.cancelled) return;
+
+    const t = Math.min(1, (performance.now() - startTime) / duration);
+    const ease = 1 - Math.pow(1 - t, 3);
+
+    camera.position.lerpVectors(startPos, targetPos, ease);
+    controls.target.lerpVectors(startLook, targetLook, ease);
+    controls.update();
+
+    if (t < 1) requestAnimationFrame(step);
+  }
+
+  step();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  علامة YOU فوق المواطن
+// ═══════════════════════════════════════════════════════════
+
+const youLabel = document.getElementById('youLabel');
+const youPos = new THREE.Vector3();
+const YOU_WORLD_POS = new THREE.Vector3(0, 2.5, totalD / 2 + 15);
+
+// نحدّث موقع الـ YOU label كل فريم
+function updateYouLabel() {
+  youPos.copy(YOU_WORLD_POS);
+  youPos.y += 2; // فوق الرأس
+
+  youPos.project(camera);
+
+  if (youPos.z > 1) {
+    youLabel.classList.remove('show');
+    return;
+  }
+
+  const x = (youPos.x * 0.5 + 0.5) * window.innerWidth;
+  const y = (-youPos.y * 0.5 + 0.5) * window.innerHeight;
+
+  youLabel.style.left = x + 'px';
+  youLabel.style.top = y + 'px';
+  youLabel.classList.add('show');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  شريط التنقل السفلي
+// ═══════════════════════════════════════════════════════════
+
+let currentView = 'move';
+
+function changeView(view) {
+  currentView = view;
+  document.querySelectorAll('.bar-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+
+  if (view === 'move') {
+    animateCamera(
+      new THREE.Vector3(-150, 120, 200),
+      new THREE.Vector3(0, 10, 0),
+      900
+    );
+    showToast('🕹️ وضع الحركة');
+  }
+  else if (view === 'football') {
+    // الملعب
+    animateCamera(
+      new THREE.Vector3(0, 60, BUILDING_D / 2 + 250),
+      new THREE.Vector3(0, 0, BUILDING_D / 2 + 130),
+      900
+    );
+    showToast('⚽ ملعب كرة القدم');
+  }
+  else if (view === 'full') {
+    // عرض كامل
+    animateCamera(
+      new THREE.Vector3(0, 250, 350),
+      new THREE.Vector3(0, 0, 0),
+      1000
+    );
+    showToast('🔍 عرض كامل');
+  }
+  else if (view === 'neighbourhood') {
+    // الحي
+    animateCamera(
+      new THREE.Vector3(-300, 150, 100),
+      new THREE.Vector3(-200, 20, -BUILDING_D / 2 - 100),
+      900
+    );
+    showToast('🏘️ الحي المجاور');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  الجولة السياحية
+// ═══════════════════════════════════════════════════════════
+
+let tourRunning = false;
+let tourIndex = 0;
+
+function takeTour() {
+  if (tourRunning) {
+    tourRunning = false;
+    showToast('⏹️ تم إيقاف الجولة');
+    return;
+  }
+
+  tourRunning = true;
+  tourIndex = 0;
+  showToast('🎬 بدأ الجولة');
+  runTourStep();
+}
+
+function runTourStep() {
+  if (!tourRunning) return;
+  if (tourIndex >= roomGrid.length) {
+    tourRunning = false;
+    showToast('✅ انتهت الجولة');
+    // نرجع للوضع الأول
+    animateCamera(
+      new THREE.Vector3(-150, 120, 200),
+      new THREE.Vector3(0, 10, 0),
+      1000
+    );
+    return;
+  }
+
+  const room = roomGrid[tourIndex];
+  focusRoom(room);
+
+  tourIndex++;
+  setTimeout(runTourStep, 3000);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  التفاعل — اضغط على الأثاث
+// ═══════════════════════════════════════════════════════════
+
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+let downPos = { x: 0, y: 0 };
+
+renderer.domElement.addEventListener('pointerdown', (e) => {
+  downPos.x = e.clientX;
+  downPos.y = e.clientY;
+});
+
+renderer.domElement.addEventListener('pointerup', (e) => {
+  const dx = e.clientX - downPos.x;
+  const dy = e.clientY - downPos.y;
+  if (Math.sqrt(dx * dx + dy * dy) > 8) return;
+
+  // نجيبو كل الغرف للتفاعل
+  const hits = raycaster.intersectObjects(roomObjects, true);
+
+  if (hits.length === 0) return;
+
+  // نطلعو للـ room group
+  let obj = hits[0].object;
+  while (obj && !obj.userData.id && obj.parent) {
+    obj = obj.parent;
+  }
+
+  if (obj && obj.userData.id) {
+    showInteractPanel(obj.userData);
+  }
+});
+
+pointer.x = 0;
+pointer.y = 0;
+
+function showInteractPanel(room) {
+  const panel = document.getElementById('interactPanel');
+  document.getElementById('iTitle').textContent = room.icon + ' ' + room.name;
+  document.getElementById('iDesc').textContent = getRoomDescription(room.id);
+
+  const openBtn = panel.querySelector('.btn-open');
+  openBtn.onclick = () => openActivity(room.activity);
+
+  panel.classList.add('show');
+}
+
+function closeInteract() {
+  document.getElementById('interactPanel').classList.remove('show');
+}
+
+function getRoomDescription(id) {
+  const descs = {
+    parliament: 'اقترح قوانين، صوّت، وشاهد الديمقراطية تعمل.',
+    court: 'اطّلع على القضايا، أو ارفع دعوى جديدة.',
+    treasury: 'ساهم في الخزينة العامة وتموّل المشاريع.',
+    president: 'أوامر الرئيس، المراسيم، والإعلانات الرسمية.',
+    market: 'اشترِ المنتجات، الأثاث، الهدايا، والمزيد.',
+    news: 'اقرأ آخر أخبار أُمّة، وانشر خبرك الخاص.',
+    rewards: 'شاهد لوحة المتصدرين، والإنجازات، والجوائز.'
+  };
+  return descs[id] || 'استكشف هذا المكان.';
+}
+
+function openActivity(activityName) {
+  closeInteract();
+  if (window.AndroidBridge && AndroidBridge.openActivity) {
+    AndroidBridge.openActivity(activityName);
+  } else {
+    showToast('⚠️ التنقل غير متاح');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  Toast
+// ═══════════════════════════════════════════════════════════
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  مسافة تحديث pointer
+// ═══════════════════════════════════════════════════════════
+
+renderer.domElement.addEventListener('pointermove', (e) => {
+  pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
+  pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
+});
+
+renderer.domElement.addEventListener('pointerup', (e) => {
+  raycaster.setFromCamera(pointer, camera);
+});
+
+// ═══════════════════════════════════════════════════════════
+//  Animation Loop
+// ═══════════════════════════════════════════════════════════
+
+let lastFrame = performance.now();
+let time = 0;
+
+function animate() {
+  requestAnimationFrame(animate);
+
+  const now = performance.now();
+  const dt = Math.min((now - lastFrame) / 1000, 0.1);
+  lastFrame = now;
+  time += dt;
+
+  controls.update();
+
+  // نحدّث موقع YOU label
+  updateYouLabel();
+
+  renderer.render(scene, camera);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  إغلاق وربط
+// ═══════════════════════════════════════════════════════════
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// نستقبل البيانات من Android
+window.setCurrentUser = function(userId) {
+  console.log('👤 User:', userId);
+};
+
+window.showToastFromAndroid = function(msg) {
+  showToast(msg);
+};
+
+// نبلّغو Android بجاهزيتنا
+setTimeout(() => {
+  document.getElementById('loading').style.display = 'none';
+  animate();
+  console.log('✅ مكتب أُمّة جاهز');
+  console.log('📊 Rooms:', roomGrid.length);
+  console.log('📐 Total building:', totalW, '×', totalD);
+
+  if (window.AndroidBridge && AndroidBridge.onReady) {
+    AndroidBridge.onReady();
+  }
+
+  // نحدّد الغرفة الأولى في البداية
+  setTimeout(() => {
+    if (roomGrid.length > 0) {
+      focusRoom(roomGrid[0]);
+    }
+  }, 1500);
+}, 800);
+
+</script>
+</body>
+</html>

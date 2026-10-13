@@ -672,7 +672,10 @@ if (countReg != null) countReg.remove();
             case NavDrawerHelper.ITEM_HOME:
                 handleTabClick(BottomNavHelper.TAB_HOME);
                 break;
-            case NavDrawerHelper.ITEM_CITY:
+            case NavDrawerHelper.ITEM_OFFICE:
+                    startActivity(new Intent(MainActivity.this, OfficeActivity.class));
+                    break;
+                case NavDrawerHelper.ITEM_CITY:
                 try { startActivity(new Intent(this, CityMapActivity.class)); } catch (Exception ignored) {}
                 break;
             case NavDrawerHelper.ITEM_PARLIAMENT:

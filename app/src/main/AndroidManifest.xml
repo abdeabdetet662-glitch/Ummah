@@ -153,5 +153,6 @@
         <activity android:name=".NewTicketActivity" android:exported="false" android:screenOrientation="portrait" />
         <activity android:name=".SupportChatActivity" android:exported="false" android:screenOrientation="portrait" />
         
+            <activity android:name=".OfficeActivity" android:exported="false" android:screenOrientation="portrait" />
     </application>
 </manifest>
